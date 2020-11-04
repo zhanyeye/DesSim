@@ -1,7 +1,6 @@
 package cn.softeng.events;
 
 /**
- * @author: zhanyeye
  * @date: 11/4/2020 9:13 AM
  * @Description:
  * 事件数据的持有类，用于事件调度器调度未来事件

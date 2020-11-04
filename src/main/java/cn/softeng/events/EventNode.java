@@ -1,7 +1,6 @@
 package cn.softeng.events;
 
 /**
- * @author: zhanyeye
  * @date: 11/4/2020 9:15 AM
  * @Description:
  * 一个实现事件优先队列的红黑树结点, 结点指向一个事件链表,链表可能只有一个元素

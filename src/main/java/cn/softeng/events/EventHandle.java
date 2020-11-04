@@ -1,7 +1,6 @@
 package cn.softeng.events;
 
 /**
- * @author: zhanyeye
  * @date: 11/3/2020 8:53 PM
  * @Description: 用于记录一个即将调度的未来事件
  */

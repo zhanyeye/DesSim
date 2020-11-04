@@ -1,7 +1,6 @@
 package cn.softeng.events;
 
 /**
- * @author: zhanyeye
  * @date: 11/3/2020 9:19 PM
  * @Description: 事件抽象类
  */
