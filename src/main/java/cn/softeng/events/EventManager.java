@@ -450,13 +450,12 @@ public final class EventManager {
      * Must hold the lockObject when calling this method.
      */
     private void captureProcess(Process cur) {
-        // if we don't wake a new process, take one from the pool
         Process next = cur.preCapture();
+        // if we don't wake a new process, take one from the pool
         if (next == null) {
             processRunning = false;
             Process.processEvents(this);
-        }
-        else {
+        } else {
             next.wake();
         }
 
@@ -533,12 +532,15 @@ public final class EventManager {
             evt.target = t;
             evt.handle = handle;
             if (handle != null) {
-                if (handle.isScheduled())
+                if (handle.isScheduled()) {
                     throw new ProcessError("Tried to schedule using an EventHandle already in use");
+                }
                 handle.event = evt;
             }
 
-            if (trcListener != null) trcListener.traceWait(this, currentTick, nextEventTime, priority, t);
+            if (trcListener != null) {
+                trcListener.traceWait(this, currentTick, nextEventTime, priority, t);
+            }
             node.addEvent(evt, fifo);
             captureProcess(cur);
         }

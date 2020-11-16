@@ -80,6 +80,7 @@ final class Process extends Thread {
     private boolean hasNext;
 
     private boolean dieFlag;
+
     /**
      * true if Process is active
      */
@@ -127,7 +128,10 @@ final class Process extends Thread {
     @Override
     public void run() {
         while (true) {
-            // wait in pool
+            // wait in pool. why? -> look Process.getProcess()
+            // the internal of getProcess() calls Process.start(),
+            // starts the thread, pauses in waitInPool(), and the
+            // then puts it in the pool for use
             waitInPool();
 
             // Process has been woken up, execute the method we have been assigned
@@ -145,7 +149,6 @@ final class Process extends Thread {
             // Ensure all state is cleared before returning to the pool
             evt = null;
             hasNext = false;
-            // 设置该线程的事件管理器，调用它的线程，和执行目标都为空
             setup(null, null, null);
         }
     }
@@ -158,10 +161,8 @@ final class Process extends Thread {
         return evt;
     }
 
-    // Useful to filter pooled threads when staring at stack traces.
-
     /**
-     *
+     * Useful to filter pooled threads when staring at stack traces.
      */
     private void waitInPool() {
         synchronized (pool) {
@@ -180,7 +181,6 @@ final class Process extends Thread {
         }
     }
 
-
     /**
      * Setup the process state for execution.
      * Includes eventmanger, this process's waiter(caller) and target for execution
@@ -197,9 +197,7 @@ final class Process extends Thread {
         condWait = false;
     }
 
-
     /**
-     * 从线程池拉取一个线程, 尝试执行给定eventManager中的事件
      * Pull a process from the pool and have it attempt to execute events from the given eventManager
      * @param evt
      */
@@ -209,27 +207,37 @@ final class Process extends Thread {
         newProcess.wake();
     }
 
-    // Set up a new process for the given entity, method, and arguments
-    // Called from Process.start() and from EventManager.startExternalProcess()
-    static Process allocate(EventManager eventManager, Process next, ProcessTarget proc) {
+    /**
+     * Set up a new process for the given entity, method, and arguments
+     * Called by EventManager.start() and EventManager.interruptEvent()
+     * @param eventManager
+     * @param next
+     * @param target
+     * @return a new process watiting to be awakened
+     */
+    static Process allocate(EventManager eventManager, Process next, ProcessTarget target) {
         Process newProcess = Process.getProcess();
-        newProcess.setup(eventManager, next, proc);
+        newProcess.setup(eventManager, next, target);
         return newProcess;
     }
 
-    // Return a process from the pool or create a new one
+    /**
+     * Return a process from the pool or create a new one
+     * @return a process which state is cleared or null, wait for setup and wake up
+     */
     private static Process getProcess() {
         while (true) {
             synchronized (pool) {
-                // If there is an available process in the pool, then use it
                 if (pool.size() > 0) {
+                    // If there is an available process in the pool, then use it
                     return pool.remove(pool.size() - 1);
-                }
-                // If there are no process in the pool, then create a new one and add it to the pool
-                else {
+                } else {
+                    // If there are no process in the pool, then create a new one and add it to the pool
                     numProcesses++;
                     Process temp = new Process("processthread-" + numProcesses);
-                    temp.start(); // Note: Thread.start() calls Process.run which adds the new process to the pool
+                    temp.start();
+                    // Note: Thread.start() calls Process.run which adds the new process to the pool
+                    // then continue the while loop to return created process
                 }
             }
 
@@ -254,7 +262,6 @@ final class Process extends Thread {
     /**
      * This is the wrapper to allow internal code to advance the state machine by waking
      * a Process.
-     *
      */
     final void wake() {
         super.interrupt();
@@ -265,7 +272,7 @@ final class Process extends Thread {
     }
 
     /**
-     * Returns true if we woke a next Process, otherwise return false.
+     * we woke a next Process,then set nextProcess field null
      */
     synchronized final void wakeNextProcess() {
         nextProcess.wake();
@@ -274,15 +281,15 @@ final class Process extends Thread {
     }
 
     synchronized void kill() {
-        if (activeFlag)
+        if (activeFlag) {
             throw new ProcessError("Cannot terminate an active thread");
+        }
         dieFlag = true;
         this.wake();
     }
 
     /**
-     * This is used to tear down a live threadstack when an error is received from
-     * the model.
+     * This is used to tear down a live threadstack when an error is received from the model.
      */
     synchronized Process forceKillNext() {
         Process ret = nextProcess;
@@ -300,6 +307,11 @@ final class Process extends Thread {
         return dieFlag;
     }
 
+    /**
+     * Preparation before the capture process, called by EventManager.captureProcess()
+     * return nextProcess field, clear the nextProcess and hasNext state
+     * @return nextProcess
+     */
     synchronized final Process preCapture() {
         activeFlag = false;
         Process ret = nextProcess;
@@ -308,6 +320,9 @@ final class Process extends Thread {
         return ret;
     }
 
+    /**
+     * set currnet process active, and update hasNext
+     */
     synchronized final void postCapture() {
         activeFlag = true;
         hasNext = (nextProcess != null);
