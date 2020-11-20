@@ -25,6 +25,7 @@ import java.util.ArrayList;
  * 每一个线程都有一个事件管理器
  */
 public final class EventManager {
+
     public final String name;
 
     /**
@@ -393,20 +394,22 @@ public final class EventManager {
         cur.begCondWait();
         try {
             for (int i = 0; i < condEvents.size();) {
-                ConditionalEvent c = condEvents.get(i);
-                if (c.c.evaluate()) {
+                ConditionalEvent conditionalEvent = condEvents.get(i);
+                if (conditionalEvent.c.evaluate()) {
                     condEvents.remove(i);
                     EventNode node = getEventNode(currentTick, 0);
                     Event evt = getEvent();
                     evt.node = node;
-                    evt.target = c.target;
-                    evt.handle = c.handle;
+                    evt.target = conditionalEvent.target;
+                    evt.handle = conditionalEvent.handle;
                     if (evt.handle != null) {
                         // no need to check the handle.isScheduled as we just unscheduled it above
                         // and we immediately switch it to this event
                         evt.handle.event = evt;
                     }
-                    if (trcListener != null) trcListener.traceWaitUntilEnded(this, currentTick, c.target);
+                    if (trcListener != null) {
+                        trcListener.traceWaitUntilEnded(this, currentTick, conditionalEvent.target);
+                    }
                     node.addEvent(evt, true);
                     continue;
                 }
@@ -791,8 +794,9 @@ public final class EventManager {
         }
         // Catch the exception when the thread is interrupted
         catch( InterruptedException e ) {}
-        if (cur.shouldDie())
+        if (cur.shouldDie()) {
             throw new ThreadKilledException("Thread killed");
+        }
     }
 
     public static final double calcSimTime(double secs) {

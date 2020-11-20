@@ -295,9 +295,10 @@ final class Process extends Thread {
         Process ret = nextProcess;
         nextProcess = null;
         if (ret != null) {
-            // 将线程的关闭flag设置为真
+            // set Process dieFlag to true
             ret.dieFlag = true;
-            // 唤醒线程，线程被唤醒后会检查 cur.shouldDie()，从而抛出异常
+            // wake up current process, then EventManager.threadWait() will check cur.shouldDie()
+            // and throw a ThreadKilledException
             ret.wake();
         }
         return ret;
@@ -321,7 +322,8 @@ final class Process extends Thread {
     }
 
     /**
-     * set currnet process active, and update hasNext
+     * The action after capture process
+     * set current process active, and update hasNext
      */
     synchronized final void postCapture() {
         activeFlag = true;

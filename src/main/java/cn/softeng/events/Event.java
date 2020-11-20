@@ -2,10 +2,9 @@ package cn.softeng.events;
 
 /**
  * @date: 11/4/2020 9:13 AM
- * @Description:
- * 事件数据的持有类，用于事件调度器调度未来事件
- * 它是一个链表结构，同时链表头也对应一个红黑树结点
- * 当多个事件的发生时刻和优先级都相同时，这些事件会构成一个链表
+ * Holder class for event data used by the event monitor to schedule future events.
+ * Event是一个链表结构，当Event发生的tick和priority相等时，他们位于同一个链表中
+ * Event中node字段对应一个红黑树结点，只有链表的头元素需要持有一个红黑树结点的引用
  */
 final class Event extends BaseEvent {
     /**
