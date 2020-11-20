@@ -8,12 +8,12 @@ package cn.softeng.events;
  */
 final class Event extends BaseEvent {
     /**
-     * 该事件对应红黑树节点，可能为null?
+     * 该事件对应红黑树节点，事件链表的首元素会持有红黑树结点的引用
      */
     EventNode node;
 
     /**
-     * 链表元素的下一个事件，这个链表中的事件发生时间和优先级都相同
+     * 链表元素的下一个事件，该链表中的事件发生时间和优先级都相同
      */
     Event next;
 

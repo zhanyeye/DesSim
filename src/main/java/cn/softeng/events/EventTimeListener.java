@@ -18,7 +18,8 @@ package cn.softeng.events;
 
 public interface EventTimeListener {
 
-public void tickUpdate(long tick);
-public void timeRunning(boolean running);
+    public void tickUpdate(long tick);
+    public void timeRunning();
+    public void handleError(Throwable t);
 
 }

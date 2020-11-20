@@ -19,19 +19,79 @@ package cn.softeng.events;
 
 public interface EventTraceListener {
 
-public void traceEvent(EventManager e, long curTick, long tick, int priority, ProcessTarget t);
+    /**
+     * Called at the start of execution for an event.
+     * @param tick - time for the next event in clock ticks
+     * @param priority - priority of the event being executed
+     * @param t - holds the method to be executed by the event
+     */
+    public void traceEvent(long tick, int priority, ProcessTarget t);
 
-public void traceWait(EventManager e, long curTick, long tick, int priority, ProcessTarget t);
+    /**
+     * Called when a future event is scheduled by a 'wait' method.
+     * @param tick - time for the next event in clock ticks
+     * @param priority - priority of the event to be executed
+     * @param t - holds the method to be executed by the event
+     */
+    public void traceWait(long tick, int priority, ProcessTarget t);
 
-public void traceSchedProcess(EventManager e, long curTick, long tick, int priority, ProcessTarget t);
+    /**
+     * Called when a future event is scheduled by a 'schedule' or 'scheduleProcessExternal' method.
+     * @param tick - time for the next event in clock ticks
+     * @param priority - priority of the event to be executed
+     * @param t - holds the method to be executed by the event
+     */
+    public void traceSchedProcess(long tick, int priority, ProcessTarget t);
 
-public void traceProcessStart(EventManager e, ProcessTarget t, long tick);
-public void traceProcessEnd(EventManager e, long tick);
+    /**
+     * Called when a new process is started by a 'startProcess' method.
+     * @param t - holds the method to be executed by the process
+     */
+    public void traceProcessStart(ProcessTarget t);
 
-public void traceInterrupt(EventManager e, long curTick, long tick, int priority, ProcessTarget t);
-public void traceKill(EventManager e, long curTick, long tick, int priority, ProcessTarget t);
+    /**
+     * Called when a process finishes execution.
+     */
+    public void traceProcessEnd();
 
-public void traceWaitUntil(EventManager e, long tick);
-public void traceWaitUntilEnded(EventManager e, long tick, ProcessTarget t);
+    /**
+     * Called at the start of execution for a future event that has been re-scheduled for immediate
+     * execution.
+     * @param tick - time for the next event in clock ticks
+     * @param priority - priority of the event being executed
+     * @param t - holds the method to be executed by the event
+     */
+    public void traceInterrupt(long tick, int priority, ProcessTarget t);
+
+    /**
+     * Called when a future event is cancelled.
+     * @param tick - time for the next event in clock ticks
+     * @param priority - priority of the event being cancelled
+     * @param t - holds the method to be executed by the cancelled event
+     */
+    public void traceKill(long tick, int priority, ProcessTarget t);
+
+    /**
+     * Called when a conditional event has been scheduled by a 'waitUntil' method.
+     */
+    public void traceWaitUntil();
+
+    /**
+     * Called when a conditional event has been scheduled by a 'scheduleUntil' method.
+     */
+    public void traceSchedUntil(ProcessTarget t);
+
+    /**
+     * Called when a conditional event's condition is evaluated.
+     * @param t - holds the method to be executed by the conditional event
+     */
+    public void traceConditionalEval(ProcessTarget t);
+
+    /**
+     * Called when the evaluation of conditional event's condition has finished.
+     * @param wakeup - true if the conditional event is now scheduled after evaluating the condition
+     * @param t - holds the method to be executed by the conditional event
+     */
+    public void traceConditionalEvalEnded(boolean wakeup, ProcessTarget t);
 
 }

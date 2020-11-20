@@ -1,12 +1,13 @@
 package cn.softeng.events;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The EventManager is responsible for scheduling future events, controlling
  * conditional event evaluation, and advancing the simulation time. Events are
  * scheduled in based on:
- * EventManager负责调度未来事件、控制条件事件计算和推进仿真时间。事件调度基于以下规则:
  * <ul>
  * <li>1 - The execution time scheduled for the event
  * <li>2 - The priority of the event (if scheduled to occur at the same time)
@@ -20,44 +21,28 @@ import java.util.ArrayList;
  * Most EventManager functionality is available through static methods that rely
  * on being in a running model context which will access the eventmanager that is
  * currently running, think of it like a thread-local variable for all model threads.
- * 大多数EventManager功能都是通过静态方法提供的，这些静态方法依赖于运行中的模型上下文来访问当前运行的EventManager，
- * 可以把它看作是所有模型线程的一个线程局部变量。
- * 每一个线程都有一个事件管理器
  */
 public final class EventManager {
-
     public final String name;
 
     /**
      * Object used as global lock for synchronization
-     * 全局同步锁
      */
     private final Object lockObject;
 
     /**
-     * 事件的优先队列
+     * Event priority queue
      */
     private final EventTree eventTree;
 
-    /**
-     *
-     */
+    private final AtomicBoolean isRunning;
+    private final AtomicLong currentTick;
     private volatile boolean executeEvents;
-
-    /**
-     *
-     */
     private boolean processRunning;
+    private boolean disableSchedule;
 
-    /**
-     *
-     */
     private final ArrayList<ConditionalEvent> condEvents;
 
-    /**
-     * Master simulation time (long)
-     */
-    private long currentTick;
     /**
      * The next tick to execute events at
      */
@@ -67,18 +52,23 @@ public final class EventManager {
      */
     private long targetTick;
     /**
+     * execute a single event
+     */
+    private boolean oneEvent;
+    /**
+     * execute all the events at the next simulation time
+     */
+    private boolean oneSimTime;
+    /**
      * The number of discrete ticks per simulated second
-     * 每秒的仿真执行刻度数
      */
     private double ticksPerSecond;
     /**
      * The length of time in seconds each tick represents
-     * 每一个仿真刻度所需要的秒数
      */
     private double secsPerTick;
 
     // Real time execution state
-
     /**
      * the simulation tick corresponding to the wall-clock millis value
      */
@@ -88,36 +78,16 @@ public final class EventManager {
      */
     private long realTimeMillis;
 
-    /**
-     * TRUE if the simulation is to be executed in Real Time mode
-     */
-    private volatile boolean executeRealTime;
-    /**
-     * TRUE if the time keeping for Real Time model needs re-basing
-     */
-    private volatile boolean rebaseRealTime;
-    /**
-     * target ratio of elapsed simulation time to elapsed wall clock time
-     */
-    private volatile int realTimeFactor;
+    private volatile boolean executeRealTime;  // TRUE if the simulation is to be executed in Real Time mode
+    private volatile boolean rebaseRealTime;   // TRUE if the time keeping for Real Time model needs re-basing
+    private volatile double realTimeFactor;    // target ratio of elapsed simulation time to elapsed wall clock time
 
-    /**
-     * 时间监听器，用于向gui更新仿真时间和仿真转态
-     */
     private EventTimeListener timelistener;
-    /**
-     * 错误监听器，用于向gui发送错误信息
-     */
-    private EventErrorListener errListener;
-    /**
-     *
-     */
     private EventTraceListener trcListener;
 
     /**
      * Allocates a new EventManager with the given parent and name
-     * 实例化一个新的事件管理器
-     * @param parent the connection point for this EventManager in the tree
+     *
      * @param name the name this EventManager should use
      */
     public EventManager(String name) {
@@ -126,21 +96,25 @@ public final class EventManager {
         lockObject = new Object();
 
         // Initialize and event lists and timekeeping variables
-        currentTick = 0;
+        currentTick = new AtomicLong(0);
         nextTick = 0;
-        // 调用该函数设置secsPerTick为1e-6d, 即 1 秒中 1000000 tick
+        oneEvent = false;
+        oneSimTime = false;
+
+        // set tick length to 0.000001s = 0.001ms (1000000 tick for 1s = 1000 tick for 1ms)
         setTickLength(1e-6d);
 
         eventTree = new EventTree();
         condEvents = new ArrayList<>();
 
+        isRunning = new AtomicBoolean(false);
         executeEvents = false;
         processRunning = false;
+        disableSchedule = false;
         executeRealTime = false;
         realTimeFactor = 1;
         rebaseRealTime = true;
         setTimeListener(null);
-        setErrorListener(null);
     }
 
     /**
@@ -149,25 +123,10 @@ public final class EventManager {
      */
     public final void setTimeListener(EventTimeListener l) {
         synchronized (lockObject) {
-            if (l != null)
-                timelistener = l;
-            else
-                timelistener = new NoopListener();
-
-            timelistener.tickUpdate(currentTick);
-        }
-    }
-
-    /**
-     * 设置错误监听器
-     * @param l
-     */
-    public final void setErrorListener(EventErrorListener l) {
-        synchronized (lockObject) {
             if (l != null) {
-                errListener = l;
+                timelistener = l;
             } else {
-                errListener = new NoopListener();
+                timelistener = new NoopListener();
             }
         }
     }
@@ -187,10 +146,9 @@ public final class EventManager {
      */
     public void clear() {
         synchronized (lockObject) {
-            currentTick = 0;
+            currentTick.set(0);
             nextTick = 0;
             targetTick = Long.MAX_VALUE;
-            timelistener.tickUpdate(currentTick);
             rebaseRealTime = true;
 
             eventTree.runOnAllNodes(new KillAllEvents());
@@ -226,7 +184,6 @@ public final class EventManager {
         }
     }
 
-
     /**
      * 线程cur执行事件目标
      * the return from execute target informs whether or not this thread should grab an new Event, or return to the pool
@@ -241,31 +198,27 @@ public final class EventManager {
             // 只有 waitTarget 的getProcess 才不为空
             Process p = t.getProcess();
             if (p != null) {
-                // 记录cur线程为调用该线程的父线程
                 p.setNextProcess(cur);
-                // 唤醒已经被event捕获的线程
                 p.wake();
-                // 让当前线程休眠
+                // the cur process waits until process p finishes executing
                 threadWait(cur);
-
-                // 通知 execute() 继续获取事件执行
                 return true;
             }
 
             // Execute the method
-            // 执行进程目标的任务
             t.process();
 
             // Notify the event manager that the process has been completed
-            if (trcListener != null) trcListener.traceProcessEnd(this, currentTick);
-            // 如果有该线程是其他线程的子线程，则唤醒它的父线程，并释放该线程回线程池
+            if (trcListener != null) {
+                disableSchedule();
+                trcListener.traceProcessEnd();
+                enableSchedule();
+            }
             if (cur.hasNext()) {
-                // 唤醒它的父线程
                 cur.wakeNextProcess();
-                // 返回false: 表示当前线程有父线程等待，需唤醒父线程，将该线程返回线程池
                 return false;
-            } else {
-                // 返回true: 表示当前线程没有父线程等待， 通知 execute() 继续获取事件执行
+            }
+            else {
                 return true;
             }
         } catch (Throwable e) {
@@ -274,14 +227,14 @@ public final class EventManager {
                 return false;
 
             // Tear down any threads waiting for this to finish
-            // 说明执行t.process()时出现了异常,删除任何等待此操作完成的线程
             Process next = cur.forceKillNext();
             while (next != null) {
                 next = next.forceKillNext();
             }
             executeEvents = false;
             processRunning = false;
-            errListener.handleError(this, e, currentTick);
+            isRunning.set(false);
+            timelistener.handleError(e);
             return false;
         }
     }
@@ -303,52 +256,56 @@ public final class EventManager {
                 return;
 
             processRunning = true;
-            timelistener.timeRunning(true);
+            enableSchedule();
+            isRunning.set(true);
+            timelistener.timeRunning();
 
             // Loop continuously
             while (true) {
-                // 从优先队列中取出最近的事件
                 EventNode nextNode = eventTree.getNextNode();
-                if (nextNode == null || currentTick >= targetTick) {
-                    // 如果优先队列为空或已经到达目标时间，则结束循环
+                if (nextNode == null ||
+                        currentTick.get() >= targetTick) {
                     executeEvents = false;
                 }
 
                 if (!executeEvents) {
                     processRunning = false;
-                    timelistener.timeRunning(false);
+                    isRunning.set(false);
+                    timelistener.timeRunning();
                     return;
                 }
 
                 // If the next event is at the current tick, execute it
-                if (nextNode.schedTick == currentTick) {
+                if (nextNode.schedTick == currentTick.get()) {
                     // Remove the event from the future events
-                    // 因为EventNode是一个发生时间相同，优先级也相同的事件的链表，所以取出链表头元素
                     Event nextEvent = nextNode.head;
-                    // 获取这个链表头元素的执行目标
                     ProcessTarget nextTarget = nextEvent.target;
                     if (trcListener != null) {
-                        trcListener.traceEvent(this, currentTick, nextNode.schedTick, nextNode.priority, nextTarget);
+                        disableSchedule();
+                        trcListener.traceEvent(nextNode.schedTick, nextNode.priority, nextTarget);
+                        enableSchedule();
                     }
-                    // 删除这个头元素
+
                     removeEvent(nextEvent);
 
                     // the return from execute target informs whether or not this
                     // thread should grab an new Event, or return to the pool
-                    if (executeTarget(cur, nextTarget)) {
-                        // 继续获取事件执行, 从队列中取出事件继续执行
-                        continue;
-                    } else {
-                        // 释放线程到线程池
-                        return;
+                    boolean bool = executeTarget(cur, nextTarget);
+                    if (oneEvent) {
+                        oneEvent = false;
+                        executeEvents = false;
                     }
+                    if (bool)
+                        continue;
+                    else
+                        return;
                 }
 
                 // If the next event would require us to advance the time, check the
                 // conditonal events
                 if (eventTree.getNextNode().schedTick > nextTick) {
                     if (condEvents.size() > 0) {
-                        evaluateConditions(cur);
+                        evaluateConditions();
                         if (!executeEvents) continue;
                     }
 
@@ -356,7 +313,7 @@ public final class EventManager {
                     // beginning of the eventStack for the current tick, go back to the
                     // beginning, otherwise fall through to the time-advance
                     nextTick = eventTree.getNextNode().schedTick;
-                    if (nextTick == currentTick)
+                    if (nextTick == currentTick.get())
                         continue;
                 }
 
@@ -366,8 +323,8 @@ public final class EventManager {
                     long realTick = this.calcRealTimeTick();
                     if (realTick < nextTick && realTick < targetTick) {
                         // Update the displayed simulation time
-                        currentTick = realTick;
-                        timelistener.tickUpdate(currentTick);
+                        currentTick.set(realTick);
+                        timelistener.tickUpdate(currentTick.get());
                         //Halt the thread for 20ms and then reevaluate the loop
                         try { lockObject.wait(20); } catch( InterruptedException e ) {}
                         continue;
@@ -375,40 +332,61 @@ public final class EventManager {
                 }
 
                 // advance time
-                if (targetTick < nextTick) {
-                    currentTick = targetTick;
-                } else {
-                    currentTick = nextTick;
-                }
+                if (targetTick < nextTick)
+                    currentTick.set(targetTick);
+                else
+                    currentTick.set(nextTick);
 
-                timelistener.tickUpdate(currentTick);
+                timelistener.tickUpdate(currentTick.get());
+
+                if (oneSimTime) {
+                    executeEvents = false;
+                    oneSimTime = false;
+                }
             }
         }
     }
 
-    /**
-     *
-     * @param cur
-     */
-    private void evaluateConditions(Process cur) {
-        cur.begCondWait();
+    public void nextOneEvent(double simTime) {
+        oneEvent = true;
+        resume(this.secondsToNearestTick(simTime));
+    }
+
+    public void nextEventTime(double simTime) {
+        oneSimTime = true;
+        resume(this.secondsToNearestTick(simTime));
+    }
+
+    public final long getTicks() {
+        return currentTick.get();
+    }
+
+    public final boolean isRunning() {
+        return isRunning.get();
+    }
+
+    private void evaluateConditions() {
+        // Protecting the conditional evaluate() callbacks and the traceWaitUntilEnded callback
+        disableSchedule();
         try {
             for (int i = 0; i < condEvents.size();) {
-                ConditionalEvent conditionalEvent = condEvents.get(i);
-                if (conditionalEvent.c.evaluate()) {
+                ConditionalEvent c = condEvents.get(i);
+                if (trcListener != null)
+                    trcListener.traceConditionalEval(c.target);
+                boolean bool = c.c.evaluate();
+                if (trcListener != null)
+                    trcListener.traceConditionalEvalEnded(bool, c.target);
+                if (bool) {
                     condEvents.remove(i);
-                    EventNode node = getEventNode(currentTick, 0);
+                    EventNode node = getEventNode(currentTick.get(), 0);
                     Event evt = getEvent();
                     evt.node = node;
-                    evt.target = conditionalEvent.target;
-                    evt.handle = conditionalEvent.handle;
+                    evt.target = c.target;
+                    evt.handle = c.handle;
                     if (evt.handle != null) {
                         // no need to check the handle.isScheduled as we just unscheduled it above
                         // and we immediately switch it to this event
                         evt.handle.event = evt;
-                    }
-                    if (trcListener != null) {
-                        trcListener.traceWaitUntilEnded(this, currentTick, conditionalEvent.target);
                     }
                     node.addEvent(evt, true);
                     continue;
@@ -419,10 +397,11 @@ public final class EventManager {
         catch (Throwable e) {
             executeEvents = false;
             processRunning = false;
-            errListener.handleError(this, e, currentTick);
+            isRunning.set(false);
+            timelistener.handleError(e);
         }
 
-        cur.endCondWait();
+        enableSchedule();
     }
 
     /**
@@ -433,7 +412,7 @@ public final class EventManager {
     private long calcRealTimeTick() {
         long curMS = System.currentTimeMillis();
         if (rebaseRealTime) {
-            realTimeTick = currentTick;
+            realTimeTick = currentTick.get();
             realTimeMillis = curMS;
             rebaseRealTime = false;
         }
@@ -453,12 +432,13 @@ public final class EventManager {
      * Must hold the lockObject when calling this method.
      */
     private void captureProcess(Process cur) {
-        Process next = cur.preCapture();
         // if we don't wake a new process, take one from the pool
+        Process next = cur.preCapture();
         if (next == null) {
             processRunning = false;
             Process.processEvents(this);
-        } else {
+        }
+        else {
             next.wake();
         }
 
@@ -467,7 +447,6 @@ public final class EventManager {
     }
 
     /**
-     * 计算系统当前刻度 + 等待刻度， 要考虑数据溢出的情况
      * Calculate the time for an event taking into account numeric overflow.
      * Must hold the lockObject when calling this method
      */
@@ -477,7 +456,7 @@ public final class EventManager {
             throw new ProcessError("Negative duration wait is invalid, waitLength = " + waitLength);
 
         // Check for numeric overflow of internal time
-        long nextEventTime = currentTick + waitLength;
+        long nextEventTime = currentTick.get() + waitLength;
         if (nextEventTime < 0)
             nextEventTime = Long.MAX_VALUE;
 
@@ -487,13 +466,11 @@ public final class EventManager {
     /**
      * Pause the execution of the current Process and schedule it to wake up at a future
      * time in the controlling EventManager,
-     * @throws ProcessError if called outside of a Process context
-     *
-     * @param waitLength the number of ticks in the future to wake at
-     * @param eventPriority the priority of the scheduled wakeup event
+     * @param ticks the number of ticks in the future to wake at
+     * @param priority the priority of the scheduled wakeup event
      * @param fifo break ties with previously scheduled events using FIFO/LIFO ordering
-     * @param t the process target to run when the event is executed
      * @param handle an optional handle to hold onto the scheduled event
+     * @throws ProcessError if called outside of a Process context
      */
     public static final void waitTicks(long ticks, int priority, boolean fifo, EventHandle handle) {
         Process cur = Process.current();
@@ -503,13 +480,11 @@ public final class EventManager {
     /**
      * Pause the execution of the current Process and schedule it to wake up at a future
      * time in the controlling EventManager,
-     * @throws ProcessError if called outside of a Process context
-     *
      * @param secs the number of seconds in the future to wake at
-     * @param eventPriority the priority of the scheduled wakeup event
+     * @param priority the priority of the scheduled wakeup event
      * @param fifo break ties with previously scheduled events using FIFO/LIFO ordering
-     * @param t the process target to run when the event is executed
      * @param handle an optional handle to hold onto the scheduled event
+     * @throws ProcessError if called outside of a Process context
      */
     public static final void waitSeconds(double secs, int priority, boolean fifo, EventHandle handle) {
         Process cur = Process.current();
@@ -525,32 +500,30 @@ public final class EventManager {
      * @param priority the priority of the scheduled event: 1 is the highest priority (default is priority 5)
      */
     private void waitTicks(Process cur, long ticks, int priority, boolean fifo, EventHandle handle) {
-        synchronized (lockObject) {
-            cur.checkCondWait();
-            long nextEventTime = calculateEventTime(ticks);
-            WaitTarget t = new WaitTarget(cur);
-            EventNode node = getEventNode(nextEventTime, priority);
-            Event evt = getEvent();
-            evt.node = node;
-            evt.target = t;
-            evt.handle = handle;
-            if (handle != null) {
-                if (handle.isScheduled()) {
-                    throw new ProcessError("Tried to schedule using an EventHandle already in use");
-                }
-                handle.event = evt;
-            }
-
-            if (trcListener != null) {
-                trcListener.traceWait(this, currentTick, nextEventTime, priority, t);
-            }
-            node.addEvent(evt, fifo);
-            captureProcess(cur);
+        assertCanSchedule();
+        long nextEventTime = calculateEventTime(ticks);
+        WaitTarget t = new WaitTarget(cur);
+        EventNode node = getEventNode(nextEventTime, priority);
+        Event evt = getEvent();
+        evt.node = node;
+        evt.target = t;
+        evt.handle = handle;
+        if (handle != null) {
+            if (handle.isScheduled())
+                throw new ProcessError("Tried to schedule using an EventHandle already in use");
+            handle.event = evt;
         }
+
+        if (trcListener != null) {
+            disableSchedule();
+            trcListener.traceWait(nextEventTime, priority, t);
+            enableSchedule();
+        }
+        node.addEvent(evt, fifo);
+        captureProcess(cur);
     }
 
     /**
-     * 查找指定的事件节点，如果没有则按照参数创建一个
      * Find an eventNode in the list, if a node is not found, create one and
      * insert it.
      */
@@ -559,11 +532,6 @@ public final class EventManager {
     }
 
     private Event freeEvents = null;
-
-    /**
-     * 创建一个事件
-     * @return
-     */
     private Event getEvent() {
         if (freeEvents != null) {
             Event evt = freeEvents;
@@ -589,19 +557,21 @@ public final class EventManager {
      * the thread stack.
      */
     private void waitUntil(Process cur, Conditional cond, EventHandle handle) {
-        synchronized (lockObject) {
-            cur.checkCondWait();
-            WaitTarget t = new WaitTarget(cur);
-            ConditionalEvent evt = new ConditionalEvent(cond, t, handle);
-            if (handle != null) {
-                if (handle.isScheduled())
-                    throw new ProcessError("Tried to waitUntil using a handle already in use");
-                handle.event = evt;
-            }
-            condEvents.add(evt);
-            if (trcListener != null) trcListener.traceWaitUntil(this, currentTick);
-            captureProcess(cur);
+        assertCanSchedule();
+        WaitTarget t = new WaitTarget(cur);
+        ConditionalEvent evt = new ConditionalEvent(cond, t, handle);
+        if (handle != null) {
+            if (handle.isScheduled())
+                throw new ProcessError("Tried to waitUntil using a handle already in use");
+            handle.event = evt;
         }
+        condEvents.add(evt);
+        if (trcListener != null) {
+            disableSchedule();
+            trcListener.traceWaitUntil();
+            enableSchedule();
+        }
+        captureProcess(cur);
     }
 
     public static final void scheduleUntil(ProcessTarget t, Conditional cond, EventHandle handle) {
@@ -610,16 +580,18 @@ public final class EventManager {
     }
 
     private void schedUntil(Process cur, ProcessTarget t, Conditional cond, EventHandle handle) {
-        synchronized (lockObject) {
-            cur.checkCondWait();
-            ConditionalEvent evt = new ConditionalEvent(cond, t, handle);
-            if (handle != null) {
-                if (handle.isScheduled())
-                    throw new ProcessError("Tried to scheduleUntil using a handle already in use");
-                handle.event = evt;
-            }
-            condEvents.add(evt);
-            if (trcListener != null) trcListener.traceWaitUntil(this, currentTick);
+        assertCanSchedule();
+        ConditionalEvent evt = new ConditionalEvent(cond, t, handle);
+        if (handle != null) {
+            if (handle.isScheduled())
+                throw new ProcessError("Tried to scheduleUntil using a handle already in use");
+            handle.event = evt;
+        }
+        condEvents.add(evt);
+        if (trcListener != null) {
+            disableSchedule();
+            trcListener.traceSchedUntil(t);
+            enableSchedule();
         }
     }
 
@@ -631,19 +603,20 @@ public final class EventManager {
     private void start(Process cur, ProcessTarget t) {
         Process newProcess = Process.allocate(this, cur, t);
         // Notify the eventManager that a new process has been started
-        synchronized (lockObject) {
-            cur.checkCondWait();
-            if (trcListener != null) trcListener.traceProcessStart(this, t, currentTick);
-            // Transfer control to the new process
-            newProcess.wake();
-            threadWait(cur);
+        assertCanSchedule();
+        if (trcListener != null) {
+            disableSchedule();
+            trcListener.traceProcessStart(t);
+            enableSchedule();
         }
+        // Transfer control to the new process
+        newProcess.wake();
+        threadWait(cur);
     }
 
     /**
      * Remove an event from the eventList, must hold the lockObject.
      * @param idx
-     * @return
      */
     private void removeEvent(Event evt) {
         EventNode node = evt.node;
@@ -693,27 +666,29 @@ public final class EventManager {
      *	Removes an event from the pending list without executing it.
      */
     private void killEvent(Process cur, EventHandle handle) {
-        synchronized (lockObject) {
-            cur.checkCondWait();
+        assertCanSchedule();
 
-            // no handle given, or Handle was not scheduled, nothing to do
-            if (handle == null || handle.event == null)
-                return;
+        // no handle given, or Handle was not scheduled, nothing to do
+        if (handle == null || handle.event == null)
+            return;
 
-            if (trcListener != null) trcKill(handle.event);
-            ProcessTarget t = rem(handle);
-
-            t.kill();
+        if (trcListener != null) {
+            disableSchedule();
+            trcKill(handle.event);
+            enableSchedule();
         }
+        ProcessTarget t = rem(handle);
+
+        t.kill();
     }
 
     private void trcKill(BaseEvent event) {
         if (event instanceof Event) {
             EventNode node = ((Event)event).node;
-            trcListener.traceKill(this, currentTick, node.schedTick, node.priority, event.target);
+            trcListener.traceKill(node.schedTick, node.priority, event.target);
         }
         else {
-            trcListener.traceKill(this, currentTick, -1, -1, event.target);
+            trcListener.traceKill(-1, -1, event.target);
         }
     }
 
@@ -731,36 +706,40 @@ public final class EventManager {
      *	Removes an event from the pending list and executes it.
      */
     private void interruptEvent(Process cur, EventHandle handle) {
-        synchronized (lockObject) {
-            cur.checkCondWait();
+        assertCanSchedule();
 
-            // no handle given, or Handle was not scheduled, nothing to do
-            if (handle == null || handle.event == null)
-                return;
+        // no handle given, or Handle was not scheduled, nothing to do
+        if (handle == null || handle.event == null)
+            return;
 
-            if (trcListener != null) trcInterrupt(handle.event);
-            ProcessTarget t = rem(handle);
-
-            Process proc = t.getProcess();
-            if (proc == null)
-                proc = Process.allocate(this, cur, t);
-            proc.setNextProcess(cur);
-            proc.wake();
-            threadWait(cur);
+        if (trcListener != null) {
+            disableSchedule();
+            trcInterrupt(handle.event);
+            enableSchedule();
         }
+        ProcessTarget t = rem(handle);
+
+        Process proc = t.getProcess();
+        if (proc == null)
+            proc = Process.allocate(this, cur, t);
+        proc.setNextProcess(cur);
+        proc.wake();
+        threadWait(cur);
     }
 
     private void trcInterrupt(BaseEvent event) {
         if (event instanceof Event) {
             EventNode node = ((Event)event).node;
-            trcListener.traceInterrupt(this, currentTick, node.schedTick, node.priority, event.target);
+            trcListener.traceInterrupt(node.schedTick, node.priority, event.target);
         }
         else {
-            trcListener.traceInterrupt(this, currentTick, -1, -1, event.target);
+            trcListener.traceInterrupt(-1, -1, event.target);
         }
     }
 
-    public void setExecuteRealTime(boolean useRealTime, int factor) {
+    public void setExecuteRealTime(boolean useRealTime, double factor) {
+        if (useRealTime == executeRealTime && factor == realTimeFactor)
+            return;
         executeRealTime = useRealTime;
         realTimeFactor = factor;
         if (useRealTime)
@@ -794,44 +773,14 @@ public final class EventManager {
         }
         // Catch the exception when the thread is interrupted
         catch( InterruptedException e ) {}
-        if (cur.shouldDie()) {
+        if (cur.shouldDie())
             throw new ThreadKilledException("Thread killed");
-        }
     }
 
-    public static final double calcSimTime(double secs) {
-        EventManager evt = Process.current().evt();
-        long ticks = evt.secondsToNearestTick(secs) + evt.currentTick;
-        if (ticks < 0)
-            ticks = Long.MAX_VALUE;
-
-        return evt.ticksToSeconds(ticks);
-    }
-
-    public static final long calcSimTicks(double secs) {
-        EventManager evt = Process.current().evt();
-        long ticks = evt.secondsToNearestTick(secs) + evt.currentTick;
-        if (ticks < 0)
-            ticks = Long.MAX_VALUE;
-
-        return ticks;
-    }
-
-    /**
-     * 将进程目标合成为Event节点, 插入事件队列中
-     * @param waitLength 等待刻度
-     * @param eventPriority 事件优先级
-     * @param fifo 进出队列方式
-     * @param t 进程目标
-     * @param handle
-     */
     public void scheduleProcessExternal(long waitLength, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
         synchronized (lockObject) {
-            // 调度事件 = 系统当前时刻 + 等待时刻
             long schedTick = calculateEventTime(waitLength);
-            // 根据时刻和优先级创建一个节点
             EventNode node = getEventNode(schedTick, eventPriority);
-            // 创建一个Event, 设置Event对应的节点，执行目标t, 等
             Event evt = getEvent();
             evt.node = node;
             evt.target = t;
@@ -841,21 +790,28 @@ public final class EventManager {
                     throw new ProcessError("Tried to schedule using an EventHandle already in use");
                 handle.event = evt;
             }
-            if (trcListener != null) trcListener.traceSchedProcess(this, currentTick, schedTick, eventPriority, t);
-            // 将事件添加到对应节点，（这个节点已经在队列中）
+            // FIXME: this is the only callback that does not occur in Process context, disable for now
+            //if (trcListener != null)
+            //	trcListener.traceSchedProcess(this, currentTick.get(), schedTick, eventPriority, t);
             node.addEvent(evt, fifo);
+
+            // During real-time waits an event can be inserted becoming the next event to execute
+            // If nextTick is not updated, we can fall through the entire time update code and not
+            // execute this event, leading to the state machine becoming broken
+            if (nextTick > eventTree.getNextNode().schedTick)
+                nextTick = eventTree.getNextNode().schedTick;
         }
     }
 
     /**
      * Schedule a future event in the controlling EventManager for the current Process.
-     * @throws ProcessError if called outside of a Process context
      *
      * @param waitLength the number of ticks in the future to schedule this event
      * @param eventPriority the priority of the scheduled event
      * @param fifo break ties with previously scheduled events using FIFO/LIFO ordering
      * @param t the process target to run when the event is executed
      * @param handle an optional handle to hold onto the scheduled event
+     * @throws ProcessError if called outside of a Process context
      */
     public static final void scheduleTicks(long waitLength, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
         Process cur = Process.current();
@@ -864,13 +820,14 @@ public final class EventManager {
 
     /**
      * Schedule a future event in the controlling EventManager for the current Process.
-     * @throws ProcessError if called outside of a Process context
      *
      * @param secs the number of seconds in the future to schedule this event
      * @param eventPriority the priority of the scheduled event
      * @param fifo break ties with previously scheduled events using FIFO/LIFO ordering
      * @param t the process target to run when the event is executed
      * @param handle an optional handle to hold onto the scheduled event
+     *
+     * @throws ProcessError if called outside of a Process context
      */
     public static final void scheduleSeconds(double secs, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
         Process cur = Process.current();
@@ -878,17 +835,8 @@ public final class EventManager {
         cur.evt().scheduleTicks(cur, ticks, eventPriority, fifo, t, handle);
     }
 
-    /**
-     *
-     * @param cur 执行的线程
-     * @param waitLength 等待多久tick后发生
-     * @param eventPriority 事件优先级
-     * @param fifo
-     * @param t 执行目标
-     * @param handle
-     */
     private void scheduleTicks(Process cur, long waitLength, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
-        cur.checkCondWait();
+        assertCanSchedule();
         long schedTick = calculateEventTime(waitLength);
         EventNode node = getEventNode(schedTick, eventPriority);
         Event evt = getEvent();
@@ -900,7 +848,11 @@ public final class EventManager {
                 throw new ProcessError("Tried to schedule using an EventHandle already in use");
             handle.event = evt;
         }
-        if (trcListener != null) trcListener.traceSchedProcess(this, currentTick, schedTick, eventPriority, t);
+        if (trcListener != null) {
+            disableSchedule();
+            trcListener.traceSchedProcess(schedTick, eventPriority, t);
+            enableSchedule();
+        }
         node.addEvent(evt, fifo);
     }
 
@@ -921,16 +873,22 @@ public final class EventManager {
      * in case the eventManager thread has already been paused and needs to
      * resume the event execution loop.  This prevents the model being resumed
      * from an inconsistent state.
+     * @param targetTicks - clock ticks at which to pause
      */
     public void resume(long targetTicks) {
         synchronized (lockObject) {
-            targetTick = targetTicks;
+
+            // Ignore the pause time if it has already been reached
+            if (currentTick.get() < targetTicks)
+                targetTick = targetTicks;
+            else
+                targetTick = Long.MAX_VALUE;
+
             rebaseRealTime = true;
             if (executeEvents)
                 return;
 
             executeEvents = true;
-            // 从线程池中拉取一个线程，指定事件管理器，唤醒该线程
             Process.processEvents(this);
         }
     }
@@ -950,6 +908,14 @@ public final class EventManager {
     }
 
     /**
+     * Returns whether or not a future event can be scheduled from the present thread.
+     * @return true if a future event can be scheduled
+     */
+    public static final boolean canSchedule() {
+        return hasCurrent() && EventManager.current().scheduleEnabled();
+    }
+
+    /**
      * Returns the controlling EventManager for the current Process.
      * @throws ProcessError if called outside of a Process context
      */
@@ -962,7 +928,7 @@ public final class EventManager {
      * @throws ProcessError if called outside of a Process context
      */
     public static final long simTicks() {
-        return Process.current().evt().currentTick;
+        return Process.current().evt().currentTick.get();
     }
 
     /**
@@ -970,24 +936,16 @@ public final class EventManager {
      * @throws ProcessError if called outside of a Process context
      */
     public static final double simSeconds() {
-        return Process.current().evt()._simSeconds();
+        return Process.current().evt().getSeconds();
     }
 
-    private double _simSeconds() {
-        return currentTick * secsPerTick;
+    public final double getSeconds() {
+        return currentTick.get() * secsPerTick;
     }
 
-    /**
-     * 设置 tick 花费时间，
-     * eventManager 初始化时,调用该函数设置secsPerTick为1e-6d, 即 1 秒中 1000000tick
-     * @param tickLength
-     */
     public final void setTickLength(double tickLength) {
         secsPerTick = tickLength;
         ticksPerSecond = Math.round(1e9d / secsPerTick) / 1e9d;
-
-        globalsecsPerTick = secsPerTick;
-        globalticksPerSecond = ticksPerSecond;
     }
 
     /**
@@ -1005,23 +963,55 @@ public final class EventManager {
     }
 
     /**
-     * This whole block is a temporary crutch until we decide how access to time conversion
-     * should be exposed.
+     * Apppend EventData objects to the provided list for all pending events.
+     * @param events List to append EventData objects to
      */
-    private static double globalsecsPerTick = 1e-6d;
-    private static double globalticksPerSecond = Math.round(globalsecsPerTick) / 1e9d;
-
-    /**
-     * Convert the number of seconds rounded to the nearest tick. The same as EventManager.secondsToNearestTick()
-     */
-    public static final long secsToNearestTick(double seconds) {
-        return Math.round(seconds * globalticksPerSecond);
+    public final void getEventDataList(ArrayList<EventData> events) {
+        // Unsynchronized for use by the Event Viewer
+        EventDataBuilder lb = new EventDataBuilder(events);
+        eventTree.runOnAllNodes(lb);
     }
 
-    /**
-     * Convert the number of ticks into a value in seconds. The same as EventManager.ticksToSeconds()
-     */
-    public static final double ticksToSecs(long ticks) {
-        return ticks * globalsecsPerTick;
+    private static class EventDataBuilder implements EventNode.Runner {
+        final ArrayList<EventData> eventDataList;
+
+        EventDataBuilder(ArrayList<EventData> events) {
+            eventDataList = events;
+        }
+
+        @Override
+        public void runOnNode(EventNode node) {
+            Event evt = node.head;
+            while (evt != null) {
+                long ticks = evt.node.schedTick;
+                int pri = evt.node.priority;
+                String desc = evt.target.getDescription();
+                eventDataList.add(new EventData(ticks, pri, desc));
+                evt = evt.next;
+            }
+        }
+    }
+
+    public final void getConditionalDataList(ArrayList<String> events) {
+        for (ConditionalEvent cond : condEvents) {
+            events.add(cond.target.getDescription());
+        }
+    }
+
+    private void disableSchedule() {
+        disableSchedule = true;
+    }
+
+    private void enableSchedule() {
+        disableSchedule = false;
+    }
+
+    private void assertCanSchedule() {
+        if (disableSchedule)
+            throw new ProcessError("Event Control attempted from inside a user callback");
+    }
+
+    private boolean scheduleEnabled() {
+        return !disableSchedule;
     }
 }

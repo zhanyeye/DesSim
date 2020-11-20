@@ -16,13 +16,13 @@
  */
 package cn.softeng.events;
 
-class NoopListener implements EventTimeListener, EventErrorListener {
+class NoopListener implements EventTimeListener {
 	@Override
 	public void tickUpdate(long tick) {}
 
 	@Override
-	public void timeRunning(boolean running) {}
+	public void timeRunning() {}
 
 	@Override
-	public void handleError(EventManager evt, Throwable t, long currentTick) {}
+	public void handleError(Throwable t) {}
 }
