@@ -37,11 +37,17 @@ public final class EventManager {
 
     private final AtomicBoolean isRunning;
     private final AtomicLong currentTick;
+    /**
+     *
+     */
     private volatile boolean executeEvents;
     /**
      * 确保EventManager同一时间只有一个processTarget被执行
      */
     private boolean processRunning;
+    /**
+     * 停止调度 flag, 有些操作前需要暂停调度
+     */
     private boolean disableSchedule;
 
     private final ArrayList<ConditionalEvent> condEvents;
@@ -277,9 +283,9 @@ public final class EventManager {
 
             // Loop continuously
             while (true) {
+                // 获取优先队列的队首元素
                 EventNode nextNode = eventTree.getNextNode();
-                if (nextNode == null ||
-                        currentTick.get() >= targetTick) {
+                if (nextNode == null || currentTick.get() >= targetTick) {
                     executeEvents = false;
                 }
 
