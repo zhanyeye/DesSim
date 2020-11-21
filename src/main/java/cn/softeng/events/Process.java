@@ -19,7 +19,8 @@ package cn.softeng.events;
 import java.util.ArrayList;
 
 /**
- * Process is a subclass of Thread that can be managed by the discrete event simulation.
+ * Process is a subclass of Thread that can be managed by the discrete event
+ * simulation.
  *
  * This is the basis for all functionality required by startProcess and the
  * discrete event model. Each process creates its own thread to run in. These
@@ -32,19 +33,17 @@ import java.util.ArrayList;
  * deadlock with other threads trying to wake you from the threadPool.
  */
 final class Process extends Thread {
-
+    // Properties required to manage the pool of available Processes
     /**
      * storage for all available Processes
      */
     private static final ArrayList<Process> pool;
-
     /**
      * Maximum size of Process pool
      */
     private static final int maxPoolSize = 100;
-
     /**
-     * Total number of created processes (to name a new Process)
+     * Total of all created processes to date (used to name new Processes)
      */
     private static int numProcesses = 0;
 
@@ -52,7 +51,6 @@ final class Process extends Thread {
      * The EventManager that is currently managing this Process
      */
     private EventManager eventManager;
-
     /**
      * The Process from which the present process was created
      *
@@ -62,7 +60,6 @@ final class Process extends Thread {
      * the nextProcess filed is used to hold this reference.
      */
     private Process nextProcess;
-
     /**
      * The entity whose method is to be executed
      */
@@ -73,23 +70,19 @@ final class Process extends Thread {
      * they are essentially Thread local variables that are only valid when activeFlag == true
      */
     private EventManager evt;
-
     /**
      * true if has nextProcess
      */
     private boolean hasNext;
 
     private boolean dieFlag;
-
     /**
      * true if Process is active
      */
     private boolean activeFlag;
 
-    private boolean condWait;
-
     static {
-        // Initialize Process pool
+        // Initialize the storage for the pooled Processes
         pool = new ArrayList<>(maxPoolSize);
     }
 
@@ -118,7 +111,7 @@ final class Process extends Thread {
 
     /**
      * Run method invokes the method on the target with the given arguments.
-     * A process loops endlessly after it is created, executing the method on the
+     * A process loops endlessly after it is created executing the method on the
      * target set as the entry point.  After completion, it calls endProcess and
      * will return it to a process pool if space is available, otherwise the resources
      * including the backing thread will be released.
@@ -130,17 +123,17 @@ final class Process extends Thread {
         while (true) {
             // wait in pool. why? -> look Process.getProcess()
             // the internal of getProcess() calls Process.start(),
-            // starts the thread, pauses in waitInPool(), and the
+            // starts the thread, pauses in waitInPool(), and
             // then puts it in the pool for use
             waitInPool();
 
             // Process has been woken up, execute the method we have been assigned
             ProcessTarget t;
             synchronized (this) {
-                activeFlag = true;
                 evt = eventManager;
                 t = target;
                 target = null;
+                activeFlag = true;
                 hasNext = (nextProcess != null);
             }
 
@@ -174,9 +167,7 @@ final class Process extends Thread {
             // spurious wake ups allowed as of Java 5.  All legitimate wake
             // ups are done through the InterruptedException.
             try {
-                while (true) {
-                    pool.wait();
-                }
+                while (true) { pool.wait(); }
             } catch (InterruptedException e) {}
         }
     }
@@ -194,7 +185,6 @@ final class Process extends Thread {
         target = targ;
         activeFlag = false;
         dieFlag = false;
-        condWait = false;
     }
 
     /**
@@ -228,11 +218,12 @@ final class Process extends Thread {
     private static Process getProcess() {
         while (true) {
             synchronized (pool) {
+                // If there is an available process in the pool, then use it
                 if (pool.size() > 0) {
-                    // If there is an available process in the pool, then use it
                     return pool.remove(pool.size() - 1);
-                } else {
-                    // If there are no process in the pool, then create a new one and add it to the pool
+                }
+                // If there are no process in the pool, then create a new one and add it to the pool
+                else {
                     numProcesses++;
                     Process temp = new Process("processthread-" + numProcesses);
                     temp.start();
@@ -281,24 +272,21 @@ final class Process extends Thread {
     }
 
     synchronized void kill() {
-        if (activeFlag) {
+        if (activeFlag)
             throw new ProcessError("Cannot terminate an active thread");
-        }
         dieFlag = true;
         this.wake();
     }
 
     /**
-     * This is used to tear down a live threadstack when an error is received from the model.
+     * This is used to tear down a live threadstack when an error is received from
+     * the model.
      */
     synchronized Process forceKillNext() {
         Process ret = nextProcess;
         nextProcess = null;
         if (ret != null) {
-            // set Process dieFlag to true
             ret.dieFlag = true;
-            // wake up current process, then EventManager.threadWait() will check cur.shouldDie()
-            // and throw a ThreadKilledException
             ret.wake();
         }
         return ret;
@@ -328,19 +316,5 @@ final class Process extends Thread {
     synchronized final void postCapture() {
         activeFlag = true;
         hasNext = (nextProcess != null);
-    }
-
-    final void begCondWait() {
-        condWait = true;
-    }
-
-    final void endCondWait() {
-        condWait = false;
-    }
-
-    final void checkCondWait() {
-        if (condWait) {
-            throw new ProcessError("Event Control attempted from inside a Conditional callback");
-        }
     }
 }

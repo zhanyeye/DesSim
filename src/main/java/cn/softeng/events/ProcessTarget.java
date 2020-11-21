@@ -8,6 +8,17 @@ package cn.softeng.events;
 public abstract class ProcessTarget {
 
     /**
+     * 返回该target捕获的一个线程，该方法只对WaitTarget有效
+     * @return Process
+     */
+    Process getProcess() { return null; }
+
+    /**
+     * 停止处理
+     */
+    void kill() {}
+
+    /**
      * 获取该处理内容的描述
      * @return String
      */
@@ -18,17 +29,8 @@ public abstract class ProcessTarget {
      */
     public abstract void process();
 
-    /**
-     * 停止处理
-     */
-    void kill() {}
-
-    /**
-     * 返回当前的执行的进程，好像只有WaitTarget用到了
-     * @return Process
-     */
-    Process getProcess() {
-        return null;
+    @Override
+    public String toString() {
+        return getDescription();
     }
-
 }

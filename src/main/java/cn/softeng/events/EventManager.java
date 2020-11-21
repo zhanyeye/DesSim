@@ -249,9 +249,13 @@ public final class EventManager {
         }
     }
 
+
     /**
      * Main event execution method the eventManager, this is the only entrypoint
      * for Process objects taken out of the pool.
+     * 正常情况下execute要执行的processTarget在
+     * @param cur
+     * @param t
      */
     final void execute(Process cur, ProcessTarget t) {
         synchronized (lockObject) {
