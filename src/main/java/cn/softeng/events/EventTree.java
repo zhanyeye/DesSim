@@ -2,14 +2,16 @@ package cn.softeng.events;
 
 import java.util.Arrays;
 
+
 /**
- * @date: 11/4/2020 10:18 AM
- * @Description:
+ * EventTree is a custom red-black tree implementation intended to be used as the priority queue
+ * storing Jaamsim's discrete events
  * 是一个红黑树实现，旨在实现存储事件的优先队列
  * 每一个红黑树结点都都对应一个事件链表（链表中的事件时间和优先级都一样）
+ * @author matt.chudleigh
+ *
  */
 class EventTree {
-
     /**
      * 根结点
      */
@@ -19,14 +21,12 @@ class EventTree {
      */
     private EventNode lowest = null;
 
-
     /**
      * Scratch space, used instead of having parent pointers
      * 暂存空间，用来暂存父指针
      */
     private EventNode[] scratch = new EventNode[64];
     private int scratchPos = 0;
-
     /**
      * 将结点放到暂存空间中
      * @param n
@@ -34,7 +34,6 @@ class EventTree {
     private void pushScratch(EventNode n) {
         scratch[scratchPos++] = n;
     }
-
     /**
      * 从后向前删除n个暂存结点
      * @param n
@@ -42,8 +41,6 @@ class EventTree {
     private void dropScratch(int n) {
         scratchPos = Math.max(0, scratchPos - n);
     }
-
-
     /**
      * Get the 'nth' node from the end of the scratch (1 being the first)
      * 从scratch中，取出倒数第n个结点
@@ -53,18 +50,15 @@ class EventTree {
     private EventNode getScratch(int n) {
         return (scratchPos >= n) ? scratch[scratchPos - n] : null;
     }
-
-
     /**
      * 重置暂存空间（将它的索引置0）
      */
     private void resetScratch() {
         scratchPos = 0;
     }
-
     /**
      * 获取事件优先队列的队首元素（返回红黑树中最小值结点）
-     * @return
+     * @return 红黑树中最小结点
      */
     EventNode getNextNode() {
         if (lowest == null) {
@@ -124,8 +118,7 @@ class EventTree {
         while (true) {
             int comp = n.compare(schedTick, priority);
             if (comp == 0) {
-                // Found existing node
-                return n;
+                return n; // Found existing node
             }
             EventNode next = comp > 0 ? n.left : n.right;
             if (next != EventNode.nilNode) {
@@ -174,7 +167,7 @@ class EventTree {
         }
 
         // 获取祖父节点
-        EventNode gp = getScratch(2);
+        final EventNode gp = getScratch(2);
         if (gp == null) {
             // 没有祖父节点，父节点为根节点的情况（即父节点为黑色）
             return;
@@ -182,7 +175,6 @@ class EventTree {
 
         // 获取叔叔节点
         EventNode uncle = (gp.left == parent ? gp.right : gp.left);
-
         if (uncle.red) {
             // Both parent and uncle are red
             // case 3：
@@ -200,14 +192,13 @@ class EventTree {
         }
 
         // case 4
-
-        if (n == parent.right && gp != null && parent == gp.left) {
+        if (n == parent.right && parent == gp.left) {
             // Right child of a left parent, rotate left at parent
             parent.rotateLeft(gp);
             parent = n;
             n = n.left;
         }
-        else if (n == parent.left && gp != null && parent == gp.right) {
+        else if (n == parent.left && parent == gp.right) {
             // left child of right parent, rotate right at parent
             parent.rotateRight(gp);
             parent = n;
@@ -229,7 +220,6 @@ class EventTree {
         }
 
     }
-
 
     /**
      * 删除红黑树的指定节点
@@ -285,16 +275,14 @@ class EventTree {
 
         // Drop the node
         if (parent != null) {
-            if (parent.left == current) {
+            if (parent.left == current)
                 parent.left = child;
-            } else {
+            else
                 parent.right = child;
-            }
         }
 
-        if (current == root) {
+        if (current == root)
             root = child;
-        }
 
         boolean currentIsRed = current.red;
 
@@ -441,7 +429,6 @@ class EventTree {
     }
 
 
-
     /**
      * 可复用空闲节点链表，是一个只用到节点左子树的链表结构
      */
@@ -469,6 +456,7 @@ class EventTree {
         ret.priority = priority;
         ret.head = null;
         ret.tail = null;
+
         ret.left = EventNode.nilNode;
         ret.right = EventNode.nilNode;
         ret.red = false;
@@ -499,18 +487,14 @@ class EventTree {
     }
 
 
-
     // ******************
     // 测试验证红黑树相关代码
     // ******************
 
 
-
     // Verify the sorting structure and return the number of nodes
     final int verify() {
-        if (root == EventNode.nilNode) {
-            return 0;
-        }
+        if (root == EventNode.nilNode) return 0;
 
         if (EventNode.nilNode.red == true)
             throw new RuntimeException("nil node corrupted, turned red");
@@ -548,7 +532,9 @@ class EventTree {
     final EventNode find(long schedTick, int priority) {
         EventNode curr = root;
         while (true) {
-            if (curr == EventNode.nilNode) return null;
+            if (curr == EventNode.nilNode) {
+                return null;
+            }
             int comp = curr.compare(schedTick, priority);
             if (comp == 0) {
                 return curr;
@@ -563,10 +549,11 @@ class EventTree {
     }
 
     final int verifyNodeCount() {
-        if (root == EventNode.nilNode) return 0;
+        if (root == EventNode.nilNode) {
+            return 0;
+        }
         return countNodes(root);
     }
-
 
     private int countNodes(EventNode n) {
         int count = 1;

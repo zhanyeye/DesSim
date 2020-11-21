@@ -38,6 +38,9 @@ public final class EventManager {
     private final AtomicBoolean isRunning;
     private final AtomicLong currentTick;
     private volatile boolean executeEvents;
+    /**
+     * 确保EventManager同一时间只有一个processTarget被执行
+     */
     private boolean processRunning;
     private boolean disableSchedule;
 
@@ -187,6 +190,10 @@ public final class EventManager {
     /**
      * 线程cur执行事件目标
      * the return from execute target informs whether or not this thread should grab an new Event, or return to the pool
+     * cur执行完毕后，若没有等待cur的nextProcess，则返回true,cur继续获取ProcessTarget执行；若有等待cur执行完毕的nextProcess,唤醒
+     * nextProcess,并放回false,将cur返回线程池。
+     * cur执行过程中被kill或者出现异常，都会被返回false
+     *
      * @param cur
      * @param t
      * @return boolean 返回true: 让该线程继续获取事件； 返回false:将该线程返回线程池
@@ -195,12 +202,13 @@ public final class EventManager {
         try {
             // If the event has a captured process, pass control to it
             // 如果该事件已经捕获了线程，则这是一个waitTarget，还是让原来的线程执行它
-            // 只有 waitTarget 的getProcess 才不为空
-            Process p = t.getProcess();
-            if (p != null) {
+            // 只有 waitTarget的getProcess才不为空
+            if (t.getProcess() != null) {
+                Process p = t.getProcess();
                 p.setNextProcess(cur);
                 p.wake();
                 // the cur process waits until process p finishes executing
+                // it will be wake by cur.wakeNextProcess in executeTarget(p, t)
                 threadWait(cur);
                 return true;
             }
@@ -214,19 +222,21 @@ public final class EventManager {
                 trcListener.traceProcessEnd();
                 enableSchedule();
             }
+            // 如果cur有等待它的nextProcess,则唤醒nextProcess
             if (cur.hasNext()) {
                 cur.wakeNextProcess();
                 return false;
-            }
-            else {
+            } else {
                 return true;
             }
         } catch (Throwable e) {
             // This is how kill() is implemented for sleeping processes.
-            if (e instanceof ThreadKilledException)
+            if (e instanceof ThreadKilledException) {
                 return false;
+            }
 
             // Tear down any threads waiting for this to finish
+            // 说明执行t.process()时出现了异常,删除任何等待此操作完成的线程
             Process next = cur.forceKillNext();
             while (next != null) {
                 next = next.forceKillNext();
@@ -252,8 +262,9 @@ public final class EventManager {
                 return;
             }
 
-            if (processRunning)
+            if (processRunning) {
                 return;
+            }
 
             processRunning = true;
             enableSchedule();
@@ -1007,8 +1018,9 @@ public final class EventManager {
     }
 
     private void assertCanSchedule() {
-        if (disableSchedule)
+        if (disableSchedule) {
             throw new ProcessError("Event Control attempted from inside a user callback");
+        }
     }
 
     private boolean scheduleEnabled() {
