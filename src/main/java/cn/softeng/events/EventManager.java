@@ -26,7 +26,7 @@ public final class EventManager {
     public final String name;
 
     /**
-     * Object used as global lock for synchronization
+     * 全局同步锁
      */
     private final Object lockObject;
 
@@ -50,6 +50,10 @@ public final class EventManager {
      */
     private boolean disableSchedule;
 
+    /**
+     * 条件事件链表，包含内容如: 用户暂停事件(条件事件包含 PauseModelTarget)
+     * 请注意：条件事件不放在放在一个数组中，而不是事件队列中
+     */
     private final ArrayList<ConditionalEvent> condEvents;
 
     /**
@@ -84,6 +88,7 @@ public final class EventManager {
     private long realTimeTick;
     /**
      * the wall-clock time in millis
+     * 系统真实花费的时间
      */
     private long realTimeMillis;
 
@@ -297,6 +302,7 @@ public final class EventManager {
                 }
 
                 // If the next event is at the current tick, execute it
+                // 如果下一个事件发生刻度等于系统当前刻度，则执行它
                 if (nextNode.schedTick == currentTick.get()) {
                     // Remove the event from the future events
                     Event nextEvent = nextNode.head;
@@ -316,29 +322,35 @@ public final class EventManager {
                         oneEvent = false;
                         executeEvents = false;
                     }
-                    if (bool)
+                    if (bool) {
                         continue;
-                    else
+                    } else {
                         return;
+                    }
                 }
 
-                // If the next event would require us to advance the time, check the
-                // conditonal events
+                // If the next event would require us to advance the time, check the conditonal events
+                // 如果下一个事件时刻大于系统当前时刻，需要推进仿真时间，则检查条件事件
                 if (eventTree.getNextNode().schedTick > nextTick) {
                     if (condEvents.size() > 0) {
                         evaluateConditions();
-                        if (!executeEvents) continue;
+                        if (!executeEvents) {
+                            // 如果evaluateConditions出现异常
+                            continue;
+                        }
                     }
 
                     // If a conditional event was satisfied, we will have a new event at the
                     // beginning of the eventStack for the current tick, go back to the
                     // beginning, otherwise fall through to the time-advance
                     nextTick = eventTree.getNextNode().schedTick;
-                    if (nextTick == currentTick.get())
+                    if (nextTick == currentTick.get()) {
                         continue;
+                    }
                 }
 
                 // Advance to the next event time
+                // 通过wait等待20ms（推进时间）, 然后continue，再来判断时间，
                 if (executeRealTime) {
                     // Loop until the next event time is reached
                     long realTick = this.calcRealTimeTick();
@@ -353,10 +365,12 @@ public final class EventManager {
                 }
 
                 // advance time
-                if (targetTick < nextTick)
+                // 程序能到达这里说明，realTick已经到达
+                if (targetTick < nextTick) {
                     currentTick.set(targetTick);
-                else
+                } else {
                     currentTick.set(nextTick);
+                }
 
                 timelistener.tickUpdate(currentTick.get());
 
@@ -368,11 +382,21 @@ public final class EventManager {
         }
     }
 
+    /**
+     * EventViewer NextEvent button to Execute a single event from the event
+     * @param simTime
+     */
     public void nextOneEvent(double simTime) {
         oneEvent = true;
         resume(this.secondsToNearestTick(simTime));
     }
 
+    /**
+     * Event Viewer NextTime button to Execute all the events from the future
+     * event list that are scheduled for the next event time. the conditional events
+     * are then executed along with any new events that have been scheduled for this time
+     * @param simTime
+     */
     public void nextEventTime(double simTime) {
         oneSimTime = true;
         resume(this.secondsToNearestTick(simTime));
@@ -391,19 +415,21 @@ public final class EventManager {
         disableSchedule();
         try {
             for (int i = 0; i < condEvents.size();) {
-                ConditionalEvent c = condEvents.get(i);
-                if (trcListener != null)
-                    trcListener.traceConditionalEval(c.target);
-                boolean bool = c.c.evaluate();
-                if (trcListener != null)
-                    trcListener.traceConditionalEvalEnded(bool, c.target);
+                ConditionalEvent conditionalEvent = condEvents.get(i);
+                if (trcListener != null) {
+                    trcListener.traceConditionalEval(conditionalEvent.target);
+                }
+                boolean bool = conditionalEvent.c.evaluate();
+                if (trcListener != null) {
+                    trcListener.traceConditionalEvalEnded(bool, conditionalEvent.target);
+                }
                 if (bool) {
                     condEvents.remove(i);
                     EventNode node = getEventNode(currentTick.get(), 0);
                     Event evt = getEvent();
                     evt.node = node;
-                    evt.target = c.target;
-                    evt.handle = c.handle;
+                    evt.target = conditionalEvent.target;
+                    evt.handle = conditionalEvent.handle;
                     if (evt.handle != null) {
                         // no need to check the handle.isScheduled as we just unscheduled it above
                         // and we immediately switch it to this event
@@ -427,7 +453,7 @@ public final class EventManager {
 
     /**
      * Return the simulation time corresponding the given wall clock time
-     * @param simTime = the current simulation time used when setting a real-time basis
+     * 通过计算 上一次realTimeTick + 本次事件执行所花费的tick, 得到这一次应该更新的 realTimeTick
      * @return simulation time in seconds
      */
     private long calcRealTimeTick() {
@@ -444,28 +470,32 @@ public final class EventManager {
     }
 
     /**
-     // Pause the current active thread and restart the next thread on the
-     // active thread list. For this case, a future event or conditional event
-     // has been created for the current thread.  Called by
-     // eventManager.scheduleWait() and related methods, and by
-     // eventManager.waitUntil().
-     // restorePreviousActiveThread()
+     * Pause the current active thread and restart the next thread on the
+     * active thread list. For this case, a future event or conditional event
+     * has been created for the current thread.  Called by
+     * eventManager.scheduleWait() and related methods, and by
+     * eventManager.waitUntil().
+     * restorePreviousActiveThread()
      * Must hold the lockObject when calling this method.
+     * 让当前线程等待，执行其后面的线程
      */
     private void captureProcess(Process cur) {
         // if we don't wake a new process, take one from the pool
         Process next = cur.preCapture();
         if (next == null) {
+            // 若cur没有nextProcess,从线程池中拉取一个新线程执行事件管理器
             processRunning = false;
             Process.processEvents(this);
         }
         else {
             next.wake();
         }
-
+        // 当前线程等待
         threadWait(cur);
+        // 当前线程被唤醒后的一些操作
         cur.postCapture();
     }
+
 
     /**
      * Calculate the time for an event taking into account numeric overflow.
@@ -523,8 +553,10 @@ public final class EventManager {
     private void waitTicks(Process cur, long ticks, int priority, boolean fifo, EventHandle handle) {
         assertCanSchedule();
         long nextEventTime = calculateEventTime(ticks);
+        // 创建一个等待目标，封装当前线程
         WaitTarget t = new WaitTarget(cur);
         EventNode node = getEventNode(nextEventTime, priority);
+        // 获取一个新事件
         Event evt = getEvent();
         evt.node = node;
         evt.target = t;
@@ -552,7 +584,15 @@ public final class EventManager {
         return eventTree.createOrFindNode(tick, prio);
     }
 
+    /**
+     * 空闲Event链表，保存空闲Event的引用，用于复用空闲事件
+     */
     private Event freeEvents = null;
+
+    /**
+     * 获取一个新Event，若空闲Event链表为空，则创建一个新Event
+     * @return
+     */
     private Event getEvent() {
         if (freeEvents != null) {
             Event evt = freeEvents;
@@ -900,14 +940,17 @@ public final class EventManager {
         synchronized (lockObject) {
 
             // Ignore the pause time if it has already been reached
-            if (currentTick.get() < targetTicks)
+            if (currentTick.get() < targetTicks) {
                 targetTick = targetTicks;
-            else
+            } else {
                 targetTick = Long.MAX_VALUE;
+            }
 
             rebaseRealTime = true;
-            if (executeEvents)
+            if (executeEvents) {
+                // 仿真重复启动
                 return;
+            }
 
             executeEvents = true;
             Process.processEvents(this);
@@ -971,6 +1014,7 @@ public final class EventManager {
 
     /**
      * Convert the number of seconds rounded to the nearest tick.
+     * 将经过的秒数转化为经过的tick
      */
     public final long secondsToNearestTick(double seconds) {
         return Math.round(seconds * ticksPerSecond);

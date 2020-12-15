@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.softeng.events;
+package cn.softeng.states;
 
-/**
- * 条件抽象类，其子类被组合在条件事件中，用于在仿真运行过程中检查某些情况
- * 比如用户暂停仿真运行
- */
-public abstract class Conditional {
-	public abstract boolean evaluate();
+
+public interface StateEntityListener {
+	public boolean isWatching(StateEntity ent);
+	public void updateForStateChange(StateEntity ent, StateRecord prev, StateRecord next);
 }

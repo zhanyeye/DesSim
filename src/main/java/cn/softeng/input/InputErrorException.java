@@ -1,6 +1,6 @@
 /*
  * JaamSim Discrete Event Simulation
- * Copyright (C) 2014 Ausenco Engineering Canada Inc.
+ * Copyright (C) 2002-2011 Ausenco Engineering Canada Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.softeng.events;
+package cn.softeng.input;
 
 /**
- * 条件抽象类，其子类被组合在条件事件中，用于在仿真运行过程中检查某些情况
- * 比如用户暂停仿真运行
+ * Custom exception thrown when an error due to bad input is encountered.
  */
-public abstract class Conditional {
-	public abstract boolean evaluate();
+public class InputErrorException extends RuntimeException {
+	public InputErrorException(String format, Object... args) {
+		super(String.format(format, args));
+	}
 }

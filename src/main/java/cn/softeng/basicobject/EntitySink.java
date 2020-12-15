@@ -1,6 +1,6 @@
 /*
  * JaamSim Discrete Event Simulation
- * Copyright (C) 2014 Ausenco Engineering Canada Inc.
+ * Copyright (C) 2013 Ausenco Engineering Canada Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cn.softeng.events;
+package cn.softeng.basicobject;
+
+import com.jaamsim.Graphics.DisplayEntity;
 
 /**
- * 条件抽象类，其子类被组合在条件事件中，用于在仿真运行过程中检查某些情况
- * 比如用户暂停仿真运行
+ * EntitySink kills the DisplayEntities sent to it.
  */
-public abstract class Conditional {
-	public abstract boolean evaluate();
+public class EntitySink extends LinkedComponent {
+
+	{
+		nextComponent.setHidden(true);
+		defaultEntity.setHidden(true);
+		stateAssignment.setHidden(true);
+	}
+
+	@Override
+	public void addEntity( DisplayEntity ent ) {
+		super.addEntity(ent);
+
+		// Only increments the number process when there is no next entity
+		this.sendToNextComponent(ent);
+
+		// Kill the added entity
+		ent.kill();
+	}
+
 }

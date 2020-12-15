@@ -17,7 +17,8 @@
 package cn.softeng.events;
 
 /**
- * todo 好像比较重要
+ * 用于将一个线程封装到执行目标，包装进事件中，延迟执行
+ * 一般创建一个组合waitTarget的事件后，会捕获(wait)被封装的线程
  */
 class WaitTarget extends ProcessTarget {
 	private Process proc;

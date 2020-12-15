@@ -1,0 +1,98 @@
+/*
+ * JaamSim Discrete Event Simulation
+ * Copyright (C) 2014 Ausenco Engineering Canada Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package cn.softeng.input;
+
+import java.util.ArrayList;
+
+
+public class KeywordIndex {
+//	private final ArrayList<String> input;
+//	public final String keyword;
+//	private final int start;
+//	private final int end;
+//	public final ParseContext context;
+//
+//	public KeywordIndex(String word, ArrayList<String> arg, ParseContext ctxt) {
+//		this(word, arg, 0, arg.size(), ctxt);
+//	}
+//
+//	public KeywordIndex(String word, ArrayList<String> inp, int s, int e, ParseContext ctxt) {
+//		input = inp;
+//		keyword = word;
+//		start = s;
+//		end = e;
+//		context = ctxt;
+//	}
+//
+//	public int numArgs() {
+//		return end - start;
+//	}
+//
+//	public String argString() {
+//		StringBuilder sb = new StringBuilder();
+//		for (int i = start; i < end; i++) {
+//			String dat = this.input.get(i);
+//			if (i > start)
+//				sb.append("  ");
+//
+//			if (Parser.needsQuoting(dat) && !dat.equals("{") && !dat.equals("}"))
+//				sb.append("'").append(dat).append("'");
+//			else
+//				sb.append(dat);
+//		}
+//		return sb.toString();
+//	}
+//
+//	public String[] getArgArray() {
+//		String[] ret = new String[end - start];
+//		for (int i = start; i < end; i++) {
+//			ret[i - start] = this.input.get(i);
+//		}
+//		return ret;
+//	}
+//
+//	public String getArg(int index) {
+//		if (index < 0 || index >= numArgs())
+//			throw new IndexOutOfBoundsException("Index out of range:" + index);
+//		return input.get(start + index);
+//	}
+//
+//	public ArrayList<KeywordIndex> getSubArgs() {
+//		ArrayList<KeywordIndex> subArgs = new ArrayList<>();
+//		for (int i= 0; i < this.numArgs(); i++) {
+//			//skip over opening brace if present
+//			if (this.getArg(i).equals("{"))
+//				i++;
+//
+//			//iterate until closing brace, or end of entry
+//			int subArgStart = i;
+//			int subArgEnd = i;
+//			for (int j = i; j < this.numArgs(); j++, i++){
+//				if (this.getArg(j).equals("}")) {
+//					break;
+//				}
+//
+//				subArgEnd++;
+//			}
+//
+//			KeywordIndex subArg = new KeywordIndex(keyword, this.input, subArgStart + start, subArgEnd + start, context);
+//			subArgs.add(subArg);
+//		}
+//
+//		return subArgs;
+//	}
+}
