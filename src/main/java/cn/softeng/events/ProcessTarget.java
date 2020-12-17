@@ -20,15 +20,15 @@ public abstract class ProcessTarget {
     void kill() {}
 
     /**
+     * 具体一系列行为，即事件执行的内容
+     */
+    public abstract void process();
+
+    /**
      * 返回该target的描述信息
      * @return String 描述信息
      */
     public abstract String getDescription();
-
-    /**
-     * 具体一系列行为，即事件执行的内容
-     */
-    public abstract void process();
 
     @Override
     public String toString() {

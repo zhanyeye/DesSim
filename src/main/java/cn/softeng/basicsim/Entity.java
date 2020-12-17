@@ -119,7 +119,7 @@ public class Entity {
 
 
     /**
-     *
+     * 封装异常信息并抛出
      * @param fmt
      * @param args
      * @throws ErrorException
@@ -130,5 +130,24 @@ public class Entity {
         sb.append(String.format(fmt, args));
         throw new ErrorException(sb.toString());
     }
+
+    /**
+     * 返回所有创建过个的实体
+     * @return
+     */
+    public static ArrayList<? extends Entity> getAll() {
+        synchronized (allInstances) {
+            return allInstances;
+        }
+    }
+
+    public static <T extends Entity> ClonesOfIterable<T> getClonesOfIterable(Class<T> proto) {
+        return new ClonesOfIterable<>(proto);
+    }
+
+    /**
+     * 重置实体收集的统计数据
+     */
+    public void clearStatistics() {}
 
 }

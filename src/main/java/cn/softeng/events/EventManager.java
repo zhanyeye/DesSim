@@ -23,59 +23,75 @@ import java.util.concurrent.atomic.AtomicLong;
  * currently running, think of it like a thread-local variable for all model threads.
  */
 public final class EventManager {
-    public final String name;
 
+    public final String name;
     /**
      * 全局同步锁
      */
     private final Object lockObject;
 
     /**
-     * Event priority queue
+     * 事件优先队列：一个红黑树+链表数据结构的实现
      */
     private final EventTree eventTree;
 
-    private final AtomicBoolean isRunning;
-    private final AtomicLong currentTick;
     /**
-     *
+     * 测试用
+     */
+    private final AtomicBoolean isRunning;
+
+    /**
+     * 仿真时钟的当前刻度
+     */
+    private final AtomicLong currentTick;
+
+    /**
+     * 当前仿真的执行情况，防止重复执行
      */
     private volatile boolean executeEvents;
+
     /**
      * 确保EventManager同一时间只有一个processTarget被执行
      */
     private boolean processRunning;
+
     /**
      * 停止调度 flag, 有些操作前需要暂停调度
      */
     private boolean disableSchedule;
 
     /**
-     * 条件事件链表，包含内容如: 用户暂停事件(条件事件包含 PauseModelTarget)
-     * 请注意：条件事件不放在放在一个数组中，而不是事件队列中
+     * 条件事件列表，包含内容如: 用户暂停事件(条件事件包含 PauseModelTarget)
+     * 请注意：条件放在一个数组中，而不是事件队列中
      */
     private final ArrayList<ConditionalEvent> condEvents;
 
     /**
-     * The next tick to execute events at
+     * 执行下一个事件的时间点 （时间刻度tick）
      */
     private long nextTick;
+
     /**
-     * the largest time we will execute events for (run to time)
+     * 仿真运行的目标时间点
      */
     private long targetTick;
+
     /**
-     * execute a single event
+     * 执行未来事件列表中最近的一个事件 flag
      */
     private boolean oneEvent;
+
     /**
      * execute all the events at the next simulation time
+     * 执行未来事件列表中下一个时刻的所有事件的 flag
      */
     private boolean oneSimTime;
+
     /**
      * The number of discrete ticks per simulated second
      */
     private double ticksPerSecond;
+
     /**
      * The length of time in seconds each tick represents
      */
@@ -86,6 +102,7 @@ public final class EventManager {
      * the simulation tick corresponding to the wall-clock millis value
      */
     private long realTimeTick;
+
     /**
      * the wall-clock time in millis
      * 系统真实花费的时间
