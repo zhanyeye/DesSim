@@ -23,7 +23,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * currently running, think of it like a thread-local variable for all model threads.
  */
 public final class EventManager {
-
+    /**
+     * 实体管理器的名称
+     */
     public final String name;
     /**
      * 全局同步锁
@@ -36,7 +38,7 @@ public final class EventManager {
     private final EventTree eventTree;
 
     /**
-     * 测试用
+     * 调度器当前是否运行，测试用 ???
      */
     private final AtomicBoolean isRunning;
 
@@ -46,7 +48,7 @@ public final class EventManager {
     private final AtomicLong currentTick;
 
     /**
-     * 当前仿真的执行情况，防止重复执行
+     * 用于控制调度器是否执行的 flag
      */
     private volatile boolean executeEvents;
 
@@ -117,7 +119,7 @@ public final class EventManager {
     private EventTraceListener trcListener;
 
     /**
-     * Allocates a new EventManager with the given parent and name
+     * Allocates a new EventManager with the given name
      *
      * @param name the name this EventManager should use
      */
@@ -336,6 +338,7 @@ public final class EventManager {
                     // thread should grab an new Event, or return to the pool
                     boolean bool = executeTarget(cur, nextTarget);
                     if (oneEvent) {
+                        // 若调度器只执行一个事件，则将oneEvent归位，并停止调度
                         oneEvent = false;
                         executeEvents = false;
                     }
@@ -352,7 +355,6 @@ public final class EventManager {
                     if (condEvents.size() > 0) {
                         evaluateConditions();
                         if (!executeEvents) {
-                            // 如果evaluateConditions出现异常
                             continue;
                         }
                     }
@@ -392,6 +394,7 @@ public final class EventManager {
                 timelistener.tickUpdate(currentTick.get());
 
                 if (oneSimTime) {
+                    // 若一次执行下一时刻上的所有事件，则将oneSimTime归位，并停止调度
                     executeEvents = false;
                     oneSimTime = false;
                 }
@@ -427,6 +430,9 @@ public final class EventManager {
         return isRunning.get();
     }
 
+    /**
+     * 检查EventManager的所有条件事件列表是否满足
+     */
     private void evaluateConditions() {
         // Protecting the conditional evaluate() callbacks and the traceWaitUntilEnded callback
         disableSchedule();
@@ -457,8 +463,7 @@ public final class EventManager {
                 }
                 i++;
             }
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             executeEvents = false;
             processRunning = false;
             isRunning.set(false);
@@ -476,6 +481,7 @@ public final class EventManager {
     private long calcRealTimeTick() {
         long curMS = System.currentTimeMillis();
         if (rebaseRealTime) {
+            // 只会在第一次运行时执行
             realTimeTick = currentTick.get();
             realTimeMillis = curMS;
             rebaseRealTime = false;
