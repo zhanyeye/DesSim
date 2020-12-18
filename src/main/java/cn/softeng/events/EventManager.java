@@ -449,10 +449,8 @@ public final class EventManager {
                 if (bool) {
                     condEvents.remove(i);
                     EventNode node = getEventNode(currentTick.get(), 0);
-                    Event evt = getEvent();
-                    evt.node = node;
-                    evt.target = conditionalEvent.target;
-                    evt.handle = conditionalEvent.handle;
+                    Event evt = getEvent(node, conditionalEvent.target, conditionalEvent.handle);
+
                     if (evt.handle != null) {
                         // no need to check the handle.isScheduled as we just unscheduled it above
                         // and we immediately switch it to this event
@@ -519,10 +517,12 @@ public final class EventManager {
         cur.postCapture();
     }
 
-
     /**
+     * 将系统的当前时刻 + 等待时刻，得出即将插入队列的事件的发生时间
      * Calculate the time for an event taking into account numeric overflow.
      * Must hold the lockObject when calling this method
+     * @param waitLength 系统当前时刻等待多久后会发生下一个事件
+     * @return 即将插入队列的发生时间
      */
     private long calculateEventTime(long waitLength) {
         // Test for negative duration schedule wait length
@@ -580,10 +580,8 @@ public final class EventManager {
         WaitTarget t = new WaitTarget(cur);
         EventNode node = getEventNode(nextEventTime, priority);
         // 获取一个新事件
-        Event evt = getEvent();
-        evt.node = node;
-        evt.target = t;
-        evt.handle = handle;
+        Event evt = getEvent(node, t, handle);
+
         if (handle != null) {
             if (handle.isScheduled())
                 throw new ProcessError("Tried to schedule using an EventHandle already in use");
@@ -613,17 +611,27 @@ public final class EventManager {
     private Event freeEvents = null;
 
     /**
-     * 获取一个新Event，若空闲Event链表为空，则创建一个新Event
+     * 返回一个设置了指定属性的事件实例，若 freeEvent 链表不为空，则复用空闲事件对象，否则new一个实例
+     * @param node 事件插入事件队列后（红黑树实现），对应的红黑树节点
+     * @param target 事件执行目标
+     * @param handle
      * @return
      */
-    private Event getEvent() {
+    private Event getEvent(EventNode node, ProcessTarget target, EventHandle handle) {
+        Event ret = null;
         if (freeEvents != null) {
+            // freeEvent列表不为空，复用空闲事件
             Event evt = freeEvents;
             freeEvents = evt.next;
-            return evt;
+            ret = evt;
+        } else {
+            // freeEvent列表为空，new一个新的实例
+            ret = new Event();
         }
-
-        return new Event();
+        ret.node = node;
+        ret.target = target;
+        ret.handle = handle;
+        return ret;
     }
 
     private void clearFreeList() {
@@ -861,14 +869,20 @@ public final class EventManager {
             throw new ThreadKilledException("Thread killed");
     }
 
+    /**
+     *
+     * @param waitLength
+     * @param eventPriority
+     * @param fifo
+     * @param t
+     * @param handle
+     */
     public void scheduleProcessExternal(long waitLength, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
         synchronized (lockObject) {
             long schedTick = calculateEventTime(waitLength);
             EventNode node = getEventNode(schedTick, eventPriority);
-            Event evt = getEvent();
-            evt.node = node;
-            evt.target = t;
-            evt.handle = handle;
+            Event evt = getEvent(node, t, handle);
+
             if (handle != null) {
                 if (handle.isScheduled())
                     throw new ProcessError("Tried to schedule using an EventHandle already in use");
@@ -913,6 +927,7 @@ public final class EventManager {
      *
      * @throws ProcessError if called outside of a Process context
      */
+    @Deprecated
     public static final void scheduleSeconds(double secs, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
         Process cur = Process.current();
         long ticks = cur.evt().secondsToNearestTick(secs);
@@ -923,10 +938,8 @@ public final class EventManager {
         assertCanSchedule();
         long schedTick = calculateEventTime(waitLength);
         EventNode node = getEventNode(schedTick, eventPriority);
-        Event evt = getEvent();
-        evt.node = node;
-        evt.target = t;
-        evt.handle = handle;
+        Event evt = getEvent(node, t, handle);
+
         if (handle != null) {
             if (handle.isScheduled())
                 throw new ProcessError("Tried to schedule using an EventHandle already in use");
@@ -1022,10 +1035,12 @@ public final class EventManager {
      * Returns the current simulation time in seconds for the current Process.
      * @throws ProcessError if called outside of a Process context
      */
+    @Deprecated
     public static final double simSeconds() {
         return Process.current().evt().getSeconds();
     }
 
+    @Deprecated
     public final double getSeconds() {
         return currentTick.get() * secsPerTick;
     }
