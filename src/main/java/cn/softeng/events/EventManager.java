@@ -611,7 +611,7 @@ public final class EventManager {
     private Event freeEvents = null;
 
     /**
-     * 返回一个设置了指定属性的事件实例，若 freeEvent 链表不为空，则复用空闲事件对象，否则new一个实例
+     * 返回一个设置了指定属性的事件实例，并该event的属性赋值（包括加入红黑树node），若 freeEvent 链表不为空，则复用空闲事件对象，否则new一个实例
      * @param node 事件插入事件队列后（红黑树实现），对应的红黑树节点
      * @param target 事件执行目标
      * @param handle
@@ -708,7 +708,7 @@ public final class EventManager {
 
     /**
      * Remove an event from the eventList, must hold the lockObject.
-     * @param idx
+     * @param evt
      */
     private void removeEvent(Event evt) {
         EventNode node = evt.node;
@@ -870,7 +870,7 @@ public final class EventManager {
     }
 
     /**
-     *
+     * 有外部调度事件的执行，例如启动仿真
      * @param waitLength
      * @param eventPriority
      * @param fifo
@@ -884,8 +884,9 @@ public final class EventManager {
             Event evt = getEvent(node, t, handle);
 
             if (handle != null) {
-                if (handle.isScheduled())
+                if (handle.isScheduled()) {
                     throw new ProcessError("Tried to schedule using an EventHandle already in use");
+                }
                 handle.event = evt;
             }
             // FIXME: this is the only callback that does not occur in Process context, disable for now
@@ -896,8 +897,9 @@ public final class EventManager {
             // During real-time waits an event can be inserted becoming the next event to execute
             // If nextTick is not updated, we can fall through the entire time update code and not
             // execute this event, leading to the state machine becoming broken
-            if (nextTick > eventTree.getNextNode().schedTick)
+            if (nextTick > eventTree.getNextNode().schedTick) {
                 nextTick = eventTree.getNextNode().schedTick;
+            }
         }
     }
 

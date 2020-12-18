@@ -1,6 +1,8 @@
 package cn.softeng.basicobject;
 
 import cn.softeng.basicsim.Entity;
+import cn.softeng.events.EventHandle;
+import cn.softeng.events.EventManager;
 import cn.softeng.events.ProcessTarget;
 import cn.softeng.input.BooleanInput;
 import cn.softeng.input.EntityInput;
@@ -53,6 +55,9 @@ public class Queue extends LinkedComponent {
     protected int maxElements;
     protected double elementSeconds;
     protected long numberReneged;
+
+    private final DoQueueChanged userUpdate = new DoQueueChanged(this);
+    private final EventHandle userUpdateHandle = new EventHandle();
 
     {
         priority = new ValueInput("Priority", Double.valueOf(0));
@@ -135,6 +140,7 @@ public class Queue extends LinkedComponent {
         }
     }
 
+
     /**
      * 队列变化通知Target, 用于通知Queue的使用者,Queue发生了改变
      */
@@ -159,7 +165,6 @@ public class Queue extends LinkedComponent {
         }
     }
 
-
     // ***************************************************************************
     // 队列处理方法
     // ***************************************************************************
@@ -173,7 +178,27 @@ public class Queue extends LinkedComponent {
             entityNum *= -1;
         }
         int pri = (int) priority.getValue().intValue();
-//        QueueEntry entry = new QueueEntry(entity, entityNum, pri, getS)
+        QueueEntry entry = new QueueEntry(entity, entityNum, pri, getSimTicks());
+
+        // 将实体添加到集合中
+        boolean bool = itemSet.add(entry);
+        if (!bool) {
+            error("Entity %s is already present in the queue.", entity);
+        }
+
+        // 通知该队列的所有用户
+        if (!userUpdateHandle.isScheduled()) {
+            EventManager.scheduleTicks(0, 2, false, userUpdate, userUpdateHandle);
+        }
+
+        // 调度指定时间去检查放弃（违约）条件
+        if (renegeTime.getValue() != null) {
+            double dur = renegeTime.getValue();
+            // 以FIFO的顺序调度违约测试，所以若有多个实体被同时添加到队列中
+            // 则队列中越靠近前目的实体会先被测试
+//            EventManager.scheduleTicks();
+        }
+
 
 
 
