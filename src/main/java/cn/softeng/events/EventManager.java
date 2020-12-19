@@ -27,6 +27,7 @@ public final class EventManager {
      * 实体管理器的名称
      */
     public final String name;
+
     /**
      * 全局同步锁
      */

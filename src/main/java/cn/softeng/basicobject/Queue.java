@@ -1,6 +1,7 @@
 package cn.softeng.basicobject;
 
 import cn.softeng.basicsim.Entity;
+import cn.softeng.basicsim.EntityTarget;
 import cn.softeng.events.EventHandle;
 import cn.softeng.events.EventManager;
 import cn.softeng.events.ProcessTarget;
@@ -9,10 +10,11 @@ import cn.softeng.input.EntityInput;
 import cn.softeng.input.ValueInput;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.TreeSet;
 
 /**
- * 队列组件，用于排队
+ * 队列组件,用于实体排队
  * @date: 12/17/2020 10:01 AM
  */
 public class Queue extends LinkedComponent {
@@ -109,7 +111,8 @@ public class Queue extends LinkedComponent {
     }
 
     /**
-     * 队列中的实体条目
+     * 对进入队列中的实体又进行了一次封装，
+     * 添加优先级，入队时间等属性，以便重新排序
      */
     private static class QueueEntry implements Comparable<QueueEntry> {
         final Entity entity;
@@ -140,6 +143,21 @@ public class Queue extends LinkedComponent {
         }
     }
 
+    /**
+     * 从Queue等待集合中取出指定的实体
+     * @param ent
+     * @return
+     */
+    private QueueEntry getQueueEntry(Entity ent) {
+        Iterator<QueueEntry> itr = itemSet.iterator();
+        while (itr.hasNext()) {
+            QueueEntry entry = itr.next();
+            if (entry.entity == ent) {
+                return entry;
+            }
+            return null;
+        }
+    }
 
     /**
      * 队列变化通知Target, 用于通知Queue的使用者,Queue发生了改变
@@ -172,6 +190,9 @@ public class Queue extends LinkedComponent {
     @Override
     public void addEntity(Entity entity) {
         super.addEntity(entity);
+
+        // todo 更新队列统计相关操作
+
         // 建立一个实体项目
         long entityNum = this.getTotalNumberAdded();
         if (!fifo.getValue()) {
@@ -196,12 +217,30 @@ public class Queue extends LinkedComponent {
             double dur = renegeTime.getValue();
             // 以FIFO的顺序调度违约测试，所以若有多个实体被同时添加到队列中
             // 则队列中越靠近前目的实体会先被测试
-//            EventManager.scheduleTicks();
+//            EventManager.scheduleTicks(dur, 5, true, new );
         }
 
+    }
+
+
+    public void renegeAction(Entity entity) {
+//        QueueEntry entry = this.
+    }
 
 
 
+    private static class RenegeActionTarget extends EntityTarget<Queue> {
+        private final Entity queuedEntity;
+
+        RenegeActionTarget(Queue q, Entity e) {
+            super(q, "renegeAction");
+            queuedEntity = e;
+        }
+
+        @Override
+        public void process() {
+//            entity.renegeA
+        }
     }
 
 
