@@ -18,32 +18,40 @@ import java.util.TreeSet;
  * @date: 12/17/2020 10:01 AM
  */
 public class Queue extends LinkedComponent {
+
     /**
      * 队列中放置接收到的实体的优先级，例如 priority 1 > priority 2
      */
     private final ValueInput priority;
+
     /**
      * 设定实体进入Queue的方式:(FIFO or LIFO)
      */
     private final BooleanInput fifo;
+
     /**
-     * 实体决定放弃之前，要在队列中等待的时间
+     * 违约时间，实体在队列中最长等待时间，（超时则视作违约，离开实体）
      */
     private final ValueInput renegeTime;
+
     /**
-     * 用于确定实体在等待其renegeTime后是否会放弃
+     * 决定该队列组件是否考虑违约情况
      */
     private final BooleanInput renegeCondition;
+
     /**
-     * 当实体放弃等待后，它将被送给哪一个组件
+     * 当实体等待超时后，它将去哪一个组件
      */
     private final EntityInput<LinkedComponent> renegeDestination;
+
     /**
-     * 按队列顺序的所有实体的集合
+     * 队列中所有实体的集合，每个实体连同其的入队时间、优先级等信息被封装成一个QueueEntry
+     * 集合中的entry按照指定的优先级排序
      */
     private final TreeSet<QueueEntry> itemSet;
+
     /**
-     * 使用该队列的组件
+     * 该Queue组件的使用者
      */
     private final ArrayList<QueueUser> userList;
 
@@ -51,29 +59,34 @@ public class Queue extends LinkedComponent {
     // 数据统计相关变量
     // ***********************************************************
 
-    protected double timeOfLastUpdate;
-    protected double startOfStatisticsCollection;
-    protected int minElements;
-    protected int maxElements;
-    protected double elementSeconds;
-    protected long numberReneged;
+    protected double timeOfLastUpdate;             // 上次更新统计的时间
+    protected double startOfStatisticsCollection;  // 收集统计信息的开始时间
+    protected int minElements;                     // 队列中观察到的最小实体数
+    protected int maxElements;                     // 队列中观察到的最大实体数数
+    protected double elementSeconds;               // 所有实体在队列中花费的总时间
+    protected long numberReneged;                  // 等待超时的实体数目
 
     private final DoQueueChanged userUpdate = new DoQueueChanged(this);
     private final EventHandle userUpdateHandle = new EventHandle();
 
     {
-        priority = new ValueInput("Priority", Double.valueOf(0));
+        // 初始化默认优先级
+        priority = new ValueInput("Priority", Long.valueOf(0));
         this.addInput(priority);
 
+        // 初始化队列进程方式
         fifo = new BooleanInput("FIFO", true);
         this.addInput(fifo);
 
-        renegeTime = new ValueInput("RenegeCondition", Double.valueOf(0));
+        // 初始化实体等待时间
+        renegeTime = new ValueInput("RenegeCondition", Long.valueOf(0));
         this.addInput(renegeTime);
 
+        // 初始化是否考虑超时情况
         renegeCondition = new BooleanInput("RenegeCondition", false);
         this.addInput(renegeCondition);
 
+        // 初始化超时实体的去向
         renegeDestination = new EntityInput<>(LinkedComponent.class, "RenegeDestination", null);
         this.addInput(renegeDestination);
     }
@@ -116,13 +129,13 @@ public class Queue extends LinkedComponent {
      */
     private static class QueueEntry implements Comparable<QueueEntry> {
         final Entity entity;
-        final long entityNum;
+        final long entryNum;
         final int priority;
         final double timeAdded;
 
-        public QueueEntry(Entity ent, long n, int pri, double time) {
+        public QueueEntry(Entity ent, long num, int pri, double time) {
             entity = ent;
-            entityNum = n;
+            entryNum = num;
             priority = pri;
             timeAdded = time;
         }
@@ -133,9 +146,9 @@ public class Queue extends LinkedComponent {
                 return 1;
             } else if (this.priority < entry.priority) {
                 return -1;
-            } else if (this.entityNum > entry.entityNum) {
+            } else if (this.entryNum > entry.entryNum) {
                 return 1;
-            } else if (this.entityNum < entry.entityNum) {
+            } else if (this.entryNum < entry.entryNum) {
                 return -1;
             } else {
                 return 0;
@@ -155,8 +168,25 @@ public class Queue extends LinkedComponent {
             if (entry.entity == ent) {
                 return entry;
             }
-            return null;
         }
+        return null;
+    }
+
+    /**
+     * 获取指定实体在队列中排队的位置
+     * @param entity
+     * @return
+     */
+    public int getPosition(Entity entity) {
+        int ret = 0;
+        Iterator<QueueEntry> itr = itemSet.iterator();
+        while (itr.hasNext()) {
+            if (itr.next().entity == entity) {
+                return ret;
+            }
+            ret++;
+        }
+        return -1;
     }
 
     /**
@@ -187,6 +217,10 @@ public class Queue extends LinkedComponent {
     // 队列处理方法
     // ***************************************************************************
 
+    /**
+     * 队列组件接受到新的实体
+     * @param entity
+     */
     @Override
     public void addEntity(Entity entity) {
         super.addEntity(entity);
@@ -194,12 +228,13 @@ public class Queue extends LinkedComponent {
         // todo 更新队列统计相关操作
 
         // 建立一个实体项目
-        long entityNum = this.getTotalNumberAdded();
+        long entryNum = this.getTotalNumberAdded();
         if (!fifo.getValue()) {
-            entityNum *= -1;
+            // 如果是先进后出,则排队的实体号为负值
+            entryNum *= -1;
         }
         int pri = (int) priority.getValue().intValue();
-        QueueEntry entry = new QueueEntry(entity, entityNum, pri, getSimTicks());
+        QueueEntry entry = new QueueEntry(entity, entryNum, pri, getSimTicks());
 
         // 将实体添加到集合中
         boolean bool = itemSet.add(entry);
@@ -209,26 +244,73 @@ public class Queue extends LinkedComponent {
 
         // 通知该队列的所有用户
         if (!userUpdateHandle.isScheduled()) {
+            // 当前时刻调度 userUpdate target 通知所有使用该队列的组件
             EventManager.scheduleTicks(0, 2, false, userUpdate, userUpdateHandle);
         }
 
         // 调度指定时间去检查放弃（违约）条件
         if (renegeTime.getValue() != null) {
-            double dur = renegeTime.getValue();
+            long dur =  renegeTime.getValue();
             // 以FIFO的顺序调度违约测试，所以若有多个实体被同时添加到队列中
             // 则队列中越靠近前目的实体会先被测试
-//            EventManager.scheduleTicks(dur, 5, true, new );
+            EventManager.scheduleTicks(dur, 5, true, new RenegeActionTarget(this, entity), null);
         }
 
     }
 
+    /**
+     * 从队列中移除指定的实体
+     * @param entry
+     * @return
+     */
+    public Entity remove(QueueEntry entry) {
+        int queueSize = itemSet.size();
 
-    public void renegeAction(Entity entity) {
-//        QueueEntry entry = this.
+        // 将指定实体从队列的所有实体 TreeSet 集合中删除
+        boolean found = itemSet.remove(entry);
+        if (found) {
+            error("Cannot find the entry in itemSet");
+        }
+
+        this.incrementNumberProcessed();
+        return entry.entity;
     }
 
+    /**
+     * 当队列中有实体等待超时，需要进行的操作
+     * @param entity 等待超时的实体
+     */
+    public void renegeAction(Entity entity) {
+        // 从等待集合中查找实体对应的条目，
+        QueueEntry entry = this.getQueueEntry(entity);
+        if (entry == null) {
+            // 如果实体已经离开队列，则什么也不做
+            return;
+        }
 
+        // 临时将接受到实体设置为超时的实体
+        Entity oldEntity = this.getReceivedEntity();
+        this.setReceivedEntity(entity);
 
+        // 检查是否考虑超时情况的条件
+        if (renegeCondition.getValue() == false) {
+            // receivedEntity 恢复原状
+            this.setReceivedEntity(oldEntity);
+            return;
+        }
+
+        // 重置实体
+        this.setReceivedEntity(oldEntity);
+
+        // 将超时实体从队列中移除，并传送到超时处理组件
+        this.remove(entry);
+        numberReneged++;
+        renegeDestination.getValue().addEntity(entity);
+    }
+
+    /**
+     * 当队列中有实体等待超时后，对实体进行的相关操作的 target
+     */
     private static class RenegeActionTarget extends EntityTarget<Queue> {
         private final Entity queuedEntity;
 
@@ -239,11 +321,68 @@ public class Queue extends LinkedComponent {
 
         @Override
         public void process() {
-//            entity.renegeA
+            entity.renegeAction(queuedEntity);
         }
     }
 
+    /**
+     * 从队列中移除第一个实体
+     * @return
+     */
+    public Entity removeFirst() {
+        if (itemSet.isEmpty()) {
+            error("Cannot remove an entity frome an empty queue");
+        }
+        return this.remove(itemSet.first());
+    }
 
+    /**
+     * 返回队列中的第一个实体
+     * @return
+     */
+    public Entity getFirst() {
+        return itemSet.first().entity;
+    }
+
+    /**
+     * 返回队列中实体的数目
+     * @return
+     */
+    public int getCount() {
+        return itemSet.size();
+    }
+
+    /**
+     * 队列是否为空
+     * @return
+     */
+    public boolean isEmpty() {
+        return itemSet.isEmpty();
+    }
+
+    /**
+     * 返回队列中第一个实体花费的时间刻度
+     * @return
+     */
+    public double getQueueTime() {
+        return this.getSimTicks() - itemSet.first().timeAdded;
+    }
+
+    /**
+     * 返回队列中第一个对象的优先级值
+     * @return
+     */
+    public int getFirstPriority() {
+        return itemSet.first().priority;
+    }
+
+    private void updateStatistics(int oldValue, int newValue) {
+        minElements = Math.min(newValue, minElements);
+        maxElements = Math.max(newValue, maxElements);
+
+        // todo 其他统计相关操作
+
+    }
 
 
 

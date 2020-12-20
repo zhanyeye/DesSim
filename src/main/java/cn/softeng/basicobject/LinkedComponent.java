@@ -102,6 +102,13 @@ public class LinkedComponent extends StateEntity {
     }
 
     /**
+     * 该组件的已处理实体数+1
+     */
+    public void incrementNumberProcessed() {
+        numberProcessed++;
+    }
+
+    /**
      * 返回在整个仿真运行（包括初始化期间）中从上游接收到的实体数。
      * @return
      */
@@ -134,4 +141,11 @@ public class LinkedComponent extends StateEntity {
         numberProcessed = 0;
     }
 
+    /**
+     * 获取该组件最近接收到的实体
+     * @return
+     */
+    public Entity getReceivedEntity() {
+        return receivedEntity;
+    }
 }
