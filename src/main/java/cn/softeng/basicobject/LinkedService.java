@@ -184,9 +184,23 @@ public class LinkedService extends LinkedComponent implements QueueUser {
         if (this.isIdle()) {
             if (processKilled) {
                 processKilled = false;
-//                boolean bool = this.up
+                boolean bool = this.updateForStoppage(startTime, stopWorkTime, getSimTicks());
+                if (bool) {
+                    this.setBusy(true);
+                    this.setPresentState();
+                    duration -= stopWorkTime - startTime;
+                    startTime = this.getSimTicks();
+                    this.scheduleProcessTicks(duration, 5, endActionTarget, endActionHandle);
+                    return;
+                }
             }
+            // Otherwise, start work on a new entity
+            this.startAction();
+            return;
         }
+
+        // If the server cannot start work or is already working, then record the state change
+        this.setPresentState();
     }
 
 
@@ -197,7 +211,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
 
         @Override
         public void process() {
-//
+            entity.endAction();
         }
     }
 
@@ -207,6 +221,19 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      */
     public boolean isIdle() {
         return !isBusy();
+    }
+
+
+    /**
+     * Performs any special processing required for this sub-class of LinkedService
+     * @param startWork - simulation time at which the process was started
+     * @param stopWork - simulation time at which the process was interrupted
+     * @param resumeWork - simulation time at which the process is to be resumed
+     * @return whether the original process should be resumed (true)
+     *         or a new process should be started (false)
+     */
+    protected boolean updateForStoppage(long startWork, long stopWork, double resumeWork) {
+        return true;
     }
 
 
