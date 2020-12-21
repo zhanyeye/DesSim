@@ -1,6 +1,8 @@
 package cn.softeng.basicsim;
 
+import cn.softeng.events.EventHandle;
 import cn.softeng.events.EventManager;
+import cn.softeng.events.ProcessTarget;
 import cn.softeng.input.Input;
 
 import java.util.ArrayList;
@@ -144,6 +146,20 @@ public class Entity {
     public static <T extends Entity> ClonesOfIterable<T> getClonesOfIterable(Class<T> proto) {
         return new ClonesOfIterable<>(proto);
     }
+
+    public final void scheduleProcessTicks(long ticks, int priority, boolean fifo, ProcessTarget t, EventHandle h) {
+        EventManager.scheduleTicks(ticks, priority, fifo, t, h);
+    }
+
+    public final void scheduleProcessTicks(long ticks, int priority, ProcessTarget t, EventHandle handle) {
+        EventManager.scheduleTicks(ticks, priority, false, t, handle);
+    }
+
+    public final void scheduleProcessTicks(long ticks, int priority, ProcessTarget t) {
+        EventManager.scheduleTicks(ticks, priority, false, t, null);
+    }
+
+
 
     /**
      * 重置实体收集的统计数据

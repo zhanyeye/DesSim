@@ -738,8 +738,7 @@ public final class EventManager {
         base.handle = null;
         if (base instanceof Event) {
             removeEvent((Event)base);
-        }
-        else {
+        } else {
             condEvents.remove(base);
         }
         return t;
@@ -756,7 +755,8 @@ public final class EventManager {
     }
 
     /**
-     *	Removes an event from the pending list without executing it.
+     * Removes an event from the pending list without executing it.
+     * 从事件等待列表中删除事件
      */
     private void killEvent(Process cur, EventHandle handle) {
         assertCanSchedule();

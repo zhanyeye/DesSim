@@ -381,10 +381,6 @@ public class Queue extends LinkedComponent {
         maxElements = Math.max(newValue, maxElements);
 
         // todo 其他统计相关操作
-
     }
-
-
-
 
 }
