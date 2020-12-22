@@ -176,10 +176,25 @@ public class Entity {
         setFlag(FLAG_DEAD);
     }
 
-//    public static <T extends Entity> T fastCopy(T entity, String name) {
-//        Class proto = entity.getClass();
-//
-//    }
+    public static <T extends Entity> T fastCopy(T entity, String name) {
+        Class proto = entity.getClass();
+
+        try {
+            T ret = (T) proto.newInstance();
+            if (name != null) {
+                entity.setName(name);
+            } else {
+                entity.setName(proto.getSimpleName() + "-" + entity.getEntityNumber());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public long getEntityNumber() {
+        return entityNumber;
+    }
 
     public void setName(String newName) {
         if (testFlag(FLAG_GENERATED)) {
