@@ -82,7 +82,6 @@ public class EntityGenerator extends LinkedService {
 
     @Override
     protected void endProcessing(long simTime) {
-        log.info("entityGenerator : " + simTime);
         // 创建一个新的实体
         int num = entitiesPerArrival.getValue().intValue();
         for (int i = 0; i < num; i++) {
@@ -94,7 +93,7 @@ public class EntityGenerator extends LinkedService {
             entity.earlyInit();
             // 将实体传送给链中的下一个元素
             this.sendToNextComponent(entity);
-            log.debug(" - numberGenerater : " + numberGenerated);
+            log.debug("time: {} - EntityGenerator > numberGenerater : {}", simTime, numberGenerated);
         }
     }
 

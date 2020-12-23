@@ -8,6 +8,7 @@ import cn.softeng.events.ProcessTarget;
 import cn.softeng.input.BooleanInput;
 import cn.softeng.input.EntityInput;
 import cn.softeng.input.ValueInput;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import java.util.TreeSet;
  * 队列组件,用于实体排队
  * @date: 12/17/2020 10:01 AM
  */
+@Slf4j
 public class Queue extends LinkedComponent {
 
     /**
@@ -255,6 +257,7 @@ public class Queue extends LinkedComponent {
             // 则队列中越靠近前目的实体会先被测试
             EventManager.scheduleTicks(dur, 5, true, new RenegeActionTarget(this, entity), null);
         }
+        log.debug("time: {} - Queue > addQueue : {}  > totalnum : {}", getSimTicks(), this.getTotalNumberAdded(), itemSet.size());
 
     }
 
