@@ -83,6 +83,18 @@ public class LinkedService extends LinkedComponent implements QueueUser {
         return stopWorkTime;
     }
 
+
+    /**
+     * 从队列中移除下一个要处理的实体，并注册到该组件中
+     * @return
+     */
+    protected Entity getNextEntityFromQueue() {
+        Entity entity = waitQueue.getValue().removeFirst();
+        this.registerEntity(entity);
+        return entity;
+    }
+
+
     /**
      * 获取该组件用到的队列
      * @return
@@ -118,7 +130,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     }
 
     /**
-     * 放回处理完实体所需要的时间
+     * 返回处理完实体所需要的时间
      * @param simTime 当前的仿真时间
      * @return 所需的处理时间
      */

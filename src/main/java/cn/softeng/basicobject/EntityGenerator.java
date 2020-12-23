@@ -65,6 +65,7 @@ public class EntityGenerator extends LinkedService {
         return (maxNumber.getValue() == null) || numberGenerated < maxNumber.getValue();
     }
 
+    @Override
     protected void endProcessing(long simTime) {
         // 创建一个新的实体
         int num = entitiesPerArrival.getValue().intValue();
@@ -73,9 +74,24 @@ public class EntityGenerator extends LinkedService {
             Entity proto = prototypeEntity.getValue();
             StringBuilder sb = new StringBuilder();
             sb.append(this.getName()).append("_").append(numberGenerated);
-
+            Entity entity = Entity.fastCopy(proto, sb.toString());
+            entity.earlyInit();
+            // 将实体传送给链中的下一个元素
+            this.sendToNextComponent(entity);
         }
+    }
 
+    @Override
+    protected long getProcessingTime(long simTime) {
+        if (numberGenerated == 0) {
+            return firstArrivalTime.getValue();
+        }
+        return interArrivalTime.getValue();
+    }
+
+    @Override
+    public long getNumberInProgress() {
+        return 0;
     }
 
 

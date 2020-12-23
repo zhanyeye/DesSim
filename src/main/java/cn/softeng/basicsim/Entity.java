@@ -177,19 +177,23 @@ public class Entity {
     }
 
     public static <T extends Entity> T fastCopy(T entity, String name) {
-        Class proto = entity.getClass();
+        T ret = (T) generateEntityWithName(entity.getClass(), name);
+        return ret;
+    }
 
+    private static <T extends Entity> T generateEntityWithName(Class<T> proto, String name) {
+        T ent = null;
         try {
-            T ret = (T) proto.newInstance();
+            ent = proto.newInstance();
             if (name != null) {
-                entity.setName(name);
+                ent.setName(name);
             } else {
-                entity.setName(proto.getSimpleName() + "-" + entity.getEntityNumber());
+                ent.setName(proto.getSimpleName() + "-" + ent.getEntityNumber());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        return ent;
     }
 
     public long getEntityNumber() {
