@@ -26,4 +26,5 @@ public abstract class Input<T> {
     public T getValue() {
         return value;
     }
+
 }

@@ -245,7 +245,9 @@ public class Entity {
         return (flags & flag) != 0;
     }
 
-
+    public static <T extends Entity> InstanceIterable<T> getInstanceIterator(Class<T> proto) {
+        return new InstanceIterable<>(proto);
+    }
 
     public static <T extends Entity> ClonesOfIterable<T> getClonesOfIterable(Class<T> proto) {
         return new ClonesOfIterable<>(proto);
@@ -263,6 +265,16 @@ public class Entity {
         EventManager.scheduleTicks(ticks, priority, false, t, null);
     }
 
+    /**
+     * 更具实体名称，获取指定实体
+     * @param name
+     * @return
+     */
+    public static Entity getNamedEntity(String name) {
+        synchronized (namedEntities) {
+            return namedEntities.get(name);
+        }
+    }
 
 
     /**

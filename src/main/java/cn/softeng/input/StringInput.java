@@ -7,4 +7,5 @@ public class StringInput extends Input<String> {
     public StringInput(String keyword, String defValue) {
         super(keyword, defValue);
     }
+
 }

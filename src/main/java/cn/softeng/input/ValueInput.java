@@ -7,4 +7,5 @@ public class ValueInput extends Input<Long> {
     public ValueInput(String keyword, Long defValue) {
         super(keyword, defValue);
     }
+
 }
