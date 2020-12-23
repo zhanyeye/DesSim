@@ -12,6 +12,7 @@ public abstract class Input<T> {
     public Input(String keyword, T defValue) {
         this.keyword = keyword;
         this.defValue = defValue;
+        this.value = defValue;
     }
 
     @Override
@@ -26,5 +27,7 @@ public abstract class Input<T> {
     public T getValue() {
         return value;
     }
+
+    public abstract void updateValue(Object newValue);
 
 }

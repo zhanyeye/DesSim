@@ -9,7 +9,7 @@ public class StartUpTarget extends ProcessTarget {
 
     final Entity entity;
 
-    StartUpTarget(Entity entity) {
+    public StartUpTarget(Entity entity) {
         this.entity = entity;
     }
 

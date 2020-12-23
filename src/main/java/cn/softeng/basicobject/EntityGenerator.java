@@ -3,10 +3,12 @@ package cn.softeng.basicobject;
 import cn.softeng.basicsim.Entity;
 import cn.softeng.input.EntityInput;
 import cn.softeng.input.ValueInput;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @date: 12/22/2020 9:38 AM
  */
+@Slf4j
 public class EntityGenerator extends LinkedService {
     /**
      * 第一个产生的实体到达时间
@@ -55,6 +57,19 @@ public class EntityGenerator extends LinkedService {
     }
 
     @Override
+    public void startUp() {
+        super.startUp();
+
+        // Start generating entities
+        this.startAction();
+    }
+
+    @Override
+    public void addEntity(Entity ent ) {
+        error("An entity cannot be sent to an EntityGenerator.");
+    }
+
+    @Override
     public void earlyInit() {
         super.earlyInit();
         numberGenerated = 0;
@@ -67,6 +82,7 @@ public class EntityGenerator extends LinkedService {
 
     @Override
     protected void endProcessing(long simTime) {
+        log.info("entityGenerator : " + simTime);
         // 创建一个新的实体
         int num = entitiesPerArrival.getValue().intValue();
         for (int i = 0; i < num; i++) {
@@ -78,6 +94,7 @@ public class EntityGenerator extends LinkedService {
             entity.earlyInit();
             // 将实体传送给链中的下一个元素
             this.sendToNextComponent(entity);
+            log.debug(" - numberGenerater : " + numberGenerated);
         }
     }
 

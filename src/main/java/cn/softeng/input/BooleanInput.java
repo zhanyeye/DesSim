@@ -8,4 +8,9 @@ public class BooleanInput extends Input<Boolean> {
     public BooleanInput(String keyword, Boolean defValue) {
         super(keyword, defValue);
     }
+
+    @Override
+    public void updateValue(Object newValue) {
+        value = (Boolean) newValue;
+    }
 }

@@ -253,6 +253,10 @@ public class Entity {
         return new ClonesOfIterable<>(proto);
     }
 
+    public static <T extends Entity> ClonesOfIterable<T> getClonesOfIterator(Class<T> proto){
+        return new ClonesOfIterable<>(proto);
+    }
+
     public final void scheduleProcessTicks(long ticks, int priority, boolean fifo, ProcessTarget t, EventHandle h) {
         EventManager.scheduleTicks(ticks, priority, fifo, t, h);
     }

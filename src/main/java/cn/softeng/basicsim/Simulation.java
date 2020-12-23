@@ -5,4 +5,6 @@ package cn.softeng.basicsim;
  */
 public class Simulation {
 
+    public static void endRun() {
+    }
 }

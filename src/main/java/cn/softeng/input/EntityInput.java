@@ -17,4 +17,9 @@ public class EntityInput<T extends Entity> extends Input<T> {
         entitySubClass = tClass;
         includeSubClasses = true;
     }
+
+    @Override
+    public void updateValue(Object newValue) {
+        value = (T) newValue;
+    }
 }

@@ -8,4 +8,9 @@ public class ValueInput extends Input<Long> {
         super(keyword, defValue);
     }
 
+    @Override
+    public void updateValue(Object newValue) {
+        value = Long.valueOf((Long) newValue);
+    }
+
 }

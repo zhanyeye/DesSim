@@ -8,4 +8,9 @@ public class StringInput extends Input<String> {
         super(keyword, defValue);
     }
 
+    @Override
+    public void updateValue(Object newValue) {
+        value = String.valueOf(newValue);
+    }
+
 }

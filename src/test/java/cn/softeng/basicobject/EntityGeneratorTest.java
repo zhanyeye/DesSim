@@ -1,8 +1,11 @@
 package cn.softeng.basicobject;
 
 import cn.softeng.basicsim.Entity;
+import cn.softeng.basicsim.InitModelTarget;
+import cn.softeng.basicsim.StartUpTarget;
 import cn.softeng.events.EventManager;
 import cn.softeng.input.Input;
+import cn.softeng.input.ValueInput;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -12,7 +15,7 @@ import org.junit.Test;
 @Slf4j
 public class EntityGeneratorTest {
     @Test
-    public  void test_EntityGeneratorFunc_noError() {
+    public  void test_EntityGeneratorFunc_noError() throws InterruptedException {
         // 创建事件管理器
         EventManager evt = new EventManager("DefaultEventManager");
 
@@ -20,28 +23,23 @@ public class EntityGeneratorTest {
         EntityGenerator entityGenerator = new EntityGenerator();
         entityGenerator.setName("EntityGenerator1");
 
-        long t = (long) entityGenerator.getInput("FirstArrivalTime").getValue();
+        SimEntity simEntity = new SimEntity();
+        simEntity.setName("defaultEntity");
 
-//        entityGenerator.getInput("FirstArrivalTime");
+        entityGenerator.getInput("FirstArrivalTime").updateValue(0L);
+        entityGenerator.getInput("InterArrivalTime").updateValue(5L);
+        entityGenerator.getInput("EntitiesPerArrival").updateValue(2L);
+        entityGenerator.getInput("PrototypeEntity").updateValue(simEntity);
 
+        evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
+        evt.resume(100);
 
+        // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
+        // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
+        while (true) {
+            Thread.sleep(1);
+        }
 
-
-
-
-
-        // ***************************************
-        // 初始化实体
-        // ***************************************
-
-        //
-
-//        evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
-//        evt.resume(evt.secondsToNearestTick(Simulation.getPauseTime()));
-
-
-        log.debug("allInstances size : " + Entity.getAll().size());
-        entityGenerator.earlyInit();
 
     }
 
