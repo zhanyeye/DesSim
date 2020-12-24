@@ -63,13 +63,13 @@ public class ProcessFlowTest {
         entitySink.setName("EntitySink");
 
         entityGenerator.getInput("FirstArrivalTime").updateValue(0L);
-        entityGenerator.getInput("InterArrivalTime").updateValue(5L);
+        entityGenerator.getInput("InterArrivalTime").updateValue(1L);
         entityGenerator.getInput("EntitiesPerArrival").updateValue(1L);
         entityGenerator.getInput("PrototypeEntity").updateValue(simEntity);
         entityGenerator.getInput("NextComponent").updateValue(queue);
 
         server.getInput("NextComponent").updateValue(entitySink);
-        server.getInput("ServiceTime").updateValue(5L);
+        server.getInput("ServiceTime").updateValue(2L);
         server.getInput("WaitQueue").updateValue(queue);
 
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);

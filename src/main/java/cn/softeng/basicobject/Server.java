@@ -27,7 +27,7 @@ public class Server extends LinkedService {
     @Override
     protected boolean startProcessing(long simTime) {
         // 从队列中删除第一个实体
-        this.getNextEntityFromQueue();
+        this.servedEntity = this.getNextEntityFromQueue();
         return true;
     }
 

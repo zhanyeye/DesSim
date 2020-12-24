@@ -1,5 +1,7 @@
 package cn.softeng.events;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,6 +24,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * on being in a running model context which will access the eventmanager that is
  * currently running, think of it like a thread-local variable for all model threads.
  */
+@Slf4j
 public final class EventManager {
     /**
      * 实体管理器的名称
@@ -391,6 +394,7 @@ public final class EventManager {
                 } else {
                     currentTick.set(nextTick);
                 }
+                log.debug("time: {} - [time advance]", currentTick.get());
 
                 timelistener.tickUpdate(currentTick.get());
 

@@ -91,9 +91,10 @@ public class EntityGenerator extends LinkedService {
             sb.append(this.getName()).append("_").append(numberGenerated);
             Entity entity = Entity.fastCopy(proto, sb.toString());
             entity.earlyInit();
+            log.debug("time: {} - EntityGenerator > numberGenerater : {}", simTime, numberGenerated);
             // 将实体传送给链中的下一个元素
             this.sendToNextComponent(entity);
-            log.debug("time: {} - EntityGenerator > numberGenerater : {}", simTime, numberGenerated);
+
         }
     }
 

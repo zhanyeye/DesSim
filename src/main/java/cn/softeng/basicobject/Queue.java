@@ -81,7 +81,7 @@ public class Queue extends LinkedComponent {
         this.addInput(fifo);
 
         // 初始化实体等待时间
-        renegeTime = new ValueInput("RenegeCondition", Long.valueOf(0));
+        renegeTime = new ValueInput("RenegeCondition", null);
         this.addInput(renegeTime);
 
         // 初始化是否考虑超时情况
@@ -271,7 +271,7 @@ public class Queue extends LinkedComponent {
 
         // 将指定实体从队列的所有实体 TreeSet 集合中删除
         boolean found = itemSet.remove(entry);
-        if (found) {
+        if (!found) {
             error("Cannot find the entry in itemSet");
         }
 
