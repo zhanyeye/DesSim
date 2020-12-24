@@ -257,8 +257,7 @@ public class Queue extends LinkedComponent {
             // 则队列中越靠近前目的实体会先被测试
             EventManager.scheduleTicks(dur, 5, true, new RenegeActionTarget(this, entity), null);
         }
-        log.debug("time: {} - {} > addQueue : {}  > totalnum : {}", getSimTicks(), this.getName(), this.getTotalNumberAdded(), itemSet.size());
-
+        log.debug("time: {} - {} > addQueue : {}  > inQueue : {}", getSimTicks(), this.getName(), this.getTotalNumberAdded(), this.getNumberInProgress());
     }
 
     /**
@@ -274,8 +273,8 @@ public class Queue extends LinkedComponent {
         if (!found) {
             error("Cannot find the entry in itemSet");
         }
-
         this.incrementNumberProcessed();
+        log.debug("time: {} - {} > addQueue : {}  > inQueue : {}", getSimTicks(), this.getName(), this.getTotalNumberAdded(), this.getNumberInProgress());
         return entry.entity;
     }
 

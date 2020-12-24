@@ -47,7 +47,8 @@ public class ProcessFlowTest {
 
     /**
      * 测试单个Queue和Service时，运行运行是否正常
-     * 即： EntityGenerator -> Queue1 -> Server1 -> EntitySink
+     * 即： EntityGenerator(实体产生间隔1s，每次产生一个实体) -> Queue1 -> Server1(服务时间2s) -> EntitySink
+     * 仿真运行的截止时间是25，waitInQueue: 12, inServer: 1, inSink: 12
      * @throws InterruptedException
      */
     @Test
@@ -82,7 +83,7 @@ public class ProcessFlowTest {
         server.getInput("WaitQueue").updateValue(queue);
 
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
-        evt.resume(50);
+        evt.resume(25);
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
         // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
@@ -93,7 +94,8 @@ public class ProcessFlowTest {
 
     /**
      * 测试2个Queue和Service时，运行运行是否正常
-     * 即： EntityGenerator -> Queue1 -> Server1 -> Queue2 -> Server2 -> EntitySink
+     * 即： EntityGenerator(实体产生间隔1s，每次产生一个实体) -> Queue1 -> Server1(服务时间2s) -> Queue2 -> Server2(服务时间4s) -> EntitySink
+     * 仿真运行的截止时间是25，waitInQueue1: 12, inServer1: 1, waitInQueue2: 6, inServer2: 1, inSink: 5
      * @throws InterruptedException
      */
     @Test
@@ -136,7 +138,7 @@ public class ProcessFlowTest {
         server2.getInput("NextComponent").updateValue(entitySink);
 
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
-        evt.resume(50);
+        evt.resume(25);
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
         // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
