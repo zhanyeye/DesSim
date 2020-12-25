@@ -6,6 +6,7 @@ import cn.softeng.input.ValueInput;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * EntityGenerator以随机间隔创建Entities序列，这些序列放置在目标Queue中
  * @date: 12/22/2020 9:38 AM
  */
 @Slf4j

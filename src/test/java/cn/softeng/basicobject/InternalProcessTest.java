@@ -9,7 +9,7 @@ import org.junit.Test;
  * @date: 12/23/2020 10:48 AM
  */
 @Slf4j
-public class ProcessFlowTest {
+public class InternalProcessTest {
     /**
      * 测试EntityGengrator产生试题是否符合预期
      * @throws InterruptedException
