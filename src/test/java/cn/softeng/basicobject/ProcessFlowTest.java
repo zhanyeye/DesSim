@@ -1,11 +1,7 @@
 package cn.softeng.basicobject;
 
-import cn.softeng.basicsim.Entity;
 import cn.softeng.basicsim.InitModelTarget;
-import cn.softeng.basicsim.StartUpTarget;
 import cn.softeng.events.EventManager;
-import cn.softeng.input.Input;
-import cn.softeng.input.ValueInput;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -46,7 +42,7 @@ public class ProcessFlowTest {
     }
 
     /**
-     * 测试单个Queue和Service时，运行运行是否正常
+     * 测试单个Queue和Service时，运行是否正常
      * 即： EntityGenerator(实体产生间隔1s，每次产生一个实体) -> Queue1 -> Server1(服务时间2s) -> EntitySink
      * 仿真运行的截止时间是25，waitInQueue: 12, inServer: 1, inSink: 12
      * @throws InterruptedException
@@ -55,6 +51,7 @@ public class ProcessFlowTest {
     public void test_singleQueueAndService_noError() throws InterruptedException {
         // 创建事件管理器
         EventManager evt = new EventManager("DefaultEventManager");
+
 
         // 创建实体，并完成用户输入
         EntityGenerator entityGenerator = new EntityGenerator();
@@ -82,7 +79,9 @@ public class ProcessFlowTest {
         server.getInput("ServiceTime").updateValue(2L);
         server.getInput("WaitQueue").updateValue(queue);
 
+        // 初始化实体
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
+        // 运行到25时刻停止
         evt.resume(25);
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
@@ -93,7 +92,7 @@ public class ProcessFlowTest {
     }
 
     /**
-     * 测试2个Queue和Service时，运行运行是否正常
+     * 测试2个Queue和Service时，运行是否正常
      * 即： EntityGenerator(实体产生间隔1s，每次产生一个实体) -> Queue1 -> Server1(服务时间2s) -> Queue2 -> Server2(服务时间4s) -> EntitySink
      * 仿真运行的截止时间是25，waitInQueue1: 12, inServer1: 1, waitInQueue2: 6, inServer2: 1, inSink: 5
      * @throws InterruptedException
@@ -137,7 +136,9 @@ public class ProcessFlowTest {
         server2.getInput("ServiceTime").updateValue(4L);
         server2.getInput("NextComponent").updateValue(entitySink);
 
+        // 初始化实体
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
+        // 运行到25时刻停止
         evt.resume(25);
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
