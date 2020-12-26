@@ -9,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple DesSimApp.
  */
 @Slf4j
-public class AppTest 
+public class DesSimAppTest
 {
     /**
      * Rigorous Test :-)

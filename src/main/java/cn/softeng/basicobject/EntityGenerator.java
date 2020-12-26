@@ -112,8 +112,4 @@ public class EntityGenerator extends LinkedService {
         return 0;
     }
 
-
-
-
-
 }

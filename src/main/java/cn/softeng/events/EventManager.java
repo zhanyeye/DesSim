@@ -417,6 +417,15 @@ public final class EventManager {
     }
 
     /**
+     * EventViewer NextEvent button to Execute a single event from the event
+     * @param simTime
+     */
+    public void nextOneEvent(long simTime) {
+        oneEvent = true;
+        resume(simTime);
+    }
+
+    /**
      * Event Viewer NextTime button to Execute all the events from the future
      * event list that are scheduled for the next event time. the conditional events
      * are then executed along with any new events that have been scheduled for this time
@@ -425,6 +434,17 @@ public final class EventManager {
     public void nextEventTime(double simTime) {
         oneSimTime = true;
         resume(this.secondsToNearestTick(simTime));
+    }
+
+    /**
+     * Event Viewer NextTime button to Execute all the events from the future
+     * event list that are scheduled for the next event time. the conditional events
+     * are then executed along with any new events that have been scheduled for this time
+     * @param simTime
+     */
+    public void nextEventTime(long simTime) {
+        oneSimTime = true;
+        resume(simTime);
     }
 
     public final long getTicks() {

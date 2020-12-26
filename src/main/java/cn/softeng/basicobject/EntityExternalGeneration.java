@@ -4,7 +4,7 @@ import cn.softeng.basicsim.Entity;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * EntityGenerator以动态间隔创建Entities，这些序列放置在目标Queue中
+ * EntityExternalGenerator以动态间隔创建Entities，这些序列放置在目标Queue中
  * @date: 12/25/2020 10:08 AM
  */
 @Slf4j

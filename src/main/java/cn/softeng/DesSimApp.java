@@ -4,7 +4,7 @@ package cn.softeng;
  * Hello world!
  *
  */
-public class App 
+public class DesSimApp
 {
     public static void main( String[] args )
     {

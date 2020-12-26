@@ -8,7 +8,7 @@ import cn.softeng.events.ProcessTarget;
 public class EndModelTarget extends ProcessTarget {
     @Override
     public void process() {
-        Simulation.endRun();
+//        Simulation.endRun();
     }
 
     @Override
