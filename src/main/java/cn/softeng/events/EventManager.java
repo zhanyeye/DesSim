@@ -1,5 +1,6 @@
 package cn.softeng.events;
 
+import cn.softeng.basicsim.Entity;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -370,6 +371,11 @@ public final class EventManager {
                     if (nextTick == currentTick.get()) {
                         continue;
                     }
+                }
+
+                // 更新统计数据
+                for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
+                    entity.updateStatistics();
                 }
 
                 // Advance to the next event time

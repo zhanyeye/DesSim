@@ -7,9 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import cn.softeng.basicsim.Entity;
-import cn.softeng.input.BooleanInput;
 import cn.softeng.events.EventManager;
-import cn.softeng.input.Output;
 
 /**
  * @date: 12/16/2020 6:05 PM
@@ -321,10 +319,7 @@ public class StateEntity extends Entity {
 
     public void setPresentState() {}
 
-//	@Output(name = "State",
-//	 description = "The present state for the object.",
-//	    unitType = DimensionlessUnit.class,
-//	    sequence = 0)
+
 //	public String getPresentState(double simTime) {
 //		if (presentState == null) {
 //			return this.getInitialState();
@@ -332,22 +327,7 @@ public class StateEntity extends Entity {
 //		return presentState.name;
 //	}
 
-    @Output(name = "WorkingState",
-            description = "Returns TRUE if the present state is one of the working states.",
-            sequence = 1)
-    public boolean isWorking(double simTime) {
-        if (presentState == null) {
-            return this.isValidWorkingState(this.getInitialState());
-        }
-        return presentState.working;
-    }
 
-    @Output(name = "WorkingTime",
-            description = "The total time recorded for the working states, including the "
-                    + "initialisation period. Breakdown events can be triggered by elapsed "
-                    + "working time instead of calendar time.",
-//	    unitType = TimeUnit.class,
-            sequence = 2)
     public double getWorkingTime(double simTime) {
         if (presentState == null) {
             return 0.0;
@@ -357,12 +337,7 @@ public class StateEntity extends Entity {
         return EventManager.current().ticksToSeconds(ticks);
     }
 
-    @Output(name = "StateTimes",
-            description = "The total time recorded for each state after the completion of "
-                    + "the initialisation period.",
-//	    unitType = TimeUnit.class,
-            reportable = true,
-            sequence = 3)
+
     public LinkedHashMap<String, Double> getStateTimes(double simTime) {
         long simTicks = EventManager.current().secondsToNearestTick(simTime);
         LinkedHashMap<String, Double> ret = new LinkedHashMap<>(states.size());

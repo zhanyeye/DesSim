@@ -3,7 +3,6 @@ package cn.softeng.basicsim;
 import cn.softeng.events.EventHandle;
 import cn.softeng.events.EventManager;
 import cn.softeng.events.ProcessTarget;
-import cn.softeng.input.Input;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,11 +27,6 @@ public class Entity {
      * 所有命名实体的集合，每一个实体都有一个唯一的名字
      */
     private static final HashMap<String, Entity> namedEntities;
-
-    /**
-     * 实体的各种输入的聚合
-     */
-    private final ArrayList<Input<?>> inputList = new ArrayList<>();
 
     /**
      * 实体名称
@@ -105,28 +99,6 @@ public class Entity {
      */
     public final long getSimTicks() {
         return EventManager.simTicks();
-    }
-
-    /**
-     * 向实体添加Input
-     * @param in
-     */
-    protected void addInput(Input<?> in) {
-        inputList.add(in);
-    }
-
-    /**
-     * 返回指定keyword的Input
-     * @param key input的关键字
-     * @return
-     */
-    public final Input<?> getInput(String key) {
-        for (Input<?> in : inputList) {
-            if (key.equals(in.getKeyword())) {
-                return in;
-            }
-        }
-        return null;
     }
 
     /**
@@ -280,10 +252,16 @@ public class Entity {
         }
     }
 
-
     /**
      * 重置实体收集的统计数据
      */
     public void clearStatistics() {}
+
+    /**
+     * 更新实体的统计数据
+     */
+    public void updateStatistics() {}
+
+
 
 }

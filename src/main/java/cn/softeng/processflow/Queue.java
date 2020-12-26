@@ -1,13 +1,11 @@
-package cn.softeng.basicobject;
+package cn.softeng.processflow;
 
 import cn.softeng.basicsim.Entity;
 import cn.softeng.basicsim.EntityTarget;
 import cn.softeng.events.EventHandle;
 import cn.softeng.events.EventManager;
 import cn.softeng.events.ProcessTarget;
-import cn.softeng.input.BooleanInput;
-import cn.softeng.input.EntityInput;
-import cn.softeng.input.ValueInput;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -24,27 +22,32 @@ public class Queue extends LinkedComponent {
     /**
      * 队列中放置接收到的实体的优先级，例如 priority 1 > priority 2
      */
-    private final ValueInput priority;
+    @Setter
+    private long priority;
 
     /**
      * 设定实体进入Queue的方式:(FIFO or LIFO)
      */
-    private final BooleanInput fifo;
+    @Setter
+    private boolean fifo;
 
     /**
      * 违约时间，实体在队列中最长等待时间，（超时则视作违约，离开实体）
      */
-    private final ValueInput renegeTime;
+    @Setter
+    private long renegeTime;
 
     /**
      * 决定该队列组件是否考虑违约情况
      */
-    private final BooleanInput renegeCondition;
+    @Setter
+    private boolean renegeCondition;
 
     /**
      * 当实体等待超时后，它将去哪一个组件
      */
-    private final EntityInput<LinkedComponent> renegeDestination;
+    @Setter
+    private LinkedComponent renegeDestination;
 
     /**
      * 队列中所有实体的集合，每个实体连同其的入队时间、优先级等信息被封装成一个QueueEntry
@@ -73,24 +76,20 @@ public class Queue extends LinkedComponent {
 
     {
         // 初始化默认优先级
-        priority = new ValueInput("Priority", Long.valueOf(0));
-        this.addInput(priority);
+        this.priority = 0;
 
         // 初始化队列进程方式
-        fifo = new BooleanInput("FIFO", true);
-        this.addInput(fifo);
+        this.fifo = true;
 
         // 初始化实体等待时间
-        renegeTime = new ValueInput("RenegeCondition", null);
-        this.addInput(renegeTime);
+        this.renegeTime = Long.MAX_VALUE;
 
         // 初始化是否考虑超时情况
-        renegeCondition = new BooleanInput("RenegeCondition", false);
-        this.addInput(renegeCondition);
+        renegeCondition = false;
 
         // 初始化超时实体的去向
-        renegeDestination = new EntityInput<>(LinkedComponent.class, "RenegeDestination", null);
-        this.addInput(renegeDestination);
+        this.renegeDestination = null;
+
     }
 
     public Queue() {
@@ -231,11 +230,11 @@ public class Queue extends LinkedComponent {
 
         // 建立一个实体项目
         long entryNum = this.getTotalNumberAdded();
-        if (!fifo.getValue()) {
+        if (!fifo) {
             // 如果是先进后出,则排队的实体号为负值
             entryNum *= -1;
         }
-        int pri = (int) priority.getValue().intValue();
+        int pri = (int) priority;
         QueueEntry entry = new QueueEntry(entity, entryNum, pri, getSimTicks());
 
         // 将实体添加到集合中
@@ -251,13 +250,13 @@ public class Queue extends LinkedComponent {
         }
 
         // 调度指定时间去检查放弃（违约）条件
-        if (renegeTime.getValue() != null) {
-            long dur =  renegeTime.getValue();
+        if (renegeCondition) {
+            long dur =  renegeTime;
             // 以FIFO的顺序调度违约测试，所以若有多个实体被同时添加到队列中
             // 则队列中越靠近前目的实体会先被测试
             EventManager.scheduleTicks(dur, 5, true, new RenegeActionTarget(this, entity), null);
         }
-        log.debug("time: {} - {} > addQueue : {}  > inQueue : {}", getSimTicks(), this.getName(), this.getTotalNumberAdded(), this.getNumberInProgress());
+//        log.debug("time: {} - {} * addEntity() > NumberInProcess : {}", getSimTicks(), this.getName(), this.getNumberInProgress());
     }
 
     /**
@@ -274,7 +273,7 @@ public class Queue extends LinkedComponent {
             error("Cannot find the entry in itemSet");
         }
         this.incrementNumberProcessed();
-        log.debug("time: {} - {} > addQueue : {}  > inQueue : {}", getSimTicks(), this.getName(), this.getTotalNumberAdded(), this.getNumberInProgress());
+//        log.debug("time: {} - {} * remove() > NumberInProcess : {}", getSimTicks(), this.getName(), this.getNumberInProgress());
         return entry.entity;
     }
 
@@ -295,7 +294,7 @@ public class Queue extends LinkedComponent {
         this.setReceivedEntity(entity);
 
         // 检查是否考虑超时情况的条件
-        if (renegeCondition.getValue() == false) {
+        if (renegeCondition == false) {
             // receivedEntity 恢复原状
             this.setReceivedEntity(oldEntity);
             return;
@@ -307,7 +306,7 @@ public class Queue extends LinkedComponent {
         // 将超时实体从队列中移除，并传送到超时处理组件
         this.remove(entry);
         numberReneged++;
-        renegeDestination.getValue().addEntity(entity);
+        renegeDestination.addEntity(entity);
     }
 
     /**
@@ -383,6 +382,12 @@ public class Queue extends LinkedComponent {
         maxElements = Math.max(newValue, maxElements);
 
         // todo 其他统计相关操作
+    }
+
+
+    @Override
+    public void updateStatistics() {
+        log.debug("Queue     -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
     }
 
 }

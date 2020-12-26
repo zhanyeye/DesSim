@@ -1,11 +1,12 @@
-package cn.softeng.basicobject;
+package cn.softeng.processflow;
 
 import cn.softeng.basicsim.Entity;
 import cn.softeng.basicsim.EntityTarget;
 import cn.softeng.events.EventHandle;
 import cn.softeng.events.EventManager;
 import cn.softeng.events.ProcessTarget;
-import cn.softeng.input.EntityInput;
+import lombok.Setter;
+
 
 import java.util.ArrayList;
 
@@ -18,7 +19,8 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     /**
      * 等待进入该组件的实体，被放置的队列
      */
-    protected final EntityInput<Queue> waitQueue;
+    @Setter
+    protected Queue waitQueue;
 
     private boolean busy;
     private long startTime;
@@ -33,8 +35,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     private final EventHandle endActionHandle = new EventHandle();
 
     {
-        waitQueue = new EntityInput<>(Queue.class, "WaitQueue", null);
-        this.addInput(waitQueue);
+        this.waitQueue = null;
     }
 
     @Override
@@ -55,13 +56,13 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     @Override
     public void addEntity(Entity entity) {
         // 若该组件的入口没有队列，则直接处理实体
-        if (waitQueue.getValue() == null) {
+        if (waitQueue == null) {
             super.addEntity(entity);
             return;
         }
 
         // 向该组件的入口的Queue中添加实体
-        waitQueue.getValue().addEntity(entity);
+        waitQueue.addEntity(entity);
     }
 
     protected final boolean isBusy() {
@@ -89,7 +90,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      * @return
      */
     protected Entity getNextEntityFromQueue() {
-        Entity entity = waitQueue.getValue().removeFirst();
+        Entity entity = waitQueue.removeFirst();
         this.registerEntity(entity);
         return entity;
     }
@@ -102,8 +103,8 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     @Override
     public ArrayList<Queue> getQueues() {
         ArrayList<Queue> ret = new ArrayList<>();
-        if (waitQueue.getValue() != null) {
-            ret.add(waitQueue.getValue());
+        if (waitQueue != null) {
+            ret.add(waitQueue);
         }
         return ret;
     }

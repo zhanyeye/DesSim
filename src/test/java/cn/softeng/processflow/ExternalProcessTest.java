@@ -1,4 +1,4 @@
-package cn.softeng.basicobject;
+package cn.softeng.processflow;
 
 import cn.softeng.basicsim.InitModelTarget;
 import cn.softeng.events.EventManager;
@@ -21,7 +21,7 @@ public class ExternalProcessTest {
         simEntity.setName("defaultEntity");
 
         // 创建实体，并完成用户输入
-        EntityExternalGeneration externalGeneration = new EntityExternalGeneration(100, 1, simEntity);
+        EntityExternalGeneration externalGeneration = new EntityExternalGeneration(0, 100, simEntity);
         externalGeneration.setName("EntityExternalGenerator");
 
         Queue queue = new Queue();
@@ -34,14 +34,15 @@ public class ExternalProcessTest {
         entitySink.setName("EntitySink");
 
 
-        externalGeneration.getInput("NextComponent").updateValue(queue);
+        externalGeneration.setNextComponent(queue);
+        externalGeneration.setEntityPerArrival(100);
 
-        server.getInput("NextComponent").updateValue(entitySink);
-        server.getInput("ServiceTime").updateValue(50L);
-        server.getInput("WaitQueue").updateValue(queue);
+        server.setWaitQueue(queue);
+        server.setServiceTime(2);
+        server.setNextComponent(entitySink);
 
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
-        evt.resume(200);
+        evt.resume(1000);
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
         // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。

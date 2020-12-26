@@ -1,6 +1,6 @@
 package cn.softeng.basicsim;
 
-import cn.softeng.basicobject.EntityGenerator;
+import cn.softeng.processflow.EntityGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 

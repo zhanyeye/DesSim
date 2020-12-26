@@ -1,7 +1,7 @@
-package cn.softeng.basicobject;
+package cn.softeng.processflow;
 
 import cn.softeng.basicsim.Entity;
-import cn.softeng.input.ValueInput;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -10,12 +10,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class Server extends LinkedService {
-    private final ValueInput serviceTime;
+    @Setter
+    private long serviceTime;
+
     private Entity servedEntity;
 
     {
-        serviceTime = new ValueInput("ServiceTime", 0L);
-        this.addInput(serviceTime);
+        serviceTime = 0;
     }
 
     @Override
@@ -36,11 +37,18 @@ public class Server extends LinkedService {
         // 将实体发送到链中的下一个组件
         this.sendToNextComponent(servedEntity);
         servedEntity = null;
+//        log.debug("time: {} - Server * endProcessing > NumberProcessed : {}", simTime, getTotalNumberProcessed());
     }
 
     @Override
     protected long getProcessingTime(long simTime) {
-        return serviceTime.getValue();
+        return serviceTime;
+    }
+
+
+    @Override
+    public void updateStatistics() {
+        log.debug("Server    -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
     }
 
 }

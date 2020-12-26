@@ -1,8 +1,9 @@
-package cn.softeng.basicobject;
+package cn.softeng.processflow;
 
 import cn.softeng.basicsim.Entity;
 import cn.softeng.states.StateEntity;
-import cn.softeng.input.EntityInput;
+import lombok.Setter;
+
 
 /**
  * LinkedComponent是用来形成一个组件链，来处理穿过系统实体
@@ -15,11 +16,13 @@ public class LinkedComponent extends StateEntity {
      * 在接收其第一个实体之前，将obj设置为DefaultEntity提供的对象。
      * 如果未提供DefaultEntity的输入，则obj设置为null，直到接收到第一个实体。
      */
-    protected final EntityInput<Entity> defaultEntity;
+    @Setter
+    protected Entity defaultEntity;
     /**
      * 已处理实体要传递的下一个组件
      */
-    protected final EntityInput<LinkedComponent> nextComponent;
+    @Setter
+    protected LinkedComponent nextComponent;
     /**
      * 初始化后，从上游添加的此组件的实体数
      */
@@ -46,11 +49,8 @@ public class LinkedComponent extends StateEntity {
     private double releaseTime = Double.NaN;
 
     {
-        defaultEntity = new EntityInput<>(Entity.class, "DefaultEntity", null);
-        this.addInput(defaultEntity);
-
-        nextComponent = new EntityInput<>(LinkedComponent.class, "NextComponent", null);
-        this.addInput(nextComponent);
+        defaultEntity = null;
+        nextComponent = null;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class LinkedComponent extends StateEntity {
         numberProcessed = 0;
         initialNumberAdded = 0;
         initialNumberProcessed = 0;
-        receivedEntity = defaultEntity.getValue();
+        receivedEntity = defaultEntity;
         releaseTime = Double.NaN;
     }
 
@@ -96,8 +96,8 @@ public class LinkedComponent extends StateEntity {
     public void sendToNextComponent(Entity entity) {
         numberProcessed++;
         releaseTime = this.getSimTicks();
-        if (nextComponent.getValue() != null) {
-            nextComponent.getValue().addEntity(entity);
+        if (nextComponent != null) {
+            nextComponent.addEntity(entity);
         }
     }
 
