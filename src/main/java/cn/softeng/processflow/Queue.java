@@ -387,7 +387,7 @@ public class Queue extends LinkedComponent {
 
     @Override
     public void updateStatistics() {
-        log.debug("Queue     -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
+        log.debug("{}    -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
     }
 
 }

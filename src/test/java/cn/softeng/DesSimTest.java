@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 /**
- * Unit test for simple DesSimApp.
+ * Unit test for simple DesSim.
  */
 @Slf4j
 public class DesSimTest

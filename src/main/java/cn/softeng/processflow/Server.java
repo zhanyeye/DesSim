@@ -27,6 +27,9 @@ public class Server extends LinkedService {
 
     @Override
     protected boolean startProcessing(long simTime) {
+        if (waitQueue.isEmpty()) {
+            return false;
+        }
         // 从队列中删除第一个实体
         this.servedEntity = this.getNextEntityFromQueue();
         return true;
@@ -48,7 +51,7 @@ public class Server extends LinkedService {
 
     @Override
     public void updateStatistics() {
-        log.debug("Server    -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
+        log.debug("{}   -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}",this.getName(), this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
     }
 
 }

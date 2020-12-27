@@ -315,7 +315,12 @@ public final class EventManager {
                 // 获取优先队列的队首元素
                 EventNode nextNode = eventTree.getNextNode();
                 if (nextNode == null || currentTick.get() >= targetTick) {
+                    // 事件队列中所有事件执行完毕，或执行到目标时间
                     executeEvents = false;
+                    // 更新统计数据
+                    for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
+                        entity.updateStatistics();
+                    }
                 }
 
                 if (!executeEvents) {
