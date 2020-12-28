@@ -80,8 +80,6 @@ public class ExternalProcessTest {
 //        launcher.scheduleAction(0, 100);
         evt.resume(100);
 
-        Thread.sleep(10000);
-        log.debug("\n\n\n\n\n");
 
         evt.resume(1000);
 

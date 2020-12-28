@@ -2,11 +2,7 @@ package cn.softeng;
 
 import static org.junit.Assert.assertTrue;
 
-import cn.softeng.processflow.EntityGenerator;
-import cn.softeng.basicsim.Entity;
-import cn.softeng.processflow.EntitySink;
-import cn.softeng.processflow.Queue;
-import cn.softeng.processflow.Server;
+import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -20,16 +16,86 @@ public class DesSimTest
      * Rigorous Test :-)
      */
     @Test
-    public void shouldAnswerWithTrue() {
-        EntityGenerator generator = new EntityGenerator();
-        Queue queue = new Queue();
-        Server server = new Server();
+    public void shouldAnswerWithTrue() throws InterruptedException {
+        EntityLauncher launcher = new EntityLauncher();
+        launcher.setName("launcher");
+        Queue queue1 = new Queue();
+        queue1.setName("queue1");
+        Queue queue2 = new Queue();
+        queue2.setName("queue2");
+        Server server1 = new Server();
+        server1.setName("server1");
+        Server server2 = new Server();
+        server2.setName("server2");
         EntitySink sink = new EntitySink();
+        sink.setName("sink");
 
-        for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
-            entity.updateStatistics();
+        launcher.setNextComponent(queue1);
+        server1.setWaitQueue(queue1);
+        server1.setServiceTime(2);
+        server1.setNextComponent(queue2);
+        server2.setWaitQueue(queue2);
+        server2.setServiceTime(3);
+        server2.setNextComponent(sink);
+
+        DesSim.initModel(DesSim.Type.HORIZONTAL);
+        DesSim.serialScheduling(100, 100);
+
+
+        while (true) {
+            Thread.sleep(1);
         }
+    }
 
+    @Test
+    public void test2() throws InterruptedException {
+        EntityLauncher launcher = new EntityLauncher();
+        launcher.setName("launcher");
+        Queue queue1 = new Queue();
+        queue1.setName("queue1");
+        Queue queue2 = new Queue();
+        queue2.setName("queue2");
+        Server server1 = new Server();
+        server1.setName("server1");
+        Server server2 = new Server();
+        server2.setName("server2");
+        EntitySink sink = new EntitySink();
+        sink.setName("sink");
+
+        launcher.setNextComponent(queue1);
+        server1.setWaitQueue(queue1);
+        server1.setServiceTime(2);
+        server1.setNextComponent(queue2);
+        server2.setWaitQueue(queue2);
+        server2.setServiceTime(3);
+        server2.setNextComponent(sink);
+
+        DesSim.initModel(DesSim.Type.VERTICAL);
+
+
+
+        DesSim.parallelScheduling(5, 1);
+
+//        DesSim.singleScheduling(0, 100);
+
+//        DesSim.resume(100);
+
+//        Thread.sleep(10000);
+//
+        DesSim.resume(1000);
+
+
+
+//        DesSim.resume(Long.MAX_VALUE);
+
+//        for (int i = 1; i <= 1000; i++) {
+//            DesSim.resume(i);
+//        }
+
+
+        while (true) {
+            Thread.sleep(1);
+        }
     }
 
 }

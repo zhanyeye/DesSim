@@ -9,6 +9,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class InitModelTarget extends ProcessTarget {
+
+    public static boolean vertical;
+
     @Override
     public void process() {
         log.info("init");
@@ -27,20 +30,6 @@ public class InitModelTarget extends ProcessTarget {
         for (Entity each : Entity.getClonesOfIterator(Entity.class)) {
             EventManager.scheduleTicks(startTime, 0, true, new StartUpTarget(each), null);
         }
-
-//        // 调度初始化时间
-//        if (Simulation.getInitializationTime() > 0.0) {
-//            double clearTime = startTime + Simulation.getInitializationTime();
-//            EventManager.scheduleTicks(clearTime, 5, false, new ClearStatisticsTarget(), null);
-//        }
-
-        // 调度模型运行的结束
-//        long endTime = 100;
-//        EventManager.scheduleTicks(endTime, 5, false, new EndModelTarget(), null);
-
-        // 开始检查暂停条件
-//        Simulation.getInstance().doPauseCondition();
-
 
     }
 

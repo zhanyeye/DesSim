@@ -30,6 +30,8 @@ public class EntityLauncher extends LinkedService{
     @Setter
     private long scheduleTime;
 
+    public EntityLauncher() {}
+
     /**
      * 到目前为止所生成的实体数
      */
@@ -44,6 +46,7 @@ public class EntityLauncher extends LinkedService{
     {
         scheduleTime = Long.MAX_VALUE;
         entitiesPerArrival = 1;
+        prototypeEntity = new SimEntity();
     }
 
     @Override
@@ -56,17 +59,28 @@ public class EntityLauncher extends LinkedService{
     public void startUp() {
         super.startUp();
         eventManager = EventManager.current();
-        scheduleAction();
+//        scheduleAction();
     }
 
+    // todo 修改
     public void scheduleAction() {
-       this.scheduleAction(scheduleTime, entitiesPerArrival);
+        long simTime = getSimTicks();
+//        if (scheduleTime < simTime) {
+//            error("schedule time is less than current time ????, no! no! no!");
+//            return;
+//        }
+
+        this.scheduleTime = scheduleTime;
+        this.entitiesPerArrival = entitiesPerArrival;
+
+        long waitlength = scheduleTime - simTime;
+        eventManager.scheduleProcessExternal(waitlength, 0, false, doActionTarget, doActionHandle);
     }
 
-    public void scheduleAction(long scheduleTime, int entitiesPerArrival) {
-        long simTime = getSimTicks();
+    public void scheduleAction(EventManager eventManager, long scheduleTime, int entitiesPerArrival) {
+        long simTime = eventManager.getTicks();
         if (scheduleTime < simTime) {
-            error("schedule time is less than current time ????, are you ok ????");
+            error("schedule time is less than current time ????, no! no! no!");
             return;
         }
 
@@ -74,7 +88,7 @@ public class EntityLauncher extends LinkedService{
         this.entitiesPerArrival = entitiesPerArrival;
 
         long waitlength = scheduleTime - simTime;
-        eventManager.scheduleProcessExternal(waitlength, 0, false, doActionTarget, doActionHandle);
+        eventManager.scheduleProcessExternalAndPause(waitlength, 0, false, doActionTarget, null);
     }
 
     public void doAction() {

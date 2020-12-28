@@ -6,6 +6,7 @@ import cn.softeng.events.ProcessTarget;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -261,6 +262,26 @@ public class Entity {
      * 更新实体的统计数据
      */
     public void updateStatistics() {}
+
+    /**
+     * ！慎用，用于DesSim.initModel 重置实体集合，避免用户不合法输入
+     */
+    public static void resetAllInstance(List<Entity> entities) {
+        allInstances.clear();
+        allInstances.addAll(entities);
+    }
+
+    /**
+     * ！慎用，用于DesSim.initModel 重置实体集合，避免用户不合法输入
+     */
+    public static void resetNamedEntities(List<Entity> entities) {
+        namedEntities.clear();
+        for (Entity entity : entities) {
+           namedEntities.put(entity.getName(), entity);
+        }
+    }
+
+
 
 
 

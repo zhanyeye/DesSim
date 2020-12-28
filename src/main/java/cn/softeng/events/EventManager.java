@@ -944,6 +944,41 @@ public final class EventManager {
     }
 
     /**
+     * 外部命令向时间队列中添加新事件，推进到时间发生时间，然后立马暂停
+     * @param waitLength
+     * @param eventPriority
+     * @param fifo
+     * @param t
+     * @param handle
+     */
+    public void scheduleProcessExternalAndPause(long waitLength, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
+        synchronized (lockObject) {
+            long schedTick = calculateEventTime(waitLength);
+            EventNode node = getEventNode(schedTick, eventPriority);
+            Event evt = getEvent(node, t, handle);
+
+            if (handle != null) {
+                if (handle.isScheduled()) {
+                    throw new ProcessError("Tried to schedule using an EventHandle already in use");
+                }
+                handle.event = evt;
+            }
+            // FIXME: this is the only callback that does not occur in Process context, disable for now
+            //if (trcListener != null)
+            //	trcListener.traceSchedProcess(this, currentTick.get(), schedTick, eventPriority, t);
+            node.addEvent(evt, fifo);
+
+            // During real-time waits an event can be inserted becoming the next event to execute
+            // If nextTick is not updated, we can fall through the entire time update code and not
+            // execute this event, leading to the state machine becoming broken
+            if (nextTick > eventTree.getNextNode().schedTick) {
+                nextTick = eventTree.getNextNode().schedTick;
+            }
+            pause();
+        }
+    }
+
+    /**
      * Schedule a future event in the controlling EventManager for the current Process.
      *
      * @param waitLength the number of ticks in the future to schedule this event

@@ -10,7 +10,7 @@ public class BaseEvent {
      */
     ProcessTarget target;
     /**
-     * ???
+     * 持有一个该事件的引用，方便在事件队列中找到对应的事件
      */
     EventHandle handle;
 }
