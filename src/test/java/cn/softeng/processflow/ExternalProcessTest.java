@@ -3,12 +3,14 @@ package cn.softeng.processflow;
 import cn.softeng.DesSim;
 import cn.softeng.basicsim.InitModelTarget;
 import cn.softeng.events.EventManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import sun.security.krb5.internal.crypto.Des;
 
 /**
  * @date: 12/25/2020 10:50 AM
  */
+@Slf4j
 public class ExternalProcessTest {
 
 
@@ -31,8 +33,10 @@ public class ExternalProcessTest {
         simEntity.setName("defaultEntity");
 
         // 创建实体，并完成用户输入
-        EntityExternalGeneration externalGeneration = new EntityExternalGeneration(0, 100, simEntity);
-        externalGeneration.setName("EntityExternalGenerator");
+//        EntityExternalGeneration externalGeneration = new EntityExternalGeneration(0, 100, simEntity);
+//        externalGeneration.setName("EntityExternalGenerator");
+
+
 
         Queue queue1 = new Queue();
         queue1.setName("Queue1");
@@ -50,8 +54,14 @@ public class ExternalProcessTest {
         entitySink.setName("EntitySink");
 
 
-        externalGeneration.setNextComponent(queue1);
-        externalGeneration.setEntityPerArrival(100);
+        EntityLauncher launcher = new EntityLauncher();
+        launcher.setName("launcher");
+        launcher.setNextComponent(queue1);
+//        launcher.scheduleAction(0, 100);
+
+//
+//        externalGeneration.setNextComponent(queue1);
+//        externalGeneration.setEntityPerArrival(100);
 
         server1.setWaitQueue(queue1);
         server1.setServiceTime(2);
@@ -61,8 +71,20 @@ public class ExternalProcessTest {
         server2.setServiceTime(3);
         server2.setNextComponent(entitySink);
 
+
+
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
+        launcher.setEntitiesPerArrival(100);
+        launcher.setScheduleTime(0);
+        launcher.setPrototypeEntity(simEntity);
+//        launcher.scheduleAction(0, 100);
+        evt.resume(100);
+
+        Thread.sleep(10000);
+        log.debug("\n\n\n\n\n");
+
         evt.resume(1000);
+
 
 //        DesSim.initModel();
 //        DesSim.singleScheduling();
