@@ -41,8 +41,6 @@ public class EntityLauncher extends LinkedService{
 
     private final EventHandle doActionHandle = new EventHandle();
 
-    private EventManager eventManager;
-
     {
         scheduleTime = Long.MAX_VALUE;
         entitiesPerArrival = 1;
@@ -58,25 +56,26 @@ public class EntityLauncher extends LinkedService{
     @Override
     public void startUp() {
         super.startUp();
-        eventManager = EventManager.current();
-//        scheduleAction();
     }
 
-    // todo 修改
-    public void scheduleAction() {
-        long simTime = getSimTicks();
-//        if (scheduleTime < simTime) {
-//            error("schedule time is less than current time ????, no! no! no!");
-//            return;
-//        }
-
+    /**
+     * 调度生成实体（只调度一次），用于DES被串行调度
+     * @param eventManager
+     * @param scheduleTime
+     * @param entitiesPerArrival
+     */
+    public void scheduleOneAction(EventManager eventManager, long scheduleTime, int entitiesPerArrival) {
         this.scheduleTime = scheduleTime;
         this.entitiesPerArrival = entitiesPerArrival;
-
-        long waitlength = scheduleTime - simTime;
-        eventManager.scheduleProcessExternal(waitlength, 0, false, doActionTarget, doActionHandle);
+        eventManager.scheduleProcessExternal(scheduleTime, 0, false, doActionTarget, doActionHandle);
     }
 
+    /**
+     * 调度生成实体，加入事件队列后，立马暂停调度器，用于DES被并行调度
+     * @param eventManager
+     * @param scheduleTime
+     * @param entitiesPerArrival
+     */
     public void scheduleAction(EventManager eventManager, long scheduleTime, int entitiesPerArrival) {
         long simTime = eventManager.getTicks();
         if (scheduleTime < simTime) {

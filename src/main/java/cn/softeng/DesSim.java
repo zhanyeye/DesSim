@@ -46,8 +46,7 @@ public class DesSim {
         for (Entity entity : Entity.getAll()) {
             if (entity.getClass() == EntityLauncher.class) {
                 EntityLauncher launcher = (EntityLauncher) entity;
-                launcher.setScheduleTime(currentTime);
-                launcher.setEntitiesPerArrival(num);
+                launcher.scheduleOneAction(eventManager, currentTime, num);
                 break;
             }
         }
@@ -61,16 +60,13 @@ public class DesSim {
      * @param num
      */
     public static void parallelScheduling(int currentTime, int num) {
-
-        EntityLauncher launcher;
         for (Entity entity : Entity.getAll()) {
             if (entity.getClass() == EntityLauncher.class) {
-                launcher = (EntityLauncher) entity;
+                EntityLauncher launcher = (EntityLauncher) entity;
                 launcher.scheduleAction(eventManager, currentTime, num);
                 break;
             }
         }
-
     }
 
     /**
