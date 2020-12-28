@@ -32,9 +32,12 @@ public class DesSim {
 
     }
 
-    public void test() {
-//        eventManager.
+
+    public static long nextEventTime() {
+        return eventManager.getCurrentTick().get();
     }
+
+
 
 
     public static void main( String[] args )

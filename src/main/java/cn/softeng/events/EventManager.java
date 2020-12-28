@@ -1,6 +1,8 @@
 package cn.softeng.events;
 
 import cn.softeng.basicsim.Entity;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public final class EventManager {
     /**
      * 仿真时钟的当前刻度
      */
+    @Getter
     private final AtomicLong currentTick;
 
     /**
@@ -76,6 +79,7 @@ public final class EventManager {
     /**
      * 执行下一个事件的时间点 （时间刻度tick）
      */
+    @Getter
     private long nextTick;
 
     /**
