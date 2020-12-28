@@ -75,12 +75,15 @@ public class DesSimTest
 
 
         DesSim.parallelScheduling(5, 1);
-
         DesSim.resume(5);
         Thread.sleep(1000);
         DesSim.resume(7);
         Thread.sleep(1000);
+        DesSim.parallelScheduling(7, 1);
+        Thread.sleep(1000);
         DesSim.resume(10);
+        Thread.sleep(1000);
+        DesSim.resume(100);
 
 
 
