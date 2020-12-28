@@ -318,7 +318,7 @@ public final class EventManager {
             while (true) {
                 // 获取优先队列的队首元素
                 EventNode nextNode = eventTree.getNextNode();
-                if (nextNode == null || currentTick.get() >= targetTick) {
+                if (nextNode == null || currentTick.get() > targetTick) {
                     // 事件队列中所有事件执行完毕，或执行到目标时间
                     executeEvents = false;
                     // 更新统计数据
@@ -363,9 +363,9 @@ public final class EventManager {
                     }
                 }
 
-                // If the next event would require us to advance the time, check the conditonal events
-                // 如果下一个事件时刻大于系统当前时刻，需要推进仿真时间，则检查条件事件
                 if (eventTree.getNextNode().schedTick > nextTick) {
+                    // If the next event would require us to advance the time, check the conditonal events
+                    // 如果下一个事件时刻大于系统当前时刻，需要推进仿真时间，则检查条件事件
                     if (condEvents.size() > 0) {
                         evaluateConditions();
                         if (!executeEvents) {
@@ -378,6 +378,11 @@ public final class EventManager {
                     // beginning, otherwise fall through to the time-advance
                     nextTick = eventTree.getNextNode().schedTick;
                     if (nextTick == currentTick.get()) {
+                        continue;
+                    }
+
+                    if (currentTick.get() == targetTick) {
+                        executeEvents = false;
                         continue;
                     }
                 }

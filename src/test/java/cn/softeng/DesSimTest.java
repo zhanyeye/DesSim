@@ -76,21 +76,14 @@ public class DesSimTest
 
         DesSim.parallelScheduling(5, 1);
 
-//        DesSim.singleScheduling(0, 100);
-
-//        DesSim.resume(100);
-
-//        Thread.sleep(10000);
-//
-        DesSim.resume(1000);
+        DesSim.resume(5);
+        Thread.sleep(1000);
+        DesSim.resume(7);
+        Thread.sleep(1000);
+        DesSim.resume(10);
 
 
 
-//        DesSim.resume(Long.MAX_VALUE);
-
-//        for (int i = 1; i <= 1000; i++) {
-//            DesSim.resume(i);
-//        }
 
 
         while (true) {
