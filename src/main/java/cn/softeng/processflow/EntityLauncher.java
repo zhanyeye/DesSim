@@ -6,10 +6,12 @@ import cn.softeng.events.EventHandle;
 import cn.softeng.events.EventManager;
 import cn.softeng.events.ProcessTarget;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 实体启动器，用于运行时触发生成实体
  */
+@Slf4j
 public class EntityLauncher extends LinkedService{
 
     /**
@@ -119,6 +121,14 @@ public class EntityLauncher extends LinkedService{
         public void process() {
             entity.doAction();
         }
+    }
+
+    @Override
+    public void updateStatistics() {
+        log.debug("Launcher -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
+        numAddMap.put(getSimTicks(), getTotalNumberAdded());
+        numInProgress.put(getSimTicks(), getNumberInProgress());
+        numProcessedMap.put(getSimTicks(), getTotalNumberProcessed());
     }
 
 }

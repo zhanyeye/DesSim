@@ -2,7 +2,11 @@ package cn.softeng.processflow;
 
 import cn.softeng.basicsim.Entity;
 import cn.softeng.states.StateEntity;
+import lombok.Getter;
 import lombok.Setter;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /**
@@ -107,6 +111,17 @@ public class LinkedComponent extends StateEntity {
     public void incrementNumberProcessed() {
         numberProcessed++;
     }
+
+    // *****************************
+    //  统计相关数据
+    // *****************************
+
+    @Getter
+    protected Map<Long, Long> numAddMap = new LinkedHashMap<>();
+    @Getter
+    protected Map<Long, Long> numProcessedMap = new LinkedHashMap<>();
+    @Getter
+    protected Map<Long, Long> numInProgress = new LinkedHashMap<>();
 
     /**
      * 返回在整个仿真运行（包括初始化期间）中从上游接收到的实体数。

@@ -45,7 +45,7 @@ public final class EventManager {
     private final EventTree eventTree;
 
     /**
-     * 调度器当前是否运行，测试用 ???
+     * 调度器当前是否运行
      */
     private final AtomicBoolean isRunning;
 
@@ -1071,6 +1071,7 @@ public final class EventManager {
             }
 
             executeEvents = true;
+            isRunning.set(true);
             Process.processEvents(this);
         }
     }

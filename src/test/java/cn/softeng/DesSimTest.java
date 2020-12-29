@@ -1,11 +1,10 @@
 package cn.softeng;
 
-import static org.junit.Assert.assertTrue;
-
 import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import sun.security.krb5.internal.crypto.Des;
+
+import java.util.Map;
 
 /**
  * Unit test for simple DesSim.
@@ -41,6 +40,13 @@ public class DesSimTest
 
         DesSim.initModel(DesSim.Type.HORIZONTAL);
         DesSim.serialScheduling(0, 1);
+
+//        Thread.sleep(1000);
+
+        log.debug(server1.getName());
+        for (Map.Entry<Long, Long> entry : server1.getNumProcessedMap().entrySet()) {
+            log.debug("{} - {}", entry.getKey(), entry.getValue());
+        }
 
         while (true) {
             Thread.sleep(1);
@@ -90,6 +96,7 @@ public class DesSimTest
         DesSim.resume(200);
         Thread.sleep(1000);
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
         // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。

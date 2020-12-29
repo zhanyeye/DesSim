@@ -42,7 +42,7 @@ public class DesSim {
      * @param currentTime 注入时间
      * @param num 注入个数
      */
-    public static void serialScheduling(int currentTime, int num) {
+    public static void serialScheduling(int currentTime, int num) throws InterruptedException {
         for (Entity entity : Entity.getAll()) {
             if (entity.getClass() == EntityLauncher.class) {
                 EntityLauncher launcher = (EntityLauncher) entity;
@@ -51,6 +51,9 @@ public class DesSim {
             }
         }
         eventManager.resume(Long.MAX_VALUE);
+        while (eventManager.isRunning()) {
+            Thread.sleep(1);
+        }
     }
 
     /**
