@@ -18,7 +18,6 @@ public class EntitySink extends LinkedComponent {
 
         // 终止加入到该组件的实体
         entity.kill();
-//        log.debug("time: {} - EntitySink > totalSinkNum : {}", getSimTicks(), this.getTotalNumberAdded());
     }
 
 

@@ -226,8 +226,6 @@ public class Queue extends LinkedComponent {
     public void addEntity(Entity entity) {
         super.addEntity(entity);
 
-        // todo 更新队列统计相关操作
-
         // 建立一个实体项目
         long entryNum = this.getTotalNumberAdded();
         if (!fifo) {
@@ -256,7 +254,6 @@ public class Queue extends LinkedComponent {
             // 则队列中越靠近前目的实体会先被测试
             EventManager.scheduleTicks(dur, 5, true, new RenegeActionTarget(this, entity), null);
         }
-//        log.debug("time: {} - {} * addEntity() > NumberInProcess : {}", getSimTicks(), this.getName(), this.getNumberInProgress());
     }
 
     /**
@@ -273,7 +270,6 @@ public class Queue extends LinkedComponent {
             error("Cannot find the entry in itemSet");
         }
         this.incrementNumberProcessed();
-//        log.debug("time: {} - {} * remove() > NumberInProcess : {}", getSimTicks(), this.getName(), this.getNumberInProgress());
         return entry.entity;
     }
 
