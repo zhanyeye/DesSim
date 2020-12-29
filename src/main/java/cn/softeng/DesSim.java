@@ -54,10 +54,9 @@ public class DesSim {
     }
 
     /**
-     * DES被并行的调度，调用时必须确保DES调度正在运行，
-     * 没有被暂停，否则会报错
-     * @param currentTime
-     * @param num
+     * DES被并行的调度，调用时必须确保DES调度正在运行，否则会报错
+     * @param currentTime 时间调度时间
+     * @param num 注入个数
      */
     public static void parallelScheduling(int currentTime, int num) {
         for (Entity entity : Entity.getAll()) {
@@ -86,9 +85,13 @@ public class DesSim {
         return eventManager.getCurrentTick().get();
     }
 
-//    public static boolean hasEvent() {
-//        return eventManager.
-//    }
+    /**
+     * 事件队列中是否有事件
+     * @return
+     */
+    public static boolean hasEvent() {
+        return eventManager.hasEvent();
+    }
 
     /**
      * DES运行类型枚举类

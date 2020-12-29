@@ -1200,4 +1200,12 @@ public final class EventManager {
     private boolean scheduleEnabled() {
         return !disableSchedule;
     }
+
+    /**
+     * 当前事件队列是否为空
+     * @return
+     */
+    public boolean hasEvent() {
+        return eventTree.getNextNode() != null;
+    }
 }
