@@ -9,6 +9,13 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class EntitySink extends LinkedComponent {
+
+    public EntitySink() {}
+
+    public EntitySink(String name) {
+        setName(name);
+    }
+
     @Override
     public void addEntity(Entity entity) {
         super.addEntity(entity);

@@ -52,6 +52,12 @@ public class EntityGenerator extends LinkedService {
         this.maxNumber = Long.MAX_VALUE;
     }
 
+    public EntityGenerator() {}
+
+    public EntityGenerator(String name) {
+        setName(name);
+    }
+
     @Override
     public void startUp() {
         super.startUp();

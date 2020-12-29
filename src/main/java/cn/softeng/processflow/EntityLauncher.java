@@ -34,6 +34,10 @@ public class EntityLauncher extends LinkedService{
 
     public EntityLauncher() {}
 
+    public EntityLauncher(String name) {
+        setName(name);
+    }
+
     /**
      * 到目前为止所生成的实体数
      */

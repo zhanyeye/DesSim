@@ -11,6 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 public class SimEntity extends StateEntity {
     public SimEntity() {}
 
+    public SimEntity(String name) {
+        setName(name);
+    }
+
     @Override
     public void earlyInit() {
         super.earlyInit();

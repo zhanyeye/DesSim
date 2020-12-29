@@ -19,6 +19,12 @@ public class Server extends LinkedService {
         serviceTime = 0;
     }
 
+    public Server() {}
+
+    public Server(String name) {
+        setName(name);
+    }
+
     @Override
     public void earlyInit() {
         super.earlyInit();

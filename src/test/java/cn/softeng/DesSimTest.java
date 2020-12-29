@@ -17,8 +17,11 @@ public class DesSimTest
      */
     @Test
     public void testSerialScheduling() throws InterruptedException {
+
+        // 这里应该从XML中读取模型所包含的组件
         EntityLauncher launcher = new EntityLauncher();
         launcher.setName("launcher");
+
         Queue queue1 = new Queue();
         queue1.setName("queue1");
         Queue queue2 = new Queue();
