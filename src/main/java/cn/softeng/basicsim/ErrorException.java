@@ -17,7 +17,7 @@
 package cn.softeng.basicsim;
 
 /**
- * Custom exception thrown when a program error is encountered.
+ * 自定义异常
  */
 public class ErrorException extends RuntimeException {
 	public ErrorException(String format, Object... args) {

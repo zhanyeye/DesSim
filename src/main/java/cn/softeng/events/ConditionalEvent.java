@@ -18,7 +18,6 @@ package cn.softeng.events;
 
 /**
  * 条件事件，组合了一个条件对象，在仿真运行时，用于检查一些情况，例如：用户暂停仿真
- *
  */
 final class ConditionalEvent extends BaseEvent {
 	Conditional c;

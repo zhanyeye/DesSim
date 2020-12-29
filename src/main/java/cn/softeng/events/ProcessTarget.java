@@ -1,7 +1,6 @@
 package cn.softeng.events;
 
 /**
- * @author: zhanyeye
  * @date: 11/3/2020 9:20 PM
  * 事件执行的目标的抽象类，每个event都会包含一个 ProcessTarget，
  * 类似与设计模式中命令模式中的命令对象

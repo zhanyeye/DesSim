@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- *
+ * 封装创建模拟对象所需的方法和数据的基类。封装基本系统对象以实现离散事件执行
  * @date: 12/15/2020 11:41 PM
  */
 public class Entity {
