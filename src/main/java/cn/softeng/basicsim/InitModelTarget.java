@@ -14,7 +14,8 @@ public class InitModelTarget extends ProcessTarget {
 
     @Override
     public void process() {
-        log.info("init");
+        log.debug("time: 0 - [time advance]");
+        log.info("[init model]");
         // 初始化每一个实体
         for (Entity each : Entity.getClonesOfIterable(Entity.class)) {
             each.earlyInit();
@@ -28,7 +29,7 @@ public class InitModelTarget extends ProcessTarget {
         // 启动每一个实体
         long startTime = 0;
         for (Entity each : Entity.getClonesOfIterator(Entity.class)) {
-            EventManager.scheduleTicks(startTime, 0, true, new StartUpTarget(each), null);
+            EventManager.scheduleTicks(startTime, 5, true, new StartUpTarget(each), null);
         }
 
     }

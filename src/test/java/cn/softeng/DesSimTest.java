@@ -39,7 +39,7 @@ public class DesSimTest
         server2.setNextComponent(sink);
 
         DesSim.initModel(DesSim.Type.HORIZONTAL);
-        DesSim.serialScheduling(100, 100);
+        DesSim.serialScheduling(0, 1);
 
 
         while (true) {

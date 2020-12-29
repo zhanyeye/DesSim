@@ -67,7 +67,9 @@ public class EntityLauncher extends LinkedService{
     public void scheduleOneAction(EventManager eventManager, long scheduleTime, int entitiesPerArrival) {
         this.scheduleTime = scheduleTime;
         this.entitiesPerArrival = entitiesPerArrival;
-        eventManager.scheduleProcessExternal(scheduleTime, 0, false, doActionTarget, doActionHandle);
+        // 优先级须大于5，当0时刻调度该事件时，initModelTarget.process()中的初始化操作优先级是5
+        // 必须先初始化再调度该事件，所以优先级需要大于5
+        eventManager.scheduleProcessExternal(scheduleTime, 6, false, doActionTarget, doActionHandle);
     }
 
     /**
