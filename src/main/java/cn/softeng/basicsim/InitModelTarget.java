@@ -5,6 +5,7 @@ import cn.softeng.events.ProcessTarget;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * 初始化target,在模型运行前,初始化模型中各个组件
  * @date: 12/23/2020 12:18 PM
  */
 @Slf4j
