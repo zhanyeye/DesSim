@@ -16,7 +16,7 @@ public class DesSimTest
      * Rigorous Test :-)
      */
     @Test
-    public void shouldAnswerWithTrue() throws InterruptedException {
+    public void testSerialScheduling() throws InterruptedException {
         EntityLauncher launcher = new EntityLauncher();
         launcher.setName("launcher");
         Queue queue1 = new Queue();
@@ -32,7 +32,7 @@ public class DesSimTest
 
         launcher.setNextComponent(queue1);
         server1.setWaitQueue(queue1);
-        server1.setServiceTime(2);
+        server1.setServiceTime(3);
         server1.setNextComponent(queue2);
         server2.setWaitQueue(queue2);
         server2.setServiceTime(3);
@@ -48,7 +48,7 @@ public class DesSimTest
     }
 
     @Test
-    public void test2() throws InterruptedException {
+    public void testParallelScheduling() throws InterruptedException {
         EntityLauncher launcher = new EntityLauncher();
         launcher.setName("launcher");
         Queue queue1 = new Queue();
