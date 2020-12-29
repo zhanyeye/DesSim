@@ -39,14 +39,14 @@ public class DesSim {
 
     /**
      * DES 被串行调度
-     * @param currentTime 注入时间
+     * @param scheduleTime 注入时间
      * @param num 注入个数
      */
-    public static void serialScheduling(int currentTime, int num) throws InterruptedException {
+    public static void serialScheduling(int scheduleTime, int num) throws InterruptedException {
         for (Entity entity : Entity.getAll()) {
             if (entity.getClass() == EntityLauncher.class) {
                 EntityLauncher launcher = (EntityLauncher) entity;
-                launcher.scheduleOneAction(eventManager, currentTime, num);
+                launcher.scheduleOneAction(eventManager, scheduleTime, num);
                 break;
             }
         }
@@ -58,14 +58,14 @@ public class DesSim {
 
     /**
      * DES被并行的调度，调用时必须确保DES调度正在运行，否则会报错
-     * @param currentTime 时间调度时间
+     * @param scheduleTime 时间调度时间
      * @param num 注入个数
      */
-    public static void parallelScheduling(int currentTime, int num) {
+    public static void parallelScheduling(int scheduleTime, int num) {
         for (Entity entity : Entity.getAll()) {
             if (entity.getClass() == EntityLauncher.class) {
                 EntityLauncher launcher = (EntityLauncher) entity;
-                launcher.scheduleAction(eventManager, currentTime, num);
+                launcher.scheduleAction(eventManager, scheduleTime, num);
                 break;
             }
         }
@@ -75,10 +75,12 @@ public class DesSim {
      * 执行事件直到指定时刻
      * @param time
      */
-    public static void resume(long time) {
+    public static void resume(long time) throws InterruptedException {
         eventManager.resume(time);
+        while (eventManager.isRunning()) {
+            Thread.sleep(1);
+        }
     }
-
 
     /**
      * 事件队列中即将执行的事件的时间
@@ -94,6 +96,14 @@ public class DesSim {
      */
     public static boolean hasEvent() {
         return eventManager.hasEvent();
+    }
+
+    /**
+     * DES系统当前仿真时间
+     * @return
+     */
+    public long currentSimTime() {
+        return eventManager.getTicks();
     }
 
     /**
