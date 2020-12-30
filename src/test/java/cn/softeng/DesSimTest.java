@@ -14,7 +14,7 @@ import java.util.Map;
 public class DesSimTest
 {
     /**
-     * Rigorous Test :-)
+     * 水平调度测试
      */
     @Test
     public void testSerialScheduling() throws InterruptedException, InstantiationException, IllegalAccessException {
@@ -33,17 +33,17 @@ public class DesSimTest
         // ******************************
 
         // 设置实体启动器的后继
-        launcher.setNextComponent((LinkedComponent) DesSim.getEntity("2"));
+        launcher.setNextComponent(DesSim.getEntity("2"));
 
         // 设置服务的等待队列，服务时间，服务的后继
         server1.setWaitQueue((Queue) DesSim.getEntity("2"));
         server1.setServiceTime(2);
-        server1.setNextComponent((LinkedComponent) DesSim.getEntity("5"));
+        server1.setNextComponent(DesSim.getEntity("5"));
 
         // 设置服务的等待队列，服务时间，服务的后继
         server2.setWaitQueue((Queue) DesSim.getEntity("2"));
         server2.setServiceTime(2);
-        server2.setNextComponent((LinkedComponent) DesSim.getEntity("5"));
+        server2.setNextComponent(DesSim.getEntity("5"));
 
         // ********************************
         // 运行模型
@@ -54,8 +54,14 @@ public class DesSimTest
         // 开始水平调度
         DesSim.serialScheduling(0, 100);
 
+        // *******************************
+        // 获取数据
+        // *******************************
+
+        // 输出时钟序列
         log.debug("{}", DesSim.getTimePointList().toString());
 
+        
 
         log.debug("{}", server1.getName());
         log.debug("getNumAddMap");

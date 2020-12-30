@@ -42,7 +42,7 @@ public class DesSim {
     }
 
     /**
-     * 创建指定的模型类别
+     * 创建指定类别的模型
      * @param klass 模型对应类型名，可选项："EntityGenerator", "EntityLauncher", "Queue", "Server", "EntitySink" ...
      * @param identifier 所创建类型的唯一标识符
      * @return
@@ -66,14 +66,14 @@ public class DesSim {
         return eventManager.getTimePointList();
     }
 
-//    public static LinkedComponent getLinkedEntity(String identifier) {
-//        Entity ret = Entity.getNamedEntity(identifier);
-//        return (LinkedComponent) ret;
-//    }
-
-    public static Entity getEntity(String identifier) {
-        return Entity.getNamedEntity(identifier);
+    public static LinkedComponent getEntity(String identifier) {
+        Entity ret = Entity.getNamedEntity(identifier);
+        return (LinkedComponent) ret;
     }
+
+//    public static Entity getEntity(String identifier) {
+//        return Entity.getNamedEntity(identifier);
+//    }
 
     /**
      * 初始化模型，确认DES类型
