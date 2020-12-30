@@ -1,5 +1,6 @@
 package cn.softeng;
 
+import cn.softeng.basicsim.Entity;
 import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -17,33 +18,33 @@ public class DesSimTest
      * 水平调度测试
      */
     @Test
-    public void testSerialScheduling() throws InterruptedException, InstantiationException, IllegalAccessException {
+    public void testSerialScheduling() throws InterruptedException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 
         // *****************************
         // 定义模型, 设置标识符
         // *****************************
-        EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", "1");
-        Queue queue = DesSim.createModelInstance("Queue", "2");
-        Server server1 = DesSim.createModelInstance("Server", "3");
-        Server server2 = DesSim.createModelInstance("Server", "4");
-        EntitySink sink = DesSim.createModelInstance("EntitySink", "5");
+        EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
+        Queue queue = DesSim.createModelInstance("Queue", 2);
+        Server server1 = DesSim.createModelInstance("Server", 3);
+        Server server2 = DesSim.createModelInstance("Server", 4);
+        EntitySink sink = DesSim.createModelInstance("EntitySink", 5);
 
         // ******************************
         // 为模型属性赋值
         // ******************************
 
         // 设置实体启动器的后继
-        launcher.setNextComponent(DesSim.getEntity("2"));
+        launcher.setNextComponent(DesSim.getEntity(2));
 
         // 设置服务的等待队列，服务时间，服务的后继
-        server1.setWaitQueue((Queue) DesSim.getEntity("2"));
+        server1.setWaitQueue((Queue) DesSim.getEntity(2));
         server1.setServiceTime(2);
-        server1.setNextComponent(DesSim.getEntity("5"));
+        server1.setNextComponent(DesSim.getEntity(5));
 
         // 设置服务的等待队列，服务时间，服务的后继
-        server2.setWaitQueue((Queue) DesSim.getEntity("2"));
+        server2.setWaitQueue((Queue) DesSim.getEntity(2));
         server2.setServiceTime(2);
-        server2.setNextComponent(DesSim.getEntity("5"));
+        server2.setNextComponent(DesSim.getEntity(5));
 
         // ********************************
         // 运行模型
@@ -61,23 +62,6 @@ public class DesSimTest
         // 输出时钟序列
         log.debug("{}", DesSim.getTimePointList().toString());
 
-        
-
-        log.debug("{}", server1.getName());
-        log.debug("getNumAddMap");
-        for (Map.Entry<Long, Long> entry : server1.getNumAddMap().entrySet()) {
-            log.debug("{} - {}", entry.getKey(), entry.getValue());
-        }
-        log.debug("getNumInProgress");
-        for (Map.Entry<Long, Long> entry : server1.getNumInProgress().entrySet()) {
-            log.debug("{} - {}", entry.getKey(), entry.getValue());
-        }
-        log.debug(server1.getName());
-        log.debug("getNumProcessed");
-        for (Map.Entry<Long, Long> entry : server1.getNumProcessedMap().entrySet()) {
-            log.debug("{} - {}", entry.getKey(), entry.getValue());
-        }
-
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
         // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
@@ -87,19 +71,13 @@ public class DesSimTest
     }
 
     @Test
-    public void testParallelScheduling() throws InterruptedException {
-        EntityLauncher launcher = new EntityLauncher();
-        launcher.setName("launcher");
-        Queue queue1 = new Queue();
-        queue1.setName("queue1");
-        Queue queue2 = new Queue();
-        queue2.setName("queue2");
-        Server server1 = new Server();
-        server1.setName("server1");
-        Server server2 = new Server();
-        server2.setName("server2");
-        EntitySink sink = new EntitySink();
-        sink.setName("sink");
+    public void testParallelScheduling() throws InterruptedException, IllegalAccessException, InstantiationException {
+        EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
+        Queue queue1 = DesSim.createModelInstance("Queue",2);
+        Queue queue2 = DesSim.createModelInstance("Queue", 3);
+        Server server1 = DesSim.createModelInstance("Server", 4);
+        Server server2 = DesSim.createModelInstance("Server", 5);
+        EntitySink sink = DesSim.createModelInstance("EntitySink", 6);
 
         launcher.setNextComponent(queue1);
         server1.setWaitQueue(queue1);

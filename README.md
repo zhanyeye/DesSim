@@ -38,10 +38,53 @@
 
 
 ### 使用指南
-使用的前置操作：将DesSim打包成jar包，并在你的项目中引用。[[参考]](https://www.jianshu.com/p/257dcca702f7)
+使用的前将DesSim打包成jar包，并在你的项目中引用。[[参考]](https://www.jianshu.com/p/257dcca702f7)
 
 
 #### 水平调度示例
+```java
+// *****************************
+// 定义模型, 设置标识符
+// *****************************
+EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
+Queue queue = DesSim.createModelInstance("Queue", 2);
+Server server1 = DesSim.createModelInstance("Server", 3);
+Server server2 = DesSim.createModelInstance("Server", 4);
+EntitySink sink = DesSim.createModelInstance("EntitySink", 5);
+
+// ******************************
+// 为模型属性赋值
+// ******************************
+
+// 设置实体启动器的后继
+launcher.setNextComponent(DesSim.getEntity(2));
+
+// 设置服务的等待队列，服务时间，服务的后继
+server1.setWaitQueue((Queue) DesSim.getEntity(2));
+server1.setServiceTime(2);
+server1.setNextComponent(DesSim.getEntity(5));
+
+// 设置服务的等待队列，服务时间，服务的后继
+server2.setWaitQueue((Queue) DesSim.getEntity(2));
+server2.setServiceTime(2);
+server2.setNextComponent(DesSim.getEntity(5));
+
+// ********************************
+// 运行模型
+// ********************************
+
+// 初始化模型：
+DesSim.initModel(DesSim.Type.HORIZONTAL);
+// 开始水平调度：0时刻调度，注入100个实体
+DesSim.serialScheduling(0, 100);
+
+// *******************************
+// 获取数据
+// *******************************
+
+// 输出时钟序列
+log.debug("{}", DesSim.getTimePointList().toString());
+```
 
 #### 垂直调度示例
 

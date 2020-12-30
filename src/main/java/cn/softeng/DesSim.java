@@ -7,7 +7,7 @@ import cn.softeng.processflow.*;
 import cn.softeng.processflow.Queue;
 import lombok.extern.slf4j.Slf4j;
 
-import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.security.InvalidParameterException;
 import java.util.*;
 
@@ -32,6 +32,7 @@ public class DesSim {
 
 
     static  {
+        // 初始化模型当前支持的组件
         allModelType = new HashMap<>();
         allModelType.put("EntityGenerator", EntityGenerator.class);
         allModelType.put("EntityLauncher", EntityLauncher.class);
@@ -42,19 +43,33 @@ public class DesSim {
     }
 
     /**
+     * 创建模型的实例
+     * @param kclass 模型类型的字符串表示
+     * @param id 模型的唯一id
+     * @param <T>
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
+    public static <T extends Entity> T createModelInstance(String kclass, int id) throws InstantiationException, IllegalAccessException {
+        return createModelInstance(kclass, String.valueOf(id));
+    }
+
+    /**
      * 创建指定类别的模型
      * @param klass 模型对应类型名，可选项："EntityGenerator", "EntityLauncher", "Queue", "Server", "EntitySink" ...
      * @param identifier 所创建类型的唯一标识符
      * @return
      */
-    public static <T extends Entity> T createModelInstance(String klass, String identifier) throws IllegalAccessException, InstantiationException {
+    public static <T extends Entity> T createModelInstance(String klass, String identifier) throws IllegalAccessException {
         if (allModelType.containsKey(klass)) {
             Class type = allModelType.get(klass);
-            T entity = (T) type.newInstance();
+            T entity = null;
+            try { entity = (T) type.newInstance(); } catch (InstantiationException e) { e.printStackTrace(); }
             entity.setName(identifier);
             return entity;
         } else {
-            throw new InvalidParameterException();
+            throw new InvalidParameterException("请检查参数 klass 是否输入错误！");
         }
     }
 
@@ -66,14 +81,37 @@ public class DesSim {
         return eventManager.getTimePointList();
     }
 
+    /**
+     * 通id获取对应的组件
+     * @param id
+     * @return
+     */
+    public static LinkedComponent getEntity(int id) {
+        return getEntity(String.valueOf(id));
+    }
+
+    /**
+     * 更具实体表示获取实体
+     * @param identifier 实体表示
+     * @return
+     */
     public static LinkedComponent getEntity(String identifier) {
         Entity ret = Entity.getNamedEntity(identifier);
         return (LinkedComponent) ret;
     }
 
-//    public static Entity getEntity(String identifier) {
-//        return Entity.getNamedEntity(identifier);
-//    }
+    public static long getCurrentData(String identifier, String attr) throws IllegalAccessException {
+        Entity entity = Entity.getNamedEntity(identifier);
+        Field[] fields = entity.getClass().getDeclaredFields();
+        for (Field field : fields) {
+           if (field.getName().equals(attr)) {
+               field.setAccessible(true);
+               return (Long) field.get(entity);
+           }
+
+        }
+        throw new InvalidParameterException("attr 不存在");
+    }
 
     /**
      * 初始化模型，确认DES类型
@@ -81,14 +119,21 @@ public class DesSim {
      */
     public static void initModel(Type type) {
         desType = type;
-        if (type == Type.HORIZONTAL) {
-            InitModelTarget.vertical = false;
-        } else if (type == Type.VERTICAL) {
-            InitModelTarget.vertical = true;
-        } else {
-
-        }
         eventManager.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
+    }
+
+    /**
+     * 水平模式下：注入后会立即执行
+     * 垂直模式下：出入后不会立即执行，需要手动触发
+     * @param scheduleTime
+     * @param num
+     */
+    public static void inject(int scheduleTime, int num) {
+       if (desType == Type.HORIZONTAL) {
+           serialScheduling(scheduleTime, num);
+       } else if (desType == Type.VERTICAL) {
+           parallelScheduling(scheduleTime, num);
+       }
     }
 
     /**
@@ -96,7 +141,8 @@ public class DesSim {
      * @param scheduleTime 注入时间
      * @param num 注入个数
      */
-    public static void serialScheduling(int scheduleTime, int num) throws InterruptedException {
+    public static void serialScheduling(int scheduleTime, int num) {
+        // 找到启动器实体，调用其scheduleOneAction方法，添加一个启动事件
         for (Entity entity : Entity.getAll()) {
             if (entity.getClass() == EntityLauncher.class) {
                 EntityLauncher launcher = (EntityLauncher) entity;
@@ -104,9 +150,10 @@ public class DesSim {
                 break;
             }
         }
+        // 调度器启动
         eventManager.resume(Long.MAX_VALUE);
         while (eventManager.isRunning()) {
-            Thread.sleep(1);
+            try { Thread.sleep(1); } catch (InterruptedException e) { e.printStackTrace(); }
         }
     }
 
@@ -129,10 +176,10 @@ public class DesSim {
      * 执行事件直到指定时刻
      * @param time
      */
-    public static void resume(long time) throws InterruptedException {
+    public static void resume(long time) {
         eventManager.resume(time);
         while (eventManager.isRunning()) {
-            Thread.sleep(1);
+            try { Thread.sleep(1); } catch (InterruptedException e) { e.printStackTrace(); }
         }
     }
 
