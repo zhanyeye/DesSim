@@ -5,7 +5,9 @@ import cn.softeng.states.StateEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -122,6 +124,15 @@ public class LinkedComponent extends StateEntity {
     protected Map<Long, Long> numProcessedMap = new LinkedHashMap<>();
     @Getter
     protected Map<Long, Long> numInProgress = new LinkedHashMap<>();
+
+    /**
+     * 获取收集的时间序列的值的集合
+     * @param map
+     * @return
+     */
+    protected List<Long> getValueList(Map<Long, Long> map) {
+        return new ArrayList<>(map.values());
+    }
 
     /**
      * 返回在整个仿真运行（包括初始化期间）中从上游接收到的实体数。

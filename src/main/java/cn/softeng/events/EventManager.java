@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -126,6 +127,8 @@ public final class EventManager {
 
     private EventTimeListener timelistener;
     private EventTraceListener trcListener;
+    @Getter
+    private List<Long> timePointList;
 
     /**
      * Allocates a new EventManager with the given name
@@ -157,6 +160,7 @@ public final class EventManager {
         realTimeFactor = 1;
         rebaseRealTime = true;
         setTimeListener(null);
+        timePointList = new ArrayList<>();
     }
 
     /**
@@ -325,6 +329,7 @@ public final class EventManager {
                     for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
                         entity.updateStatistics();
                     }
+                    timePointList.add(currentTick.get());
                 }
 
                 if (!executeEvents) {
@@ -391,6 +396,7 @@ public final class EventManager {
                 for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
                     entity.updateStatistics();
                 }
+                timePointList.add(currentTick.get());
 
                 // Advance to the next event time
                 // 通过wait等待20ms（推进时间）, 然后continue，再来判断时间，

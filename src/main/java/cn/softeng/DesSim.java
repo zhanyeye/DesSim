@@ -3,11 +3,13 @@ package cn.softeng;
 import cn.softeng.basicsim.Entity;
 import cn.softeng.basicsim.InitModelTarget;
 import cn.softeng.events.EventManager;
-import cn.softeng.processflow.EntityLauncher;
+import cn.softeng.processflow.*;
+import cn.softeng.processflow.Queue;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Array;
+import java.security.InvalidParameterException;
+import java.util.*;
 
 /**
  * DES 对外调度接口
@@ -19,7 +21,59 @@ public class DesSim {
      * 负责调度DES的事件管理器
      */
     private static EventManager eventManager = new EventManager("DesSim");
+    /**
+     * 选择的仿真模式
+     */
     private static Type desType;
+    /**
+     * 所有模型对应的类型
+     */
+    private static final Map<String,Class> allModelType;
+
+
+    static  {
+        allModelType = new HashMap<>();
+        allModelType.put("EntityGenerator", EntityGenerator.class);
+        allModelType.put("EntityLauncher", EntityLauncher.class);
+        allModelType.put("Queue", Queue.class);
+        allModelType.put("Server", Server.class);
+        allModelType.put("EntitySink", EntitySink.class);
+        allModelType.put("Server", Server.class);
+    }
+
+    /**
+     * 创建指定的模型类别
+     * @param klass 模型对应类型名，可选项："EntityGenerator", "EntityLauncher", "Queue", "Server", "EntitySink" ...
+     * @param identifier 所创建类型的唯一标识符
+     * @return
+     */
+    public static <T extends Entity> T createModelInstance(String klass, String identifier) throws IllegalAccessException, InstantiationException {
+        if (allModelType.containsKey(klass)) {
+            Class type = allModelType.get(klass);
+            T entity = (T) type.newInstance();
+            entity.setName(identifier);
+            return entity;
+        } else {
+            throw new InvalidParameterException();
+        }
+    }
+
+    /**
+     * 获取模型的时钟序列
+     * @return
+     */
+    public static List<Long> getTimePointList() {
+        return eventManager.getTimePointList();
+    }
+
+//    public static LinkedComponent getLinkedEntity(String identifier) {
+//        Entity ret = Entity.getNamedEntity(identifier);
+//        return (LinkedComponent) ret;
+//    }
+
+    public static Entity getEntity(String identifier) {
+        return Entity.getNamedEntity(identifier);
+    }
 
     /**
      * 初始化模型，确认DES类型
@@ -127,5 +181,5 @@ public class DesSim {
     public static void main(String[] args) {
         System.out.println("Hello ! this is DesSim");
     }
- 
+
 }

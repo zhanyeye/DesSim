@@ -15,8 +15,6 @@ public class InitModelTarget extends ProcessTarget {
 
     @Override
     public void process() {
-        log.debug("time: 0 - [time advance]");
-        log.info("[init model]");
         // 初始化每一个实体
         for (Entity each : Entity.getClonesOfIterable(Entity.class)) {
             each.earlyInit();

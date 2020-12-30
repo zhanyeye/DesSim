@@ -103,6 +103,13 @@ public class Queue extends LinkedComponent {
         userList = new ArrayList<>();
     }
 
+//    @Override
+//    public void setNextComponent(LinkedComponent nextComponent) {
+//        if (Server.class.equals(nextComponent.getClass())) {
+//
+//        }
+//    }
+
     @Override
     public void earlyInit() {
         super.earlyInit();

@@ -3,6 +3,7 @@ package cn.softeng;
 import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import sun.security.krb5.internal.crypto.Des;
 
 import java.util.Map;
 
@@ -16,33 +17,44 @@ public class DesSimTest
      * Rigorous Test :-)
      */
     @Test
-    public void testSerialScheduling() throws InterruptedException {
+    public void testSerialScheduling() throws InterruptedException, InstantiationException, IllegalAccessException {
 
-        // 这里应该从XML中读取模型所包含的组件
-        EntityLauncher launcher = new EntityLauncher();
-        launcher.setName("launcher");
+        // *****************************
+        // 定义模型, 设置标识符
+        // *****************************
+        EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", "1");
+        Queue queue = DesSim.createModelInstance("Queue", "2");
+        Server server1 = DesSim.createModelInstance("Server", "3");
+        Server server2 = DesSim.createModelInstance("Server", "4");
+        EntitySink sink = DesSim.createModelInstance("EntitySink", "5");
 
-        Queue queue1 = new Queue();
-        queue1.setName("queue1");
-        Queue queue2 = new Queue();
-        queue2.setName("queue2");
-        Server server1 = new Server();
-        server1.setName("server1");
-        Server server2 = new Server();
-        server2.setName("server2");
-        EntitySink sink = new EntitySink();
-        sink.setName("sink");
+        // ******************************
+        // 为模型属性赋值
+        // ******************************
 
-        launcher.setNextComponent(queue1);
-        server1.setWaitQueue(queue1);
-        server1.setServiceTime(3);
-        server1.setNextComponent(queue2);
-        server2.setWaitQueue(queue2);
-        server2.setServiceTime(3);
-        server2.setNextComponent(sink);
+        // 设置实体启动器的后继
+        launcher.setNextComponent((LinkedComponent) DesSim.getEntity("2"));
 
+        // 设置服务的等待队列，服务时间，服务的后继
+        server1.setWaitQueue((Queue) DesSim.getEntity("2"));
+        server1.setServiceTime(2);
+        server1.setNextComponent((LinkedComponent) DesSim.getEntity("5"));
+
+        // 设置服务的等待队列，服务时间，服务的后继
+        server2.setWaitQueue((Queue) DesSim.getEntity("2"));
+        server2.setServiceTime(2);
+        server2.setNextComponent((LinkedComponent) DesSim.getEntity("5"));
+
+        // ********************************
+        // 运行模型
+        // ********************************
+
+        // 初始化模型
         DesSim.initModel(DesSim.Type.HORIZONTAL);
-        DesSim.serialScheduling(0, 1);
+        // 开始水平调度
+        DesSim.serialScheduling(0, 100);
+
+        log.debug("{}", DesSim.getTimePointList().toString());
 
 
         log.debug("{}", server1.getName());
@@ -60,6 +72,9 @@ public class DesSimTest
             log.debug("{} - {}", entry.getKey(), entry.getValue());
         }
 
+
+        // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
+        // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
         while (true) {
             Thread.sleep(1);
         }
