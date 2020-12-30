@@ -98,6 +98,9 @@ public class EntityLauncher extends LinkedService{
         eventManager.scheduleProcessExternalAndPause(waitlength, 0, false, doActionTarget, null);
     }
 
+    /**
+     * 生成实体的操作
+     */
     public void doAction() {
         int num = entitiesPerArrival;
         for (int i = 0; i < num; i++) {
@@ -127,6 +130,18 @@ public class EntityLauncher extends LinkedService{
         }
     }
 
+    /**
+     * 正在进行中的实体数量
+     * @return
+     */
+    @Override
+    public long getNumberInProgress() {
+        return 0;
+    }
+
+    /**
+     * 更新统计数据
+     */
     @Override
     public void updateStatistics() {
         log.debug("Launcher -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());

@@ -21,7 +21,7 @@ public class DesSimTest
     public void testSerialScheduling() throws InterruptedException, InstantiationException, IllegalAccessException, NoSuchFieldException {
 
         // *****************************
-        // 定义模型, 设置标识符
+        // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
         // *****************************
         EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
         Queue queue = DesSim.createModelInstance("Queue", 2);
@@ -53,7 +53,7 @@ public class DesSimTest
         // 初始化模型
         DesSim.initModel(DesSim.Type.HORIZONTAL);
         // 开始水平调度
-        DesSim.serialScheduling(0, 100);
+        DesSim.inject(0, 100);
 
         // *******************************
         // 获取数据
@@ -90,6 +90,7 @@ public class DesSimTest
         DesSim.initModel(DesSim.Type.VERTICAL);
 
         DesSim.parallelScheduling(5, 1);
+
         DesSim.resume(5);
         DesSim.resume(7);
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
