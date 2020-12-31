@@ -18,6 +18,14 @@
     <maven.compiler.target>1.7</maven.compiler.target>
   </properties>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub zhanyeye Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/zhanyeye/DesSim</url>
+    </repository>
+  </distributionManagement>
+
   <dependencies>
 
     <!-- https://mvnrepository.com/artifact/junit/junit -->
