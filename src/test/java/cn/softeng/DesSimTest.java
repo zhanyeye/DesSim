@@ -75,6 +75,9 @@ public class DesSimTest {
     @Test
     public void testParallelScheduling() throws InterruptedException, IllegalAccessException, InstantiationException {
 
+        // *****************************
+        // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
+        // *****************************
         EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
         Queue queue1 = DesSim.createModelInstance("Queue",2);
         Queue queue2 = DesSim.createModelInstance("Queue", 3);
@@ -82,6 +85,9 @@ public class DesSimTest {
         Server server2 = DesSim.createModelInstance("Server", 5);
         EntitySink sink = DesSim.createModelInstance("EntitySink", 6);
 
+        // ******************************
+        // 为模型属性赋值
+        // ******************************
         launcher.setNextComponent(queue1);
         server1.setWaitQueue(queue1);
         server1.setServiceTime(2);
@@ -89,6 +95,11 @@ public class DesSimTest {
         server2.setWaitQueue(queue2);
         server2.setServiceTime(3);
         server2.setNextComponent(sink);
+
+
+        // ********************************
+        // 运行模型
+        // ********************************
 
         DesSim.initModel(DesSim.Type.VERTICAL);
 
@@ -109,6 +120,10 @@ public class DesSimTest {
         DesSim.resume(100);
 
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+
+        // *******************************
+        // 获取数据
+        // *******************************
 
         // 输出时钟序列
         log.debug("Server:");
