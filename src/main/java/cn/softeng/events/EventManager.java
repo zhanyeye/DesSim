@@ -6,7 +6,9 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -128,7 +130,7 @@ public final class EventManager {
     private EventTimeListener timelistener;
     private EventTraceListener trcListener;
     @Getter
-    private List<Long> timePointList;
+    private Set<Long> timePointSet;
 
     /**
      * Allocates a new EventManager with the given name
@@ -160,7 +162,7 @@ public final class EventManager {
         realTimeFactor = 1;
         rebaseRealTime = true;
         setTimeListener(null);
-        timePointList = new ArrayList<>();
+        timePointSet = new LinkedHashSet<>();
     }
 
     /**
@@ -329,7 +331,7 @@ public final class EventManager {
                     for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
                         entity.updateStatistics();
                     }
-                    timePointList.add(currentTick.get());
+                    timePointSet.add(currentTick.get());
                 }
 
                 if (!executeEvents) {
@@ -396,7 +398,7 @@ public final class EventManager {
                 for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
                     entity.updateStatistics();
                 }
-                timePointList.add(currentTick.get());
+                timePointSet.add(currentTick.get());
 
                 // Advance to the next event time
                 // 通过wait等待20ms（推进时间）, 然后continue，再来判断时间，
@@ -577,13 +579,15 @@ public final class EventManager {
      */
     private long calculateEventTime(long waitLength) {
         // Test for negative duration schedule wait length
-        if(waitLength < 0)
+        if(waitLength < 0) {
             throw new ProcessError("Negative duration wait is invalid, waitLength = " + waitLength);
+        }
 
         // Check for numeric overflow of internal time
         long nextEventTime = currentTick.get() + waitLength;
-        if (nextEventTime < 0)
+        if (nextEventTime < 0) {
             nextEventTime = Long.MAX_VALUE;
+        }
 
         return nextEventTime;
     }
@@ -634,8 +638,9 @@ public final class EventManager {
         Event evt = getEvent(node, t, handle);
 
         if (handle != null) {
-            if (handle.isScheduled())
+            if (handle.isScheduled()) {
                 throw new ProcessError("Tried to schedule using an EventHandle already in use");
+            }
             handle.event = evt;
         }
 
@@ -704,8 +709,9 @@ public final class EventManager {
         WaitTarget t = new WaitTarget(cur);
         ConditionalEvent evt = new ConditionalEvent(cond, t, handle);
         if (handle != null) {
-            if (handle.isScheduled())
+            if (handle.isScheduled()) {
                 throw new ProcessError("Tried to waitUntil using a handle already in use");
+            }
             handle.event = evt;
         }
         condEvents.add(evt);
@@ -726,8 +732,9 @@ public final class EventManager {
         assertCanSchedule();
         ConditionalEvent evt = new ConditionalEvent(cond, t, handle);
         if (handle != null) {
-            if (handle.isScheduled())
+            if (handle.isScheduled()) {
                 throw new ProcessError("Tried to scheduleUntil using a handle already in use");
+            }
             handle.event = evt;
         }
         condEvents.add(evt);
@@ -765,8 +772,9 @@ public final class EventManager {
         EventNode node = evt.node;
         node.removeEvent(evt);
         if (node.head == null) {
-            if (!eventTree.removeNode(node.schedTick, node.priority))
+            if (!eventTree.removeNode(node.schedTick, node.priority)) {
                 throw new ProcessError("Tried to remove an eventnode that could not be found");
+            }
         }
 
         // Clear the event to reuse it
@@ -812,8 +820,9 @@ public final class EventManager {
         assertCanSchedule();
 
         // no handle given, or Handle was not scheduled, nothing to do
-        if (handle == null || handle.event == null)
+        if (handle == null || handle.event == null) {
             return;
+        }
 
         if (trcListener != null) {
             disableSchedule();
@@ -852,8 +861,9 @@ public final class EventManager {
         assertCanSchedule();
 
         // no handle given, or Handle was not scheduled, nothing to do
-        if (handle == null || handle.event == null)
+        if (handle == null || handle.event == null) {
             return;
+        }
 
         if (trcListener != null) {
             disableSchedule();
@@ -863,8 +873,9 @@ public final class EventManager {
         ProcessTarget t = rem(handle);
 
         Process proc = t.getProcess();
-        if (proc == null)
+        if (proc == null) {
             proc = Process.allocate(this, cur, t);
+        }
         proc.setNextProcess(cur);
         proc.wake();
         threadWait(cur);
@@ -881,12 +892,14 @@ public final class EventManager {
     }
 
     public void setExecuteRealTime(boolean useRealTime, double factor) {
-        if (useRealTime == executeRealTime && factor == realTimeFactor)
+        if (useRealTime == executeRealTime && factor == realTimeFactor) {
             return;
+        }
         executeRealTime = useRealTime;
         realTimeFactor = factor;
-        if (useRealTime)
+        if (useRealTime) {
             rebaseRealTime = true;
+        }
     }
 
     /**
@@ -916,8 +929,9 @@ public final class EventManager {
         }
         // Catch the exception when the thread is interrupted
         catch( InterruptedException e ) {}
-        if (cur.shouldDie())
+        if (cur.shouldDie()) {
             throw new ThreadKilledException("Thread killed");
+        }
     }
 
     /**
@@ -1029,8 +1043,9 @@ public final class EventManager {
         Event evt = getEvent(node, t, handle);
 
         if (handle != null) {
-            if (handle.isScheduled())
+            if (handle.isScheduled()) {
                 throw new ProcessError("Tried to schedule using an EventHandle already in use");
+            }
             handle.event = evt;
         }
         if (trcListener != null) {

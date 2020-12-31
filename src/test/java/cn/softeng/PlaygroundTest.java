@@ -3,14 +3,29 @@ package cn.softeng;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @date: 12/29/2020 2:33 PM
  */
 @Slf4j
 public class PlaygroundTest {
+
+
+    @Test
+    public void testSet() {
+        Set<Long> set = new LinkedHashSet<>();
+        set.add(9L);
+        set.add(8L);
+        set.add(7L);
+        set.add(6L);
+        Iterator iterator = set.iterator();
+        while (iterator.hasNext()) {
+            log.debug("{}", iterator.next());
+        }
+
+    }
+
     @Test
     public void testLinkedHashMap() {
         Map<Long, Long> map =  new LinkedHashMap<>();

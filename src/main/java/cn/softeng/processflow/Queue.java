@@ -103,13 +103,6 @@ public class Queue extends LinkedComponent {
         userList = new ArrayList<>();
     }
 
-//    @Override
-//    public void setNextComponent(LinkedComponent nextComponent) {
-//        if (Server.class.equals(nextComponent.getClass())) {
-//
-//        }
-//    }
-
     @Override
     public void earlyInit() {
         super.earlyInit();
@@ -396,9 +389,9 @@ public class Queue extends LinkedComponent {
 
     @Override
     public void updateStatistics() {
-        log.debug("{}    -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
+        log.debug("Queue : {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
         numAddMap.put(getSimTicks(), getTotalNumberAdded());
-        numInProgress.put(getSimTicks(), getNumberInProgress());
+        numInProgressMap.put(getSimTicks(), getNumberInProgress());
         numProcessedMap.put(getSimTicks(), getTotalNumberProcessed());
     }
 

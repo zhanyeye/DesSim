@@ -210,12 +210,14 @@ class EventTree {
         gp.red = true;
         parent.red = false;
         if (parent.left == n) {
-            if (gp == root)
+            if (gp == root) {
                 root = gp.left;
+            }
             gp.rotateRight(ggp);
         } else {
-            if (gp == root)
+            if (gp == root) {
                 root = gp.right;
+            }
             gp.rotateLeft(ggp);
         }
 
@@ -236,13 +238,16 @@ class EventTree {
         while (true) {
             int comp = current.compare(schedTick, priority);
 
-            if (comp == 0) break;
+            if (comp == 0) {
+                break;
+            }
 
             pushScratch(current);
-            if (comp > 0)
+            if (comp > 0) {
                 current = current.left;
-            else
+            } else {
                 current = current.right;
+            }
             if (current == EventNode.nilNode) {
                 return false; // Node not found
             }
@@ -250,8 +255,9 @@ class EventTree {
 
         // Debugging
         // 如果节点所指向的链表仍然有元素，则抛出异常
-        if (current.head != null || current.tail != null)
+        if (current.head != null || current.tail != null) {
             throw new RuntimeException("Removing non-empy node");
+        }
 
         // We have the node to remove
         if (current.left != EventNode.nilNode && current.right != EventNode.nilNode) {
@@ -275,14 +281,16 @@ class EventTree {
 
         // Drop the node
         if (parent != null) {
-            if (parent.left == current)
+            if (parent.left == current) {
                 parent.left = child;
-            else
+            } else {
                 parent.right = child;
+            }
         }
 
-        if (current == root)
+        if (current == root) {
             root = child;
+        }
 
         boolean currentIsRed = current.red;
 

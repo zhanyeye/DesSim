@@ -17,9 +17,15 @@ public class EventData {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) return false;
-        if (obj == this) return true;
-        if (!(obj instanceof EventData)) return false;
+        if (obj == null) {
+            return false;
+        }
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof EventData)) {
+            return false;
+        }
         EventData data = (EventData) obj;
         return (ticks == data.ticks) && (priority == data.priority)
                 && description.equals(data.description);

@@ -45,8 +45,9 @@ class EventNode {
         // quick case where we are the head event
         if (this.head == evt) {
             this.head = evt.next;
-            if (evt.next == null)
+            if (evt.next == null) {
                 this.tail = null;
+            }
         }
         else {
             Event prev = this.head;
@@ -55,8 +56,9 @@ class EventNode {
             }
 
             prev.next = evt.next;
-            if (evt.next == null)
+            if (evt.next == null) {
                 this.tail = prev;
+            }
         }
     }
 
@@ -65,21 +67,30 @@ class EventNode {
     }
 
     final int compare(long schedTick, int priority) {
-        if (this.schedTick < schedTick) return -1;
-        if (this.schedTick > schedTick) return  1;
+        if (this.schedTick < schedTick) {
+            return -1;
+        }
+        if (this.schedTick > schedTick) {
+            return  1;
+        }
 
-        if (this.priority < priority) return -1;
-        if (this.priority > priority) return  1;
+        if (this.priority < priority) {
+            return -1;
+        }
+        if (this.priority > priority) {
+            return  1;
+        }
 
         return 0;
     }
 
     final void rotateRight(EventNode parent) {
         if (parent != null) {
-            if (parent.left == this)
+            if (parent.left == this) {
                 parent.left = left;
-            else
+            } else {
                 parent.right = left;
+            }
         }
 
         EventNode oldMid = left.right;
@@ -89,10 +100,11 @@ class EventNode {
     }
     final void rotateLeft(EventNode parent) {
         if (parent != null) {
-            if (parent.left == this)
+            if (parent.left == this) {
                 parent.left = right;
-            else
+            } else {
                 parent.right = right;
+            }
         }
 
         EventNode oldMid = right.left;

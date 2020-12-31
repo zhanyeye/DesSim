@@ -5,10 +5,7 @@ import cn.softeng.states.StateEntity;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -123,7 +120,31 @@ public class LinkedComponent extends StateEntity {
     @Getter
     protected Map<Long, Long> numProcessedMap = new LinkedHashMap<>();
     @Getter
-    protected Map<Long, Long> numInProgress = new LinkedHashMap<>();
+    protected Map<Long, Long> numInProgressMap = new LinkedHashMap<>();
+
+    /**
+     * 返回numAdd各时钟序列所对应的值
+     * @return
+     */
+    public List<Long> getNumAddList() {
+        return new ArrayList<>(numAddMap.values());
+    }
+
+    /**
+     * 返回numProcess各时钟序列所对应的值
+     * @return
+     */
+    public List<Long> getNumProcessList() {
+        return new ArrayList<>(numProcessedMap.values());
+    }
+
+    /**
+     * 返回numInProcess各时钟序列所对应的值
+     * @return
+     */
+    public List<Long> getNumInProgressList() {
+        return new ArrayList<>(numInProgressMap.values());
+    }
 
     /**
      * 获取收集的时间序列的值的集合

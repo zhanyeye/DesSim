@@ -30,9 +30,9 @@ public class EntitySink extends LinkedComponent {
 
     @Override
     public void updateStatistics() {
-        log.debug("Sink      -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
+        log.debug("Sink: {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
         numAddMap.put(getSimTicks(), getTotalNumberAdded());
-        numInProgress.put(getSimTicks(), getNumberInProgress());
+        numInProgressMap.put(getSimTicks(), getNumberInProgress());
         numProcessedMap.put(getSimTicks(), getTotalNumberProcessed());
     }
 

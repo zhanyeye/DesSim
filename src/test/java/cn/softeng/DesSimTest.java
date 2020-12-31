@@ -1,6 +1,5 @@
 package cn.softeng;
 
-import cn.softeng.basicsim.Entity;
 import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -12,8 +11,7 @@ import java.util.Map;
  * Unit test for simple DesSim.
  */
 @Slf4j
-public class DesSimTest
-{
+public class DesSimTest {
     /**
      * 水平调度测试
      */
@@ -60,7 +58,11 @@ public class DesSimTest
         // *******************************
 
         // 输出时钟序列
+        log.debug("Server:");
         log.debug("{}", DesSim.getTimePointList().toString());
+        log.debug("{}",server1.getNumAddList().toString());
+        log.debug("{}",server1.getNumProcessList().toString());
+        log.debug("{}", server1.getNumInProgressList().toString());
 
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
@@ -72,6 +74,7 @@ public class DesSimTest
 
     @Test
     public void testParallelScheduling() throws InterruptedException, IllegalAccessException, InstantiationException {
+
         EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
         Queue queue1 = DesSim.createModelInstance("Queue",2);
         Queue queue2 = DesSim.createModelInstance("Queue", 3);
@@ -89,34 +92,30 @@ public class DesSimTest
 
         DesSim.initModel(DesSim.Type.VERTICAL);
 
-        DesSim.parallelScheduling(5, 1);
+        DesSim.inject(5, 1);
 
         DesSim.resume(5);
         DesSim.resume(7);
+
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
 
-        DesSim.parallelScheduling(7, 1);
+        DesSim.inject(7,1);
+
         DesSim.resume(10);
+        DesSim.resume(15);
+
+        DesSim.inject(15, 1);
+
         DesSim.resume(100);
-        DesSim.parallelScheduling(100, 1);
-        DesSim.resume(200);
+
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
 
-
-        log.debug("{}", server1.getName());
-        log.debug("getNumAddMap");
-        for (Map.Entry<Long, Long> entry : server1.getNumAddMap().entrySet()) {
-            log.debug("{} - {}", entry.getKey(), entry.getValue());
-        }
-        log.debug("getNumInProgress");
-        for (Map.Entry<Long, Long> entry : server1.getNumInProgress().entrySet()) {
-            log.debug("{} - {}", entry.getKey(), entry.getValue());
-        }
-        log.debug(server1.getName());
-        log.debug("getNumProcessed");
-        for (Map.Entry<Long, Long> entry : server1.getNumProcessedMap().entrySet()) {
-            log.debug("{} - {}", entry.getKey(), entry.getValue());
-        }
+        // 输出时钟序列
+        log.debug("Server:");
+        log.debug("{}", DesSim.getTimePointList().toString());
+        log.debug("{}",server1.getNumAddList().toString());
+        log.debug("{}",server1.getNumProcessList().toString());
+        log.debug("{}", server1.getNumInProgressList().toString());
 
         // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
         // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
@@ -124,5 +123,4 @@ public class DesSimTest
             Thread.sleep(1);
         }
     }
-
 }
