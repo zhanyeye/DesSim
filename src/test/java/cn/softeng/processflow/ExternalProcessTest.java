@@ -12,11 +12,6 @@ import org.junit.Test;
 @Slf4j
 public class ExternalProcessTest {
 
-
-    public void test() {
-
-    }
-
     /**
      * 测试EntityExternalGengrator产生试题是否符合预期
      * @throws InterruptedException
@@ -27,14 +22,8 @@ public class ExternalProcessTest {
         EventManager evt = new EventManager("DefaultEventManager");
 
 
-
         SimEntity simEntity = new SimEntity();
         simEntity.setName("defaultEntity");
-
-        // 创建实体，并完成用户输入
-//        EntityExternalGeneration externalGeneration = new EntityExternalGeneration(0, 100, simEntity);
-//        externalGeneration.setName("EntityExternalGenerator");
-
 
 
         Queue queue1 = new Queue();
@@ -56,11 +45,6 @@ public class ExternalProcessTest {
         EntityLauncher launcher = new EntityLauncher();
         launcher.setName("launcher");
         launcher.setNextComponent(queue1);
-//        launcher.scheduleAction(0, 100);
-
-//
-//        externalGeneration.setNextComponent(queue1);
-//        externalGeneration.setEntityPerArrival(100);
 
         server1.setWaitQueue(queue1);
         server1.setServiceTime(2);
@@ -71,25 +55,14 @@ public class ExternalProcessTest {
         server2.setNextComponent(entitySink);
 
 
-
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
         launcher.setEntitiesPerArrival(100);
         launcher.setScheduleTime(0);
         launcher.setPrototypeEntity(simEntity);
-//        launcher.scheduleAction(0, 100);
-        evt.resume(100);
 
+        evt.resume(100);
 
         evt.resume(1000);
 
-
-//        DesSim.initModel();
-//        DesSim.singleScheduling();
-
-        // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
-        // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
-//        while (true) {
-//            Thread.sleep(1);
-//        }
     }
 }

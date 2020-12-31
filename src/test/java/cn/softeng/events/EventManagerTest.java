@@ -24,11 +24,6 @@ public class EventManagerTest {
         }
         evt.resume(1000);
 
-        // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
-        // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
-//        while (true) {
-//            Thread.sleep(1);
-//        }
     }
 
     /**
@@ -61,12 +56,6 @@ public class EventManagerTest {
         EventManager evt = new EventManager("DefalutEventManager");
         evt.scheduleProcessExternal(0, 0, false, new InternalTestTarget("External"), null);
         evt.resume(1000);
-
-        // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
-        // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
-//        while (true) {
-//            Thread.sleep(1);
-//        }
     }
 
     /**

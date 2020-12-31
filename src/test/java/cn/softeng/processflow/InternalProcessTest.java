@@ -25,21 +25,10 @@ public class InternalProcessTest {
 
         SimEntity simEntity = new SimEntity();
         simEntity.setName("defaultEntity");
-//
-//        entityGenerator.getInput("FirstArrivalTime").updateValue(0L);
-//        entityGenerator.getInput("InterArrivalTime").updateValue(5L);
-//        entityGenerator.getInput("EntitiesPerArrival").updateValue(2L);
-//        entityGenerator.getInput("PrototypeEntity").updateValue(simEntity);
 
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
         evt.resume(50);
-//        evt.resume(100);
 
-        // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
-        // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
-//        while (true) {
-//            Thread.sleep(1);
-//        }
     }
 
     /**
@@ -70,26 +59,11 @@ public class InternalProcessTest {
         EntitySink entitySink = new EntitySink();
         entitySink.setName("EntitySink");
 
-//        entityGenerator.getInput("FirstArrivalTime").updateValue(0L);
-//        entityGenerator.getInput("InterArrivalTime").updateValue(1L);
-//        entityGenerator.getInput("EntitiesPerArrival").updateValue(1L);
-//        entityGenerator.getInput("PrototypeEntity").updateValue(simEntity);
-//        entityGenerator.getInput("NextComponent").updateValue(queue);
-//
-//        server.getInput("NextComponent").updateValue(entitySink);
-//        server.getInput("ServiceTime").updateValue(2L);
-//        server.getInput("WaitQueue").updateValue(queue);
-
         // 初始化实体
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
         // 运行到25时刻停止
         evt.resume(25);
 
-        // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
-        // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
-//        while (true) {
-//            Thread.sleep(1);
-//        }
     }
 
     /**
@@ -123,30 +97,10 @@ public class InternalProcessTest {
         EntitySink entitySink = new EntitySink();
         entitySink.setName("EntitySink");
 
-//        entityGenerator.getInput("FirstArrivalTime").updateValue(0L);
-//        entityGenerator.getInput("InterArrivalTime").updateValue(1L);
-//        entityGenerator.getInput("EntitiesPerArrival").updateValue(1L);
-//        entityGenerator.getInput("PrototypeEntity").updateValue(simEntity);
-//        entityGenerator.getInput("NextComponent").updateValue(queue1);
-//
-//        server1.getInput("WaitQueue").updateValue(queue1);
-//        server1.getInput("ServiceTime").updateValue(2L);
-//        server1.getInput("NextComponent").updateValue(queue2);
-//
-//        server2.getInput("WaitQueue").updateValue(queue2);
-//        server2.getInput("ServiceTime").updateValue(4L);
-//        server2.getInput("NextComponent").updateValue(entitySink);
-
         // 初始化实体
         evt.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
         // 运行到25时刻停止
         evt.resume(25);
-
-        // Junit本身是不支持普通的多线程测试的，这是因为Junit的底层实现上，是用System.exit退出用例执行的。
-        // JVM终止了，在测试线程启动的其他线程自然也无法执行。所以手动睡眠主线程。
-//        while (true) {
-//            Thread.sleep(1);
-//        }
 
     }
 
