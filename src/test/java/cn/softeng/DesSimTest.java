@@ -1,5 +1,6 @@
 package cn.softeng;
 
+import cn.softeng.basicsim.InitModelTarget;
 import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -16,7 +17,7 @@ public class DesSimTest {
      * 水平调度测试
      */
     @Test
-    public void testSerialScheduling() throws InterruptedException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+    public void testSerialScheduling() throws InstantiationException, IllegalAccessException {
 
         // *****************************
         // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
@@ -67,7 +68,7 @@ public class DesSimTest {
     }
 
     @Test
-    public void testParallelScheduling() throws InterruptedException, IllegalAccessException, InstantiationException {
+    public void testParallelScheduling() throws IllegalAccessException, InstantiationException {
 
         // *****************************
         // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
@@ -114,6 +115,56 @@ public class DesSimTest {
         DesSim.resume(100);
 
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+
+        // *******************************
+        // 获取数据
+        // *******************************
+
+        // 输出时钟序列
+        log.debug("Server:");
+        log.debug("{}", DesSim.getTimePointList().toString());
+        log.debug("{}",server1.getNumAddList().toString());
+        log.debug("{}",server1.getNumProcessList().toString());
+        log.debug("{}", server1.getNumInProgressList().toString());
+
+    }
+
+    @Test
+    public void testStandaloneSxheduling() {
+
+        // ************************************************
+        // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
+        // ************************************************
+        EntityGenerator generator = new EntityGenerator("EntityGenerator");
+        SimEntity simEntity = new SimEntity("DefaultEntity");
+        Queue queue1 = new Queue("Queue1");
+        Queue queue2 = new Queue("Queue2");
+        Server server1 = new Server("Server1");
+        Server server2 = new Server("Server2");
+        EntitySink sink = new EntitySink("EntitySink");
+
+        // ******************************
+        // 为模型属性赋值
+        // ******************************
+        generator.setNextComponent(queue1);
+        generator.setEntitiesPerArrival(1);
+        generator.setFirstArrivalTime(0);
+        generator.setInterArrivalTime(1);
+        generator.setPrototypeEntity(simEntity);
+
+        server1.setWaitQueue(queue1);
+        server1.setServiceTime(2);
+        server1.setNextComponent(queue2);
+
+        server2.setWaitQueue(queue2);
+        server2.setServiceTime(4);
+        server2.setNextComponent(sink);
+
+        // ********************************
+        // 运行模型
+        // ********************************
+        DesSim.initModel(DesSim.Type.STANDALONE);
+        DesSim.resume(25);
 
         // *******************************
         // 获取数据
