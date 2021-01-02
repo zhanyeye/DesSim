@@ -25,6 +25,10 @@ public class Server extends LinkedService {
         setName(name);
     }
 
+    public Server(Integer id) {
+        setName(String.valueOf(id));
+    }
+
     @Override
     public void earlyInit() {
         super.earlyInit();

@@ -103,6 +103,12 @@ public class Queue extends LinkedComponent {
         userList = new ArrayList<>();
     }
 
+    public Queue(Integer id) {
+        setName(String.valueOf(id));
+        itemSet = new TreeSet<>();
+        userList = new ArrayList<>();
+    }
+
     @Override
     public void earlyInit() {
         super.earlyInit();

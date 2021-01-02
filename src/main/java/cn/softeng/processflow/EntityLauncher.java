@@ -38,6 +38,10 @@ public class EntityLauncher extends LinkedService{
         setName(name);
     }
 
+    public EntityLauncher(Integer id) {
+        setName(String.valueOf(id));
+    }
+
     /**
      * 到目前为止所生成的实体数
      */
@@ -50,7 +54,7 @@ public class EntityLauncher extends LinkedService{
     {
         scheduleTime = Long.MAX_VALUE;
         entitiesPerArrival = 1;
-        prototypeEntity = new SimEntity();
+        prototypeEntity = new SimEntity("prototypeEntity");
     }
 
     @Override

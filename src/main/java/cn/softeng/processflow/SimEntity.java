@@ -15,6 +15,10 @@ public class SimEntity extends StateEntity {
         setName(name);
     }
 
+    public SimEntity(Integer id) {
+        setName(String.valueOf(id));
+    }
+
     @Override
     public void earlyInit() {
         super.earlyInit();

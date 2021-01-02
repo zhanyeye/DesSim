@@ -16,6 +16,10 @@ public class EntitySink extends LinkedComponent {
         setName(name);
     }
 
+    public EntitySink(Integer id) {
+        setName(String.valueOf(id));
+    }
+
     @Override
     public void addEntity(Entity entity) {
         super.addEntity(entity);

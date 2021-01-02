@@ -19,14 +19,14 @@ public class DesSimTest {
     @Test
     public void testSerialScheduling() throws InstantiationException, IllegalAccessException {
 
-        // *****************************
+        // ************************************************
         // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-        // *****************************
-        EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
-        Queue queue = DesSim.createModelInstance("Queue", 2);
-        Server server1 = DesSim.createModelInstance("Server", 3);
-        Server server2 = DesSim.createModelInstance("Server", 4);
-        EntitySink sink = DesSim.createModelInstance("EntitySink", 5);
+        // ************************************************
+        EntityLauncher launcher = new EntityLauncher(1);
+        Queue queue = new Queue(2);
+        Server server1 = new Server(3);
+        Server server2 = new Server(4);
+        EntitySink sink = new EntitySink(5);
 
         // ******************************
         // 为模型属性赋值
@@ -70,9 +70,9 @@ public class DesSimTest {
     @Test
     public void testParallelScheduling() throws IllegalAccessException, InstantiationException {
 
-        // *****************************
+        // ***********************************************
         // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-        // *****************************
+        // ***********************************************
         EntityLauncher launcher = new EntityLauncher("launcher");
         Queue queue1 = new Queue("queue1");
         Queue queue2 = new Queue("queue2");

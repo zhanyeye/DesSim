@@ -48,7 +48,7 @@ public class EntityGenerator extends LinkedService {
         this.firstArrivalTime = 0;
         this.interArrivalTime = 1;
         this.entitiesPerArrival = 1;
-        this.prototypeEntity = null;
+        this.prototypeEntity = new SimEntity("prototypeEntity");
         this.maxNumber = Long.MAX_VALUE;
     }
 
@@ -56,6 +56,10 @@ public class EntityGenerator extends LinkedService {
 
     public EntityGenerator(String name) {
         setName(name);
+    }
+
+    public EntityGenerator(Integer id) {
+        setName(String.valueOf(id));
     }
 
     @Override
