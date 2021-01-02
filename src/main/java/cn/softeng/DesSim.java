@@ -47,6 +47,9 @@ public class DesSim {
      */
     public static void initModel(Type type) {
         desType = type;
+        // 清空时间管理的状态
+        eventManager.clear();
+        // 初始化已创建的模型组件
         eventManager.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
     }
 
