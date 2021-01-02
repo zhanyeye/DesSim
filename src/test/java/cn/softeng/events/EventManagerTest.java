@@ -55,7 +55,7 @@ public class EventManagerTest {
     public void test_internalSchedule_noError() throws InterruptedException {
         EventManager evt = new EventManager("DefalutEventManager");
         evt.scheduleProcessExternal(0, 0, false, new InternalTestTarget("External"), null);
-        evt.resume(1000);
+        evt.resume(100);
     }
 
     /**

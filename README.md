@@ -30,11 +30,11 @@
 // *****************************
 // 定义模型, 设置标识符
 // *****************************
-EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
-Queue queue = DesSim.createModelInstance("Queue", 2);
-Server server1 = DesSim.createModelInstance("Server", 3);
-Server server2 = DesSim.createModelInstance("Server", 4);
-EntitySink sink = DesSim.createModelInstance("EntitySink", 5);
+EntityLauncher launcher = new EntityLauncher(1);
+Queue queue = new Queue(2);
+Server server1 = new Server(3);
+Server server2 = new Server(4);
+EntitySink sink = new EntitySink(5);
 
 // ******************************
 // 为模型属性赋值

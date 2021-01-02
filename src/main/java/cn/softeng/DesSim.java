@@ -20,26 +20,11 @@ public class DesSim {
      * 负责调度DES的事件管理器
      */
     private static EventManager eventManager = new EventManager("DesSim");
+
     /**
      * 选择的仿真模式
      */
     private static Type desType;
-    /**
-     * 所有模型对应的类型
-     */
-    private static final Map<String,Class> allModelType;
-
-
-    static  {
-        // 初始化模型当前支持的组件
-        allModelType = new HashMap<>();
-        allModelType.put("EntityGenerator", EntityGenerator.class);
-        allModelType.put("EntityLauncher", EntityLauncher.class);
-        allModelType.put("Queue", Queue.class);
-        allModelType.put("Server", Server.class);
-        allModelType.put("EntitySink", EntitySink.class);
-        allModelType.put("Server", Server.class);
-    }
 
     /**
      * 初始化模型，确认DES类型
@@ -113,37 +98,6 @@ public class DesSim {
         eventManager.resume(time);
         while (eventManager.isRunning()) {
             try { Thread.sleep(1); } catch (InterruptedException e) { e.printStackTrace(); }
-        }
-    }
-
-    /**
-     * 创建模型的实例
-     * @param kclass 模型类型的字符串表示
-     * @param id 模型的唯一id
-     * @param <T>
-     * @return
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     */
-    public static <T extends Entity> T createModelInstance(String kclass, int id) throws InstantiationException, IllegalAccessException {
-        return createModelInstance(kclass, String.valueOf(id));
-    }
-
-    /**
-     * 创建指定类别的模型
-     * @param klass 模型对应类型名，可选项："EntityGenerator", "EntityLauncher", "Queue", "Server", "EntitySink" ...
-     * @param identifier 所创建类型的唯一标识符
-     * @return
-     */
-    public static <T extends Entity> T createModelInstance(String klass, String identifier) throws IllegalAccessException {
-        if (allModelType.containsKey(klass)) {
-            Class type = allModelType.get(klass);
-            T entity = null;
-            try { entity = (T) type.newInstance(); } catch (InstantiationException e) { e.printStackTrace(); }
-            entity.setName(identifier);
-            return entity;
-        } else {
-            throw new InvalidParameterException("请检查参数 klass 是否输入错误！");
         }
     }
 
