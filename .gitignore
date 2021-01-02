@@ -32,3 +32,4 @@ hs_err_pid14652.log
 replay_pid14652.log
 *.log
 src/main/java/META-INF/MANIFEST.MF
+out/artifacts/DesSim_jar/DesSim.jar

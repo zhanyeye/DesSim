@@ -1,5 +1,9 @@
 package cn.softeng;
 
+import cn.softeng.processflow.EntityLauncher;
+import cn.softeng.processflow.EntitySink;
+import cn.softeng.processflow.Queue;
+import cn.softeng.processflow.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -40,5 +44,31 @@ public class PlaygroundTest {
         for (Map.Entry<Long, Long> entry : map.entrySet()) {
             log.debug("{}-{}", entry.getKey(), entry.getValue());
         }
+    }
+
+    @Test
+    public void test() {
+        EntityLauncher launcher = new EntityLauncher("launcher");
+        cn.softeng.processflow.Queue q1 = new cn.softeng.processflow.Queue();
+        cn.softeng.processflow.Queue q2 = new Queue();
+        Server s1 = new Server();
+        Server s2 = new Server();
+        EntitySink sink = new EntitySink();
+
+        launcher.setNextComponent(q1);
+
+        s1.setWaitQueue(q1);
+        s1.setServiceTime(5);
+        s1.setNextComponent(q2);
+
+        s2.setWaitQueue(q2);
+        s2.setServiceTime(5);
+        s2.setNextComponent(sink);
+
+        DesSim.initModel(DesSim.Type.VERTICAL);
+        DesSim.inject(0, 50);
+        DesSim.resume(10);
+
+        System.out.println(DesSim.getTimePointList());
     }
 }

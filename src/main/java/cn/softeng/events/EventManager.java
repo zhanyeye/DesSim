@@ -387,11 +387,12 @@ public final class EventManager {
                     if (nextTick == currentTick.get()) {
                         continue;
                     }
+                }
 
-                    if (currentTick.get() == targetTick) {
-                        executeEvents = false;
-                        continue;
-                    }
+                // 当仿真时钟到达目标时间时，设置executeEvents为false, 同时不再推进时钟
+                if (currentTick.get() == targetTick) {
+                    executeEvents = false;
+                    continue;
                 }
 
                 // 更新统计数据

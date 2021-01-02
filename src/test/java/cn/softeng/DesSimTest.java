@@ -73,22 +73,22 @@ public class DesSimTest {
         // *****************************
         // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
         // *****************************
-        EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
-        Queue queue1 = DesSim.createModelInstance("Queue",2);
-        Queue queue2 = DesSim.createModelInstance("Queue", 3);
-        Server server1 = DesSim.createModelInstance("Server", 4);
-        Server server2 = DesSim.createModelInstance("Server", 5);
-        EntitySink sink = DesSim.createModelInstance("EntitySink", 6);
+        EntityLauncher launcher = new EntityLauncher("launcher");
+        Queue queue1 = new Queue("queue1");
+        Queue queue2 = new Queue("queue2");
+        Server server1 = new Server("server1");
+        Server server2 = new Server("server2");
+        EntitySink sink = new EntitySink("sink");
 
         // ******************************
         // 为模型属性赋值
         // ******************************
         launcher.setNextComponent(queue1);
         server1.setWaitQueue(queue1);
-        server1.setServiceTime(2);
+        server1.setServiceTime(5);
         server1.setNextComponent(queue2);
         server2.setWaitQueue(queue2);
-        server2.setServiceTime(3);
+        server2.setServiceTime(5);
         server2.setNextComponent(sink);
 
 
@@ -98,7 +98,7 @@ public class DesSimTest {
 
         DesSim.initModel(DesSim.Type.VERTICAL);
 
-        DesSim.inject(5, 1);
+        DesSim.inject(0, 1);
 
         DesSim.resume(5);
         DesSim.resume(7);
