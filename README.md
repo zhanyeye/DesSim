@@ -81,12 +81,12 @@ log.debug("{}", server1.getNumInProgressList().toString());
 // *****************************
 // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
 // *****************************
-EntityLauncher launcher = DesSim.createModelInstance("EntityLauncher", 1);
-Queue queue1 = DesSim.createModelInstance("Queue",2);
-Queue queue2 = DesSim.createModelInstance("Queue", 3);
-Server server1 = DesSim.createModelInstance("Server", 4);
-Server server2 = DesSim.createModelInstance("Server", 5);
-EntitySink sink = DesSim.createModelInstance("EntitySink", 6);
+EntityLauncher launcher = new EntityLauncher("launcher");
+Queue queue1 = new Queue("queue1");
+Queue queue2 = new Queue("queue2");
+Server server1 = new Server("server1");
+Server server2 = new Server("server2");
+EntitySink sink = new EntitySink("sink");
 
 // ******************************
 // 为模型属性赋值
