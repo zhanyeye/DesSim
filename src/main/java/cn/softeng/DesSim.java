@@ -27,6 +27,19 @@ public class DesSim {
     private static Type desType;
 
     /**
+     * 添加到组件的实体数量
+     */
+    public static final String NumberAdded = "NumberAdded";
+    /**
+     * 已经处理完毕的实体数量
+     */
+    public static final String NumberProcessed = "NumberProcessed";
+    /**
+     * 正在处理中的实体数量
+     */
+    public static final String NumberInProgress = "NumberInProgress";
+
+    /**
      * 初始化模型，确认DES类型
      * @param type DES类型: (包括：水平，垂直，单机)
      */
@@ -132,8 +145,16 @@ public class DesSim {
      * 事件队列中即将执行的事件的时间
      * @return
      */
-    public static long nextEventTime() {
-        return eventManager.getCurrentTick().get();
+    public static int nextEventTime() {
+        return (int) eventManager.getNextTick();
+    }
+
+    /**
+     * DES系统当前仿真时间
+     * @return
+     */
+    public static long currentSimTime() {
+        return eventManager.getTicks();
     }
 
     /**
@@ -145,11 +166,21 @@ public class DesSim {
     }
 
     /**
-     * DES系统当前仿真时间
+     * 获取指定组件的特定属性
+     * @param identifier 组件的标识符
+     * @param attr 属性
      * @return
      */
-    public long currentSimTime() {
-        return eventManager.getTicks();
+    public static long getCurentData(int identifier, String attr) {
+        LinkedComponent linkedComponent =  getEntity(identifier);
+        if (attr == NumberAdded) {
+            return linkedComponent.getTotalNumberAdded();
+        } else if (attr == NumberInProgress) {
+            return linkedComponent.getNumberInProgress();
+        } else if (attr == NumberProcessed) {
+            return linkedComponent.getTotalNumberProcessed();
+        }
+        throw new InvalidParameterException("attr 不存在");
     }
 
     /**

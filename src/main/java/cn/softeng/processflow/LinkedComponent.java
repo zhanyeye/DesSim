@@ -115,11 +115,11 @@ public class LinkedComponent extends StateEntity {
     //  统计相关数据
     // *****************************
 
-    @Getter
+
     protected Map<Long, Long> numAddMap = new LinkedHashMap<>();
-    @Getter
+
     protected Map<Long, Long> numProcessedMap = new LinkedHashMap<>();
-    @Getter
+
     protected Map<Long, Long> numInProgressMap = new LinkedHashMap<>();
 
     /**
