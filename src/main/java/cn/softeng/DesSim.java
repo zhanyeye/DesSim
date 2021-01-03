@@ -115,11 +115,19 @@ public class DesSim {
     }
 
     /**
+     * 执行事件直到指定时刻
+     * @param time
+     */
+    public static void doEvent(long time) {
+        resume(time);
+    }
+
+    /**
      * 获取模型的时钟序列
      * @return
      */
     public static List<Long> getTimePointList() {
-        return new ArrayList<>(eventManager.getTimePointSet());
+        return new Vector<>(eventManager.getTimePointSet());
     }
 
     /**
@@ -153,7 +161,7 @@ public class DesSim {
      * DES系统当前仿真时间
      * @return
      */
-    public static long currentSimTime() {
+    public static long currentTime() {
         return eventManager.getTicks();
     }
 

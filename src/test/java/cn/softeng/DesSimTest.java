@@ -64,6 +64,7 @@ public class DesSimTest {
         log.debug("{}",server1.getNumAddList().toString());
         log.debug("{}",server1.getNumProcessList().toString());
         log.debug("{}", server1.getNumInProgressList().toString());
+        log.debug("{}", DesSim.currentTime());
 
     }
 
