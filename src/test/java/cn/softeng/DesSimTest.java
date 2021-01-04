@@ -4,6 +4,7 @@ import cn.softeng.basicsim.InitModelTarget;
 import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
+import sun.security.krb5.internal.crypto.Des;
 
 
 import java.util.Map;
@@ -164,7 +165,10 @@ public class DesSimTest {
         // 运行模型
         // ********************************
         DesSim.initModel(DesSim.Type.STANDALONE);
-        DesSim.resume(25);
+        DesSim.resume(0);
+        DesSim.resume(0);
+        log.debug("{}", DesSim.hasEvent());
+        log.debug("{}", DesSim.nextEventTime());
 
         // *******************************
         // 获取数据

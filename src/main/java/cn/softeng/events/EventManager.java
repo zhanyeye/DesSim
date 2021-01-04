@@ -1080,7 +1080,7 @@ public final class EventManager {
         synchronized (lockObject) {
 
             // Ignore the pause time if it has already been reached
-            if (currentTick.get() < targetTicks) {
+            if (currentTick.get() <= targetTicks) {
                 targetTick = targetTicks;
             } else {
                 targetTick = Long.MAX_VALUE;
