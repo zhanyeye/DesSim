@@ -68,11 +68,19 @@ public class DesSimTest {
         // *******************************
 
         // 输出时钟序列
-        log.debug("{}", DesSim.getEntity(3).getName());
+        log.debug("{} - {}", DesSim.getEntity(3).getClass().toString(), DesSim.getEntity(3).getName());
         log.debug("{}", DesSim.getDesCLockList().toString());
         log.debug("{}", DesSim.getDataList(3, DesSim.NumberAdded).toString());
-        log.debug("{}", DesSim.getDataList(3, DesSim.NumberProcessed).toString());
         log.debug("{}", DesSim.getDataList(3, DesSim.NumberInProgress).toString());
+        log.debug("{}", DesSim.getDataList(3, DesSim.NumberProcessed).toString());
+
+        // 输出时钟序列
+        log.debug("{} - {}", DesSim.getEntity(5).getClass().toString(), DesSim.getEntity(5).getName());
+        log.debug("{}", DesSim.getDesCLockList().toString());
+        log.debug("{}", DesSim.getDataList(5, DesSim.NumberAdded).toString());
+        log.debug("{}", DesSim.getDataList(5, DesSim.NumberInProgress).toString());
+        log.debug("{}", DesSim.getDataList(5, DesSim.NumberProcessed).toString());
+
 
     }
 
