@@ -53,6 +53,7 @@ public class DesSimTest {
         DesSim.doEvent(7);
 
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+        log.debug("{}", DesSim.minEventTime());
 
         DesSim.inject(7,1);
 
