@@ -21,6 +21,11 @@ public class DesSim {
     private static EventManager eventManager = new EventManager("DesSim");
 
     /**
+     * Des 实体的生成状态
+     */
+    private static Type generateType;
+
+    /**
      * 添加到组件的实体数量
      */
     public static final String NumberAdded = "NumberAdded";
@@ -39,11 +44,15 @@ public class DesSim {
      * 初始化模型，确认DES类型
      *
      */
-    public static void initModel() {
+    public static void initModel(Type type) {
         // 清空时间管理的状态
         eventManager.clear();
         // 初始化已创建的模型组件
         eventManager.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
+        generateType = type;
+        if (generateType == Type.Generator) {
+            resume(0);
+        }
     }
 
     /**
@@ -53,6 +62,9 @@ public class DesSim {
      * @param num
      */
     public static void inject(int scheduleTime, int num) {
+        if (generateType == Type.Generator) {
+            throw new RuntimeException("自动生成实体模式下，不支持 inject !!!");
+        }
         parallelScheduling(scheduleTime, num);
     }
 
@@ -179,6 +191,17 @@ public class DesSim {
 
     public static void main(String[] args) {
         System.out.println("Hello ! this is DesSim");
+    }
+
+    public enum Type {
+        /**
+         * DES 自己定时生成实体
+         */
+        Generator,
+        /**
+         * DES 被触发后才生成实体
+         */
+        Launcher,
     }
 
 }

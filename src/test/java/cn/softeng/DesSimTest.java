@@ -45,23 +45,23 @@ public class DesSimTest {
         // 运行模型
         // ********************************
 
-        DesSim.initModel();
+        DesSim.initModel(DesSim.Type.Launcher);
 
         DesSim.inject(0, 1);
 
-        DesSim.resume(5);
-        DesSim.resume(7);
+        DesSim.doEvent(5);
+        DesSim.doEvent(7);
 
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
 
         DesSim.inject(7,1);
 
-        DesSim.resume(10);
-        DesSim.resume(15);
+        DesSim.doEvent(10);
+        DesSim.doEvent(15);
 
         DesSim.inject(15, 1);
 
-        DesSim.resume(100);
+        DesSim.doEvent(100);
 
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
 
@@ -80,7 +80,6 @@ public class DesSimTest {
 
     @Test
     public void testEntityGeneratorScheduling() {
-
         // ************************************************
         // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
         // ************************************************
@@ -112,7 +111,7 @@ public class DesSimTest {
         // ********************************
         // 运行模型
         // ********************************
-        DesSim.initModel();
+        DesSim.initModel(DesSim.Type.Generator);
         DesSim.resume(0);
         DesSim.resume(0);
         log.debug("{}", DesSim.hasEvent());
@@ -130,4 +129,5 @@ public class DesSimTest {
         log.debug("{}", DesSim.getDataList(3, DesSim.NumberProcessed).toString());
         log.debug("{}", DesSim.getDataList(3, DesSim.NumberInProgress).toString());
     }
+
 }
