@@ -1,7 +1,7 @@
 # DesSim 操作手册
 
 ### 项目介绍：
-一个离散事件仿真工具，支持动态的构建模型，基于 JaamSim 开发
+一个离散事件仿真工具，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
 支持的调度模式有三种：
 + 水平（串行调度）
