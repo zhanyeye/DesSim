@@ -1237,4 +1237,13 @@ public final class EventManager {
     public boolean hasEvent() {
         return eventTree.getNextNode() != null;
     }
+
+    /**
+     * 更新下一个事件发生时间
+     */
+    public void updateNextTick() {
+        if (eventTree.getNextNode() != null) {
+            nextTick = eventTree.getNextNode().schedTick;
+        }
+    }
 }

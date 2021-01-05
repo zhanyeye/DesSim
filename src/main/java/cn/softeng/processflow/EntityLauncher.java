@@ -69,11 +69,12 @@ public class EntityLauncher extends LinkedService{
     }
 
     /**
-     * 调度生成实体（只调度一次），用于DES被串行调度
+     * 调度生成实体（只调度一次）
      * @param eventManager
      * @param scheduleTime
      * @param entitiesPerArrival
      */
+    @Deprecated
     public void scheduleOneAction(EventManager eventManager, long scheduleTime, int entitiesPerArrival) {
         this.scheduleTime = scheduleTime;
         this.entitiesPerArrival = entitiesPerArrival;
@@ -101,6 +102,8 @@ public class EntityLauncher extends LinkedService{
         long waitlength = scheduleTime - simTime;
         // 将该事件优先级设置为最低
         eventManager.scheduleProcessExternalAndPause(waitlength, 6, false, doActionTarget, null);
+        // 更新 EventManager 的 nextTick
+        eventManager.updateNextTick();
     }
 
     /**

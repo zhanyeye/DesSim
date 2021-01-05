@@ -1,18 +1,18 @@
 # DesSim 操作手册
 
-### 项目介绍：
+#### 项目介绍：
 一个离散事件仿真工具，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
-支持的调度模式有三种：
-+ 水平（串行调度）
-+ 垂直（并行调度）
-+ 单机运行
+支持两种原型实体生成方式
+1. `Generator`模式: 原型实体根据配置自动生成
+
+2. `Launcher`模式:  原型实体由用户触发生成
 
 支持的模型组件有：
 
-**EntityGenerator** : 实体生成器，根据指定时间间隔生成实体 （只适用于单机模式）
+**EntityGenerator** : 实体生成器，根据指定时间间隔生成实体 
 
-**EntityLauncher** : 实体启动器，被用户触发后生成实体 （适用于水平，垂直模式）
+**EntityLauncher** : 实体启动器，被用户触发后生成实体 
 
 **Queue** : 队列，用于存放等待中的实体
 
@@ -21,144 +21,16 @@
 **EntitySink** : 实体回收器，回收处理完毕的实体
 
 
-### 使用指南
+#### 使用指南
 使用的前将DesSim打包成jar包，并在你的项目中引用。[[参考]](https://www.jianshu.com/p/257dcca702f7)
 
-
-#### 水平调度示例 （只被调度一次）
-```java
-// *****************************
-// 定义模型, 设置标识符
-// *****************************
-EntityLauncher launcher = new EntityLauncher(1);
-Queue queue = new Queue(2);
-Server server1 = new Server(3);
-Server server2 = new Server(4);
-EntitySink sink = new EntitySink(5);
-
-// ******************************
-// 为模型属性赋值
-// ******************************
-
-// 设置实体启动器的后继
-launcher.setNextComponent(DesSim.getEntity(2));
-
-// 设置服务的等待队列，服务时间，服务的后继
-server1.setWaitQueue((Queue) DesSim.getEntity(2));
-server1.setServiceTime(2);
-server1.setNextComponent(DesSim.getEntity(5));
-
-// 设置服务的等待队列，服务时间，服务的后继
-server2.setWaitQueue((Queue) DesSim.getEntity(2));
-server2.setServiceTime(2);
-server2.setNextComponent(DesSim.getEntity(5));
-
-// ********************************
-// 运行模型
-// ********************************
-
-// 初始化模型：
-DesSim.initModel(DesSim.Type.HORIZONTAL);
-// 开始水平调度：0时刻调度，注入100个实体
-DesSim.serialScheduling(0, 100);
-
-// *******************************
-// 获取数据
-// *******************************
-
-// 输出时钟序列
-log.debug("{}", DesSim.getTimePointList().toString());
-log.debug("Server:");
-log.debug("{}", DesSim.getTimePointList().toString());
-log.debug("{}",server1.getNumAddList().toString());
-log.debug("{}",server1.getNumProcessList().toString());
-log.debug("{}", server1.getNumInProgressList().toString());
-```
-
-#### 垂直调度示例
+##### Generator模式示例
 
 ```java
-// *****************************
+// *************************************************
 // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-// *****************************
-EntityLauncher launcher = new EntityLauncher("launcher");
-Queue queue1 = new Queue("queue1");
-Queue queue2 = new Queue("queue2");
-Server server1 = new Server("server1");
-Server server2 = new Server("server2");
-EntitySink sink = new EntitySink("sink");
+// *************************************************
 
-// ******************************
-// 为模型属性赋值
-// ******************************
-launcher.setNextComponent(queue1);
-server1.setWaitQueue(queue1);
-server1.setServiceTime(2);
-server1.setNextComponent(queue2);
-server2.setWaitQueue(queue2);
-server2.setServiceTime(3);
-server2.setNextComponent(sink);
-
-
-// ********************************
-// 运行模型
-// ********************************
-
-// 初始化
-DesSim.initModel(DesSim.Type.VERTICAL);
-
-// 在5时刻注入一个实体
-DesSim.inject(5, 1);
-
-// 运行仿真，直到时间为5时刻
-DesSim.resume(5);
-
-// 运行仿真，直到时间为5时刻
-DesSim.resume(7);
-
-// 查看事件队列中是否还有事件
-log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
-
-// 在7时刻注入一个实体
-DesSim.inject(7,1);
-
-// 运行仿真，直到时间为10时刻
-DesSim.resume(10);
-
-// 运行仿真，直到时间为15时刻
-DesSim.resume(15);
-
-// 在15时刻注入一个实体
-DesSim.inject(15, 1);
-
-// 运行仿真，直到时间为100时刻
-DesSim.resume(100);
-
-// 查看事件队列中是否还有事件
-log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
-
-// *******************************
-// 获取数据
-// *******************************
-
-// 输出时钟序列
-log.debug("{}", DesSim.getTimePointList().toString());
-
-log.debug("Server:");
-log.debug("{}", DesSim.getTimePointList().toString());
-log.debug("{}",server1.getNumAddList().toString());
-log.debug("{}",server1.getNumProcessList().toString());
-log.debug("{}", server1.getNumInProgressList().toString());
-```
-
-
-
-#### 单机调度示例
-
-```java
-// ************************************************
-// 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-// ************************************************
 EntityGenerator generator = new EntityGenerator("EntityGenerator");
 SimEntity simEntity = new SimEntity("DefaultEntity");
 Queue queue1 = new Queue("Queue1");
@@ -170,35 +42,124 @@ EntitySink sink = new EntitySink("EntitySink");
 // ******************************
 // 为模型属性赋值
 // ******************************
+
 generator.setNextComponent(queue1);
 generator.setEntitiesPerArrival(1);
 generator.setFirstArrivalTime(0);
-generator.setInterArrivalTime(1);
+generator.setInterArrivalTime(5);
 generator.setPrototypeEntity(simEntity);
 
 server1.setWaitQueue(queue1);
-server1.setServiceTime(2);
+server1.setServiceTime(5);
 server1.setNextComponent(queue2);
 
 server2.setWaitQueue(queue2);
-server2.setServiceTime(4);
+server2.setServiceTime(5);
 server2.setNextComponent(sink);
 
 // ********************************
 // 运行模型
 // ********************************
-DesSim.initModel(DesSim.Type.STANDALONE);
-DesSim.resume(25);
+
+// 初始化模型
+DesSim.initModel(DesSim.Type.Generator);
+// 仿真时钟推进到 0时刻
+DesSim.resume(0);
+// 仿真时钟推进到 50时刻
+DesSim.resume(50);
+
+// 事件队列中是否有事件
+log.debug("hasEvent:{}", DesSim.hasEvent());
+// 事件队列中最近事件的时间
+log.debug("minEventTime:{}", DesSim.nextEventTime());
 
 // *******************************
-// 获取数据
+// 获取统计数据
+// *******************************
+
+log.debug("{}", DesSim.getEntity("Server1").getClass());
+log.debug("{}", DesSim.getTimePointList().toString());
+log.debug("{}", DesSim.getDataList("Server1", DesSim.NumberAdded).toString());
+log.debug("{}", DesSim.getDataList("Server1", DesSim.NumberProcessed).toString());
+log.debug("{}", DesSim.getDataList("Server1", DesSim.NumberInProgress).toString());
+```
+
+
+
+##### Launcher模式示例
+
+```java
+// ***********************************************
+// 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
+// ***********************************************
+
+EntityLauncher launcher = new EntityLauncher("launcher");
+Queue queue1 = new Queue("queue1");
+Queue queue2 = new Queue("queue2");
+Server server1 = new Server("server1");
+Server server2 = new Server("server2");
+EntitySink sink = new EntitySink("sink");
+
+// ******************************
+// 为模型属性赋值
+// ******************************
+
+launcher.setNextComponent(queue1);
+server1.setWaitQueue(queue1);
+server1.setServiceTime(5);
+server1.setNextComponent(queue2);
+server2.setWaitQueue(queue2);
+server2.setServiceTime(5);
+server2.setNextComponent(sink);
+
+
+// ********************************
+// 运行模型
+// ********************************
+
+DesSim.initModel(DesSim.Type.Launcher);
+
+// 事件队列中是否有事件
+log.debug("hasEvent:{}", DesSim.hasEvent());
+// 下一个事件的发生时间
+log.debug("nextEventTime:{}", DesSim.nextEventTime());
+
+DesSim.inject(1, 1);
+
+// 事件队列中是否有事件
+log.debug("hasEvent:{}", DesSim.hasEvent());
+// 下一个事件的发生时间
+log.debug("nextEventTime:{}", DesSim.nextEventTime());
+
+// 仿真时钟推进到 5时刻
+DesSim.resume(5);
+// 仿真时钟推进到 7时刻
+DesSim.resume(7);
+
+log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+
+DesSim.inject(7,1);
+
+// 仿真时钟推进到 10时刻
+DesSim.resume(10);
+// 仿真时钟推进到 15时刻
+DesSim.resume(15);
+
+DesSim.inject(15, 1);
+// 仿真时钟推进到 50时刻
+DesSim.resume(30);
+
+log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+
+// *******************************
+// 获取统计数据
 // *******************************
 
 // 输出时钟序列
 log.debug("Server:");
 log.debug("{}", DesSim.getTimePointList().toString());
 log.debug("{}",server1.getNumAddList().toString());
-log.debug("{}",server1.getNumProcessList().toString());
+log.debug("{}",server1.getNumProcessedList().toString());
 log.debug("{}", server1.getNumInProgressList().toString());
 ```
 

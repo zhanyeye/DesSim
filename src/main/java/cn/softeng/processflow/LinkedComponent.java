@@ -134,7 +134,7 @@ public class LinkedComponent extends StateEntity {
      * 返回numProcess各时钟序列所对应的值
      * @return
      */
-    public List<Long> getNumProcessList() {
+    public List<Long> getNumProcessedList() {
         return new ArrayList<>(numProcessedMap.values());
     }
 
@@ -144,15 +144,6 @@ public class LinkedComponent extends StateEntity {
      */
     public List<Long> getNumInProgressList() {
         return new ArrayList<>(numInProgressMap.values());
-    }
-
-    /**
-     * 获取收集的时间序列的值的集合
-     * @param map
-     * @return
-     */
-    protected List<Long> getValueList(Map<Long, Long> map) {
-        return new ArrayList<>(map.values());
     }
 
     /**

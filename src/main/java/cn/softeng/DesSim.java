@@ -47,8 +47,10 @@ public class DesSim {
         desType = type;
         // 清空时间管理的状态
         eventManager.clear();
-        // 初始化已创建的模型组件
+        // 向事件队列中添加初始化模型的事件
         eventManager.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
+        // 执行0时刻的初始化操作
+        resume(0);
     }
 
     /**
@@ -58,13 +60,10 @@ public class DesSim {
      * @param num
      */
     public static void inject(int scheduleTime, int num) {
-        if (desType == Type.HORIZONTAL) {
-            serialScheduling(scheduleTime, num);
-        } else if (desType == Type.VERTICAL) {
-            parallelScheduling(scheduleTime, num);
-        } else if (desType == Type.STANDALONE) {
-           log.info("单机模式不支持 inject 操作 ！！！");
+        if (desType == Type.Generator) {
+            throw new RuntimeException("自动生成实体模式下，不支持 inject !!!");
         }
+        parallelScheduling(scheduleTime, num);
     }
 
     /**
@@ -72,6 +71,7 @@ public class DesSim {
      * @param scheduleTime 注入时间
      * @param num 注入个数
      */
+    @Deprecated
     public static void serialScheduling(int scheduleTime, int num) {
         // 找到启动器实体，调用其scheduleOneAction方法，添加一个启动事件
         for (Entity entity : Entity.getAll()) {
@@ -184,21 +184,45 @@ public class DesSim {
     }
 
     /**
+     * 选定指定组件，指定属性到目前为止的所有数据
+     * @param identifier
+     * @param attr
+     * @return
+     */
+    public static List<Long> getDataList(int identifier, String attr) {
+        return getDataList(String.valueOf(identifier), attr);
+    }
+
+    /**
+     * 选定指定组件，指定属性到目前为止的所有数据
+     * @param identifier
+     * @param attr
+     * @return
+     */
+    public static List<Long> getDataList(String identifier, String attr) {
+        LinkedComponent linkedComponent =  getEntity(identifier);
+        if (attr == NumberAdded) {
+            return linkedComponent.getNumAddList();
+        } else if (attr == NumberInProgress) {
+            return linkedComponent.getNumInProgressList();
+        } else if (attr == NumberProcessed) {
+            return linkedComponent.getNumProcessedList();
+        }
+        throw new InvalidParameterException("attr 不存在");
+    }
+
+    /**
      * DES运行类型枚举类
      */
     public enum Type {
         /**
-         * DES被串行调度 （所谓水平？）
+         * DES 自己定时生成实体
          */
-        HORIZONTAL,
+        Generator,
         /**
-         * DES被并行调度 （所谓垂直？）
+         * DES 被触发后才生成实体
          */
-        VERTICAL,
-        /**
-         * DES 单机运行
-         */
-        STANDALONE
+        Launcher,
     }
 
     public static void main(String[] args) {
