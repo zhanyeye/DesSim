@@ -335,6 +335,12 @@ public final class EventManager {
                 }
 
                 if (!executeEvents) {
+                    if (currentTick.get() == targetTick) {
+                        for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
+                            entity.updateStatistics();
+                        }
+                        timePointSet.add(currentTick.get());
+                    }
                     processRunning = false;
                     isRunning.set(false);
                     timelistener.timeRunning();
