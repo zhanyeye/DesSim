@@ -101,6 +101,8 @@ public class EntityLauncher extends LinkedService{
         long waitlength = scheduleTime - simTime;
         // 将该事件优先级设置为最低
         eventManager.scheduleProcessExternalAndPause(waitlength, 6, false, doActionTarget, null);
+        // 更新 EventManager 的 nextTick
+        eventManager.updateNextTick();
     }
 
     /**

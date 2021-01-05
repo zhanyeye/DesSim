@@ -23,7 +23,7 @@ public class DesSim {
     /**
      * Des 实体的生成状态
      */
-    private static Type generateType;
+    private static Type desType;
 
     /**
      * 添加到组件的实体数量
@@ -45,14 +45,13 @@ public class DesSim {
      *
      */
     public static void initModel(Type type) {
+        desType = type;
         // 清空时间管理的状态
         eventManager.clear();
         // 初始化已创建的模型组件
         eventManager.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
-        generateType = type;
-        if (generateType == Type.Generator) {
-            resume(0);
-        }
+        // 执行0时刻的初始化操作
+        resume(0);
     }
 
     /**
@@ -62,7 +61,7 @@ public class DesSim {
      * @param num
      */
     public static void inject(int scheduleTime, int num) {
-        if (generateType == Type.Generator) {
+        if (desType == Type.Generator) {
             throw new RuntimeException("自动生成实体模式下，不支持 inject !!!");
         }
         parallelScheduling(scheduleTime, num);
