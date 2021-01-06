@@ -160,11 +160,11 @@ public class DesSim {
      */
     public static long getCurentData(int identifier, String attr) {
         LinkedComponent linkedComponent =  getEntity(identifier);
-        if (attr == NumberAdded) {
+        if (attr.equals(NumberAdded)) {
             return linkedComponent.getTotalNumberAdded();
-        } else if (attr == NumberInProgress) {
+        } else if (attr.equals(NumberInProgress)) {
             return linkedComponent.getNumberInProgress();
-        } else if (attr == NumberProcessed) {
+        } else if (attr.equals(NumberProcessed)) {
             return linkedComponent.getTotalNumberProcessed();
         }
         throw new InvalidParameterException("attr 不存在");
@@ -178,11 +178,11 @@ public class DesSim {
      */
     public static Vector<Long> getDataList(int identifier, String attr) {
         LinkedComponent linkedComponent =  getEntity(identifier);
-        if (attr == NumberAdded) {
+        if (attr.equals(NumberAdded)) {
             return linkedComponent.getNumAddList();
-        } else if (attr == NumberInProgress) {
+        } else if (attr.equals(NumberInProgress)) {
             return linkedComponent.getNumInProgressList();
-        } else if (attr == NumberProcessed) {
+        } else if (attr.equals(NumberInProgress)) {
             return linkedComponent.getNumProcessedList();
         }
         throw new InvalidParameterException("attr 不存在");
