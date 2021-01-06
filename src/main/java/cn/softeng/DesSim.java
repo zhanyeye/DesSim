@@ -161,11 +161,11 @@ public class DesSim {
     public static long getCurentData(int identifier, String attr) {
         LinkedComponent linkedComponent =  getEntity(identifier);
         if (attr.equals(NumberAdded)) {
-            return linkedComponent.getTotalNumberAdded();
+            return linkedComponent.getNumberAdded();
         } else if (attr.equals(NumberInProgress)) {
             return linkedComponent.getNumberInProgress();
         } else if (attr.equals(NumberProcessed)) {
-            return linkedComponent.getTotalNumberProcessed();
+            return linkedComponent.getNumberProcessed();
         }
         throw new InvalidParameterException("attr 不存在");
     }
@@ -182,7 +182,7 @@ public class DesSim {
             return linkedComponent.getNumAddList();
         } else if (attr.equals(NumberInProgress)) {
             return linkedComponent.getNumInProgressList();
-        } else if (attr.equals(NumberInProgress)) {
+        } else if (attr.equals(NumberProcessed)) {
             return linkedComponent.getNumProcessedList();
         }
         throw new InvalidParameterException("attr 不存在");

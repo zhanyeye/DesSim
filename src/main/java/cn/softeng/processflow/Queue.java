@@ -239,7 +239,7 @@ public class Queue extends LinkedComponent {
         super.addEntity(entity);
 
         // 建立一个实体项目
-        long entryNum = this.getTotalNumberAdded();
+        long entryNum = this.getNumberAdded();
         if (!fifo) {
             // 如果是先进后出,则排队的实体号为负值
             entryNum *= -1;
@@ -395,10 +395,10 @@ public class Queue extends LinkedComponent {
 
     @Override
     public void updateStatistics() {
-        log.debug("Queue : {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
-        numAddMap.put(getSimTicks(), getTotalNumberAdded());
+        log.debug("Queue : {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getNumberAdded(), this.getNumberProcessed(), this.getNumberInProgress());
+        numAddMap.put(getSimTicks(), getNumberAdded());
         numInProgressMap.put(getSimTicks(), getNumberInProgress());
-        numProcessedMap.put(getSimTicks(), getTotalNumberProcessed());
+        numProcessedMap.put(getSimTicks(), getNumberProcessed());
     }
 
 }

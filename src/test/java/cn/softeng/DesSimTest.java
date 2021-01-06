@@ -3,7 +3,6 @@ package cn.softeng;
 import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
-import sun.security.krb5.internal.crypto.Des;
 
 
 import java.util.Map;
@@ -56,50 +55,50 @@ public class DesSimTest {
         log.debug("nextEventTime:{}", DesSim.minEventTime());
 
 
-//        log.debug("{}", DesSim.minEventTime());
-//
-//
-//        DesSim.doEvent(0);
-//
-//
-//        log.debug("{}", DesSim.minEventTime());
+        log.debug("{}", DesSim.minEventTime());
 
-//        DesSim.doEvent(0);
-//        DesSim.doEvent(7);
-//
-//        log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
-//        log.debug("{}", DesSim.minEventTime());
-//
-//        DesSim.inject(7,1);
-//
-//        DesSim.doEvent(10);
-//        DesSim.doEvent(15);
-//
-//        DesSim.inject(15, 1);
-//
-//        DesSim.doEvent(50);
-//
-//        log.debug("{}", DesSim.getDesCLockList().toString());
 
-//        log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
-//
-//        // *******************************
-//        // 获取数据
-//        // *******************************
-//
-//        // 输出时钟序列
-//        log.debug("{} - {}", DesSim.getEntity(3).getClass().toString(), DesSim.getEntity(3).getName());
-//        log.debug("{}", DesSim.getDesCLockList().toString());
-//        log.debug("{}", DesSim.getDataList(3, DesSim.NumberAdded).toString());
-//        log.debug("{}", DesSim.getDataList(3, DesSim.NumberInProgress).toString());
-//        log.debug("{}", DesSim.getDataList(3, DesSim.NumberProcessed).toString());
-//
-//        // 输出时钟序列
-//        log.debug("{} - {}", DesSim.getEntity(5).getClass().toString(), DesSim.getEntity(5).getName());
-//        log.debug("{}", DesSim.getDesCLockList().toString());
-//        log.debug("{}", DesSim.getDataList(5, DesSim.NumberAdded).toString());
-//        log.debug("{}", DesSim.getDataList(5, DesSim.NumberInProgress).toString());
-//        log.debug("{}", DesSim.getDataList(5, DesSim.NumberProcessed).toString());
+        DesSim.doEvent(0);
+
+
+        log.debug("{}", DesSim.minEventTime());
+
+        DesSim.doEvent(0);
+        DesSim.doEvent(7);
+
+        log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+        log.debug("{}", DesSim.minEventTime());
+
+        DesSim.inject(7,1);
+
+        DesSim.doEvent(10);
+        DesSim.doEvent(15);
+
+        DesSim.inject(15, 1);
+
+        DesSim.doEvent(50);
+
+        log.debug("{}", DesSim.getDesCLockList().toString());
+
+        log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+
+        // *******************************
+        // 获取数据
+        // *******************************
+
+        // 输出时钟序列
+        log.debug("{} - {}", DesSim.getEntity(3).getClass().toString(), DesSim.getEntity(3).getName());
+        log.debug("{}", DesSim.getDesCLockList().toString());
+        log.debug("{}", DesSim.getDataList(3, DesSim.NumberAdded).toString());
+        log.debug("{}", DesSim.getDataList(3, DesSim.NumberInProgress).toString());
+        log.debug("{}", DesSim.getDataList(3, DesSim.NumberProcessed).toString());
+
+        // 输出时钟序列
+        log.debug("{} - {}", DesSim.getEntity(5).getClass().toString(), DesSim.getEntity(5).getName());
+        log.debug("{}", DesSim.getDesCLockList().toString());
+        log.debug("{}", DesSim.getDataList(5, DesSim.NumberAdded).toString());
+        log.debug("{}", DesSim.getDataList(5, DesSim.NumberInProgress).toString());
+        log.debug("{}", DesSim.getDataList(5, DesSim.NumberProcessed).toString());
 
 
     }
@@ -151,7 +150,7 @@ public class DesSimTest {
         // 输出时钟序列
         log.debug("{}", DesSim.getEntity(3).getClass());
         log.debug("{}", DesSim.getDesCLockList().toString());
-        log.debug("{}", DesSim.getDataList(3, DesSim.NumberAdded).toString());
+        log.debug("{}", DesSim.getDataList(3, new String(DesSim.NumberAdded)).toString());
         log.debug("{}", DesSim.getDataList(3, DesSim.NumberProcessed).toString());
         log.debug("{}", DesSim.getDataList(3, DesSim.NumberInProgress).toString());
     }
