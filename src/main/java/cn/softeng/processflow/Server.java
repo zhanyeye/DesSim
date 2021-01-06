@@ -60,10 +60,10 @@ public class Server extends LinkedService {
 
     @Override
     public void updateStatistics() {
-        log.debug("Server : {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}",this.getName(), this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
-        numAddMap.put(getSimTicks(), getTotalNumberAdded());
+        log.debug("Server : {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}",this.getName(), this.getNumberAdded(), this.getNumberProcessed(), this.getNumberInProgress());
+        numAddMap.put(getSimTicks(), getNumberAdded());
         numInProgressMap.put(getSimTicks(), getNumberInProgress());
-        numProcessedMap.put(getSimTicks(), getTotalNumberProcessed());
+        numProcessedMap.put(getSimTicks(), getNumberProcessed());
     }
 
 }

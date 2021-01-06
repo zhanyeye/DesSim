@@ -150,7 +150,7 @@ public class LinkedComponent extends StateEntity {
      * 返回在整个仿真运行（包括初始化期间）中从上游接收到的实体数。
      * @return
      */
-    public long getTotalNumberAdded() {
+    public long getNumberAdded() {
         return initialNumberAdded + numberAdded;
     }
 
@@ -158,7 +158,7 @@ public class LinkedComponent extends StateEntity {
      * 返回在整个仿真运行（包括初始化期间）中已传递给下游的实体数。
      * @return
      */
-    public long getTotalNumberProcessed() {
+    public long getNumberProcessed() {
         return initialNumberProcessed + numberProcessed;
     }
 

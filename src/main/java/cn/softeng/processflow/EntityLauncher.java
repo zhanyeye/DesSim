@@ -152,10 +152,10 @@ public class EntityLauncher extends LinkedService{
      */
     @Override
     public void updateStatistics() {
-        log.debug("Launcher: {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getTotalNumberAdded(), this.getTotalNumberProcessed(), this.getNumberInProgress());
-        numAddMap.put(getSimTicks(), getTotalNumberAdded());
+        log.debug("Launcher: {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getNumberAdded(), this.getNumberProcessed(), this.getNumberInProgress());
+        numAddMap.put(getSimTicks(), getNumberAdded());
         numInProgressMap.put(getSimTicks(), getNumberInProgress());
-        numProcessedMap.put(getSimTicks(), getTotalNumberProcessed());
+        numProcessedMap.put(getSimTicks(), getNumberProcessed());
     }
 
 }

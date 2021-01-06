@@ -4,7 +4,6 @@ import cn.softeng.basicsim.Entity;
 import cn.softeng.basicsim.InitModelTarget;
 import cn.softeng.events.EventManager;
 import cn.softeng.processflow.*;
-import cn.softeng.processflow.Queue;
 import lombok.extern.slf4j.Slf4j;
 
 import java.security.InvalidParameterException;
@@ -174,11 +173,11 @@ public class DesSim {
     public static long getCurrentData(int identifier, String attr) {
         LinkedComponent linkedComponent =  getEntity(identifier);
         if (attr.equals(NumberAdded)) {
-            return linkedComponent.getTotalNumberAdded();
+            return linkedComponent.getNumberAdded();
         } else if (attr.equals(NumberInProgress)) {
             return linkedComponent.getNumberInProgress();
         } else if (attr.equals(NumberProcessed)) {
-            return linkedComponent.getTotalNumberProcessed();
+            return linkedComponent.getNumberProcessed();
         }
         throw new InvalidParameterException("attr 不存在");
     }
@@ -201,11 +200,11 @@ public class DesSim {
      */
     public static List<Long> getDataList(String identifier, String attr) {
         LinkedComponent linkedComponent =  getEntity(identifier);
-        if (attr == NumberAdded) {
+        if (attr.equals(NumberAdded)) {
             return linkedComponent.getNumAddList();
-        } else if (attr == NumberInProgress) {
+        } else if (attr.equals(NumberInProgress)) {
             return linkedComponent.getNumInProgressList();
-        } else if (attr == NumberProcessed) {
+        } else if (attr.equals(NumberProcessed)) {
             return linkedComponent.getNumProcessedList();
         }
         throw new InvalidParameterException("attr 不存在");
