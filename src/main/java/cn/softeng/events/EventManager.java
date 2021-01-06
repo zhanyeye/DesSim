@@ -32,9 +32,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Slf4j
 public final class EventManager {
-    /**
-     * 实体管理器的名称
-     */
+
     public final String name;
 
     /**
@@ -48,20 +46,14 @@ public final class EventManager {
     private final EventTree eventTree;
 
     /**
-     * 调度器当前是否运行
-     */
-    private final AtomicBoolean isRunning;
-
-    /**
-     * 仿真时钟的当前刻度
-     */
-    @Getter
-    private final AtomicLong currentTick;
-
-    /**
      * 用于控制调度器是否执行的 flag
      */
     private volatile boolean executeEvents;
+
+    /**
+     * 调度器当前是否运行
+     */
+    private final AtomicBoolean isRunning;
 
     /**
      * 确保EventManager同一时间只有一个processTarget被执行
@@ -80,63 +72,82 @@ public final class EventManager {
     private final ArrayList<ConditionalEvent> condEvents;
 
     /**
+     * 仿真时钟的当前刻度
+     */
+    @Getter
+    private final AtomicLong currentTick;
+
+    /**
      * 执行下一个事件的时间点 （时间刻度tick）
      */
     @Getter
     private long nextTick;
 
     /**
-     * 仿真运行的目标时间点
+     * 仿真运行的的截止时间点
      */
     private long targetTick;
 
     /**
-     * 执行未来事件列表中最近的一个事件 flag
+     * 若为true,执行事件队列中最近一个事件后停止
      */
     private boolean oneEvent;
 
     /**
-     * execute all the events at the next simulation time
-     * 执行未来事件列表中下一个时刻的所有事件的 flag
+     * 若为true,执行事件列表中下一时刻所有事件后停止
      */
     private boolean oneSimTime;
 
     /**
-     * The number of discrete ticks per simulated second
+     * 每秒中所模拟的离散刻度数
      */
     private double ticksPerSecond;
 
     /**
-     * The length of time in seconds each tick represents
+     * 每一个刻度所代表的时间长度（以秒为单位）
      */
     private double secsPerTick;
 
+    // **************************
     // Real time execution state
+    // **************************
+
     /**
      * the simulation tick corresponding to the wall-clock millis value
+     * 于真实时钟毫秒值对应的仿真刻度
      */
     private long realTimeTick;
 
     /**
      * the wall-clock time in millis
-     * 系统真实花费的时间
+     * 真实时钟的毫秒值
      */
     private long realTimeMillis;
 
-    private volatile boolean executeRealTime;  // TRUE if the simulation is to be executed in Real Time mode
-    private volatile boolean rebaseRealTime;   // TRUE if the time keeping for Real Time model needs re-basing
-    private volatile double realTimeFactor;    // target ratio of elapsed simulation time to elapsed wall clock time
+    /**
+     * TRUE if the simulation is to be executed in Real Time mode
+     */
+    private volatile boolean executeRealTime;
+    /**
+     * TRUE if the time keeping for Real Time model needs re-basing
+     */
+    private volatile boolean rebaseRealTime;
+    /**
+     * target ratio of elapsed simulation time to elapsed wall clock time
+     */
+    private volatile double realTimeFactor;
 
     private EventTimeListener timelistener;
+
     private EventTraceListener trcListener;
-    @Getter
-    private Set<Long> timePointSet;
 
     /**
-     * Allocates a new EventManager with the given name
-     *
-     * @param name the name this EventManager should use
+     * 收集发生的时间点
      */
+    @Getter
+    private Set<Double> timePointSet;
+
+
     public EventManager(String name) {
         // Basic initialization
         this.name = name;
@@ -153,6 +164,7 @@ public final class EventManager {
 
         eventTree = new EventTree();
         condEvents = new ArrayList<>();
+        timePointSet = new LinkedHashSet<>();
 
         isRunning = new AtomicBoolean(false);
         executeEvents = false;
@@ -162,7 +174,6 @@ public final class EventManager {
         realTimeFactor = 1;
         rebaseRealTime = true;
         setTimeListener(null);
-        timePointSet = new LinkedHashSet<>();
     }
 
     /**
@@ -233,7 +244,7 @@ public final class EventManager {
     }
 
     /**
-     * 线程cur执行事件目标
+     * 指定线程去执行
      * the return from execute target informs whether or not this thread should grab an new Event, or return to the pool
      * cur执行完毕后，若没有等待cur的nextProcess，则返回true,cur继续获取ProcessTarget执行；若有等待cur执行完毕的nextProcess,唤醒
      * nextProcess,并放回false,将cur返回线程池。
@@ -296,9 +307,8 @@ public final class EventManager {
 
 
     /**
-     * Main event execution method the eventManager, this is the only entrypoint
-     * for Process objects taken out of the pool.
-     * 正常情况下execute要执行的processTarget在
+     * Main event execution method the eventManager, this is the only entrypoint for Process objects taken out of the pool.
+     * 主事件的执行方法，这是从线程池取出 Process 对象的唯一入口点
      * @param cur
      * @param t
      */
@@ -328,18 +338,14 @@ public final class EventManager {
                     // 事件队列中所有事件执行完毕，或执行到目标时间
                     executeEvents = false;
                     // 更新统计数据
-                    for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
-                        entity.updateStatistics();
-                    }
-                    timePointSet.add(currentTick.get());
+                    updateStatitics();
                 }
 
                 if (!executeEvents) {
+                    // 暂停调度
                     if (currentTick.get() == targetTick) {
-                        for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
-                            entity.updateStatistics();
-                        }
-                        timePointSet.add(currentTick.get());
+                        // 更新统计数据
+                        updateStatitics();
                     }
                     processRunning = false;
                     isRunning.set(false);
@@ -353,6 +359,7 @@ public final class EventManager {
                     // Remove the event from the future events
                     Event nextEvent = nextNode.head;
                     ProcessTarget nextTarget = nextEvent.target;
+
                     if (trcListener != null) {
                         disableSchedule();
                         trcListener.traceEvent(nextNode.schedTick, nextNode.priority, nextTarget);
@@ -376,9 +383,9 @@ public final class EventManager {
                     }
                 }
 
+                // If the next event would require us to advance the time, check the conditonal events
+                // 如果下一个事件时刻大于系统当前时刻，需要推进仿真时间，则检查条件事件
                 if (eventTree.getNextNode().schedTick > nextTick) {
-                    // If the next event would require us to advance the time, check the conditonal events
-                    // 如果下一个事件时刻大于系统当前时刻，需要推进仿真时间，则检查条件事件
                     if (condEvents.size() > 0) {
                         evaluateConditions();
                         if (!executeEvents) {
@@ -401,14 +408,11 @@ public final class EventManager {
                     continue;
                 }
 
-                // 更新统计数据
-                for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
-                    entity.updateStatistics();
-                }
-                timePointSet.add(currentTick.get());
+                // 时钟推进前，更新统计数据
+                updateStatitics();
 
                 // Advance to the next event time
-                // 通过wait等待20ms（推进时间）, 然后continue，再来判断时间，
+                // 实时模式推进时间: 通过wait20ms（推进时间）, 然后continue，再来判断时间，
                 if (executeRealTime) {
                     // Loop until the next event time is reached
                     long realTick = this.calcRealTimeTick();
@@ -423,18 +427,19 @@ public final class EventManager {
                 }
 
                 // advance time
-                // 程序能到达这里说明，realTick已经到达
+                // 非实时模式推进时间
                 if (targetTick < nextTick) {
                     currentTick.set(targetTick);
                 } else {
                     currentTick.set(nextTick);
                 }
-                log.debug("time: {} - [time advance]", currentTick.get());
+
+                log.debug("time: {} - [time advance]", ticksToSeconds(currentTick.get()));
 
                 timelistener.tickUpdate(currentTick.get());
 
+                // 若一次执行下一时刻上的所有事件，则将oneSimTime归位，并停止调度
                 if (oneSimTime) {
-                    // 若一次执行下一时刻上的所有事件，则将oneSimTime归位，并停止调度
                     executeEvents = false;
                     oneSimTime = false;
                 }
@@ -452,15 +457,6 @@ public final class EventManager {
     }
 
     /**
-     * EventViewer NextEvent button to Execute a single event from the event
-     * @param simTime
-     */
-    public void nextOneEvent(long simTime) {
-        oneEvent = true;
-        resume(simTime);
-    }
-
-    /**
      * Event Viewer NextTime button to Execute all the events from the future
      * event list that are scheduled for the next event time. the conditional events
      * are then executed along with any new events that have been scheduled for this time
@@ -469,17 +465,6 @@ public final class EventManager {
     public void nextEventTime(double simTime) {
         oneSimTime = true;
         resume(this.secondsToNearestTick(simTime));
-    }
-
-    /**
-     * Event Viewer NextTime button to Execute all the events from the future
-     * event list that are scheduled for the next event time. the conditional events
-     * are then executed along with any new events that have been scheduled for this time
-     * @param simTime
-     */
-    public void nextEventTime(long simTime) {
-        oneSimTime = true;
-        resume(simTime);
     }
 
     public final long getTicks() {
@@ -1104,6 +1089,10 @@ public final class EventManager {
         }
     }
 
+    public void resume(double simTime) {
+        resume(secondsToNearestTick(simTime));
+    }
+
     @Override
     public String toString() {
         return name;
@@ -1245,5 +1234,15 @@ public final class EventManager {
         if (eventTree.getNextNode() != null) {
             nextTick = eventTree.getNextNode().schedTick;
         }
+    }
+
+    /**
+     * 更新统计数据，当时间推进&
+     */
+    public void updateStatitics() {
+        for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
+            entity.updateStatistics();
+        }
+        timePointSet.add(ticksToSeconds(currentTick.get()));
     }
 }

@@ -117,7 +117,7 @@ public class DesSim {
      * 获取模型的时钟序列
      * @return
      */
-    public static List<Long> getTimePointList() {
+    public static List<Double> getTimePointList() {
         return new ArrayList<>(eventManager.getTimePointSet());
     }
 

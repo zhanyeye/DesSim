@@ -2,7 +2,6 @@ package cn.softeng.processflow;
 
 import cn.softeng.basicsim.Entity;
 import cn.softeng.states.StateEntity;
-import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
