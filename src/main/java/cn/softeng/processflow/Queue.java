@@ -23,7 +23,7 @@ public class Queue extends LinkedComponent {
      * 队列中放置接收到的实体的优先级，例如 priority 1 > priority 2
      */
     @Setter
-    private long priority;
+    private double priority;
 
     /**
      * 设定实体进入Queue的方式:(FIFO or LIFO)
@@ -35,7 +35,7 @@ public class Queue extends LinkedComponent {
      * 违约时间，实体在队列中最长等待时间，（超时则视作违约，离开实体）
      */
     @Setter
-    private long renegeTime;
+    private double renegeTime;
 
     /**
      * 决定该队列组件是否考虑违约情况
@@ -82,7 +82,7 @@ public class Queue extends LinkedComponent {
         this.fifo = true;
 
         // 初始化实体等待时间
-        this.renegeTime = Long.MAX_VALUE;
+        this.renegeTime = Double.MAX_VALUE;
 
         // 初始化是否考虑超时情况
         renegeCondition = false;
@@ -261,7 +261,7 @@ public class Queue extends LinkedComponent {
 
         // 调度指定时间去检查放弃（违约）条件
         if (renegeCondition) {
-            long dur =  renegeTime;
+            double dur =  renegeTime;
             // 以FIFO的顺序调度违约测试，所以若有多个实体被同时添加到队列中
             // 则队列中越靠近前目的实体会先被测试
             EventManager.scheduleTicks(dur, 5, true, new RenegeActionTarget(this, entity), null);

@@ -14,18 +14,18 @@ public class EntityGenerator extends LinkedService {
      * 第一个产生的实体到达时间
      */
     @Setter
-    private long firstArrivalTime;
+    private double firstArrivalTime;
     /**
      * 生成实体之间的到达间隔时间
      */
     @Setter
-    private long interArrivalTime;
+    private double interArrivalTime;
 
     /**
      * 每次到达要生成的实体数
      */
     @Setter
-    private long entitiesPerArrival;
+    private double entitiesPerArrival;
 
     /**
      * 用于生成实体的原型
@@ -37,7 +37,7 @@ public class EntityGenerator extends LinkedService {
      * 要生成的最大实体数
      */
     @Setter
-    private long maxNumber;
+    private double maxNumber;
 
     /**
      * 到目前为止所生成的实体数
@@ -49,7 +49,7 @@ public class EntityGenerator extends LinkedService {
         this.interArrivalTime = 1;
         this.entitiesPerArrival = 1;
         this.prototypeEntity = new SimEntity("prototypeEntity");
-        this.maxNumber = Long.MAX_VALUE;
+        this.maxNumber = Double.MAX_VALUE;
     }
 
     public EntityGenerator() {}
@@ -81,14 +81,14 @@ public class EntityGenerator extends LinkedService {
     }
 
     @Override
-    protected boolean startProcessing(long simTime) {
+    protected boolean startProcessing(double simTime) {
         return numberGenerated < maxNumber;
     }
 
     @Override
-    protected void endProcessing(long simTime) {
+    protected void endProcessing(double simTime) {
         // 创建一个新的实体
-        long num = entitiesPerArrival;
+        int num = (int) entitiesPerArrival;
         for (int i = 0; i < num; i++) {
             numberGenerated++;
             Entity proto = prototypeEntity;
@@ -103,7 +103,7 @@ public class EntityGenerator extends LinkedService {
     }
 
     @Override
-    protected long getProcessingTime(long simTime) {
+    protected double getProcessingTime(double simTime) {
         if (numberGenerated == 0) {
             return firstArrivalTime;
         }

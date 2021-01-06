@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Server extends LinkedService {
     @Setter
-    private long serviceTime;
+    private double serviceTime;
 
     private Entity servedEntity;
 
@@ -36,7 +36,7 @@ public class Server extends LinkedService {
     }
 
     @Override
-    protected boolean startProcessing(long simTime) {
+    protected boolean startProcessing(double simTime) {
         if (waitQueue.isEmpty()) {
             return false;
         }
@@ -46,14 +46,14 @@ public class Server extends LinkedService {
     }
 
     @Override
-    protected void endProcessing(long simTime) {
+    protected void endProcessing(double simTime) {
         // 将实体发送到链中的下一个组件
         this.sendToNextComponent(servedEntity);
         servedEntity = null;
     }
 
     @Override
-    protected long getProcessingTime(long simTime) {
+    protected double getProcessingTime(double simTime) {
         return serviceTime;
     }
 
