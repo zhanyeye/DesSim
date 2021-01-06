@@ -23,10 +23,10 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     protected Queue waitQueue;
 
     private boolean busy;
-    private long startTime;
-    private long duration;
+    private double startTime;
+    private double duration;
     private boolean processKilled;
-    private long stopWorkTime;
+    private double stopWorkTime;
 
     private final ProcessTarget endActionTarget = new EndActionTarget(this);
     /**
@@ -126,7 +126,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      * @param simTime 当前的仿真时间
      * @return 如果可以继续处理，则为true
      */
-    protected boolean startProcessing(long simTime) {
+    protected boolean startProcessing(double simTime) {
         return true;
     }
 
@@ -135,7 +135,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      * @param simTime 当前的仿真时间
      * @return 所需的处理时间
      */
-    protected long getProcessingTime(long simTime) {
+    protected double getProcessingTime(double simTime) {
         return 0;
     }
 
@@ -143,14 +143,14 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      * 执行此LinkedService子类所需的任何特殊处理
      * @param simTime 当前的仿真时间
      */
-    protected void endProcessing(long simTime) {}
+    protected void endProcessing(double simTime) {}
 
     /**
      * 组件开始处理实体
      */
     protected final void startAction() {
         // 执行LinkedService子类的特别处理操作
-        long simTime = this.getSimTicks();
+        double simTime = this.getSimTicks();
         boolean bool = this.startProcessing(simTime);
         if (!bool) {
             this.stopAction();
@@ -245,7 +245,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      * @return whether the original process should be resumed (true)
      *         or a new process should be started (false)
      */
-    protected boolean updateForStoppage(long startWork, long stopWork, double resumeWork) {
+    protected boolean updateForStoppage(double startWork, double stopWork, double resumeWork) {
         return true;
     }
 
