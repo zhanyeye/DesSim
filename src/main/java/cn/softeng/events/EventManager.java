@@ -80,7 +80,6 @@ public final class EventManager {
     /**
      * 执行下一个事件的时间点 （时间刻度tick）
      */
-    @Getter
     private long nextTick;
 
     /**
@@ -1021,7 +1020,6 @@ public final class EventManager {
      *
      * @throws ProcessError if called outside of a Process context
      */
-    @Deprecated
     public static final void scheduleSeconds(double secs, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
         Process cur = Process.current();
         long ticks = cur.evt().secondsToNearestTick(secs);
@@ -1244,5 +1242,9 @@ public final class EventManager {
             entity.updateStatistics();
         }
         timePointSet.add(ticksToSeconds(currentTick.get()));
+    }
+
+    public double getNextEventTime() {
+        return ticksToSeconds(nextTick);
     }
 }

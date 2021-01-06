@@ -166,7 +166,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
         // 调度服务完成
         startTime = simTime;
         duration = this.getProcessingTime(simTime);
-        this.scheduleProcessTicks(duration, 5, endActionTarget, endActionHandle);
+        this.scheduleProcess(duration, 5, endActionTarget, endActionHandle);
     }
 
     /**
@@ -203,7 +203,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
                     this.setPresentState();
                     duration -= stopWorkTime - startTime;
                     startTime = this.getSimTicks();
-                    this.scheduleProcessTicks(duration, 5, endActionTarget, endActionHandle);
+                    this.scheduleProcess(duration, 5, endActionTarget, endActionHandle);
                     return;
                 }
             }

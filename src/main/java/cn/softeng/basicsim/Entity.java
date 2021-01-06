@@ -230,6 +230,19 @@ public class Entity {
         return new ClonesOfIterable<>(proto);
     }
 
+
+    public final void scheduleProcess(double secs, int priority, ProcessTarget t) {
+        EventManager.scheduleSeconds(secs, priority, false, t, null);
+    }
+
+    public final void scheduleProcess(double secs, int priority, ProcessTarget t, EventHandle handle) {
+        EventManager.scheduleSeconds(secs, priority, false, t, handle);
+    }
+
+    public final void scheduleProcess(double secs, int priority, boolean fifo, ProcessTarget t, EventHandle handle) {
+        EventManager.scheduleSeconds(secs, priority, fifo, t, handle);
+    }
+
     public final void scheduleProcessTicks(long ticks, int priority, boolean fifo, ProcessTarget t, EventHandle h) {
         EventManager.scheduleTicks(ticks, priority, fifo, t, h);
     }

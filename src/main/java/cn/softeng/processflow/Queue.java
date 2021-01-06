@@ -256,7 +256,7 @@ public class Queue extends LinkedComponent {
         // 通知该队列的所有用户
         if (!userUpdateHandle.isScheduled()) {
             // 当前时刻调度 userUpdate target 通知所有使用该队列的组件
-            EventManager.scheduleTicks(0, 2, false, userUpdate, userUpdateHandle);
+            EventManager.scheduleSeconds(0, 2, false, userUpdate, userUpdateHandle);
         }
 
         // 调度指定时间去检查放弃（违约）条件
@@ -264,7 +264,7 @@ public class Queue extends LinkedComponent {
             double dur =  renegeTime;
             // 以FIFO的顺序调度违约测试，所以若有多个实体被同时添加到队列中
             // 则队列中越靠近前目的实体会先被测试
-            EventManager.scheduleTicks(dur, 5, true, new RenegeActionTarget(this, entity), null);
+            EventManager.scheduleSeconds(dur, 5, true, new RenegeActionTarget(this, entity), null);
         }
     }
 

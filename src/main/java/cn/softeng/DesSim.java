@@ -106,7 +106,7 @@ public class DesSim {
      * 执行事件直到指定时刻
      * @param time
      */
-    public static void resume(long time) {
+    public static void resume(double time) {
         eventManager.resume(time);
         while (eventManager.isRunning()) {
             try { Thread.sleep(1); } catch (InterruptedException e) { e.printStackTrace(); }
@@ -144,8 +144,8 @@ public class DesSim {
      * 事件队列中即将执行的事件的时间
      * @return
      */
-    public static int nextEventTime() {
-        return (int) eventManager.getNextTick();
+    public static double nextEventTime() {
+        return eventManager.getNextEventTime();
     }
 
     /**

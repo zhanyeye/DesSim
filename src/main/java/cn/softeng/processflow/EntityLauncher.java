@@ -18,7 +18,7 @@ public class EntityLauncher extends LinkedService{
      * 组件触发后生成的实体数
      */
     @Setter
-    private int entitiesPerArrival;
+    private double entitiesPerArrival;
 
     /**
      * 生成的实体原型
@@ -30,7 +30,7 @@ public class EntityLauncher extends LinkedService{
      * EntityLauncher触发时间
      */
     @Setter
-    private long scheduleTime;
+    private double scheduleTime;
 
     public EntityLauncher() {}
 
@@ -75,7 +75,7 @@ public class EntityLauncher extends LinkedService{
      * @param entitiesPerArrival
      */
     @Deprecated
-    public void scheduleOneAction(EventManager eventManager, long scheduleTime, int entitiesPerArrival) {
+    public void scheduleOneAction(EventManager eventManager, double scheduleTime, int entitiesPerArrival) {
         this.scheduleTime = scheduleTime;
         this.entitiesPerArrival = entitiesPerArrival;
         // 优先级须大于5，当0时刻调度该事件时，initModelTarget.process()中的初始化操作优先级是5
