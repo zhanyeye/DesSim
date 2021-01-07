@@ -65,7 +65,7 @@ public class PlaygroundTest {
         s2.setServiceTime(5);
         s2.setNextComponent(sink);
 
-        DesSim.initModel(DesSim.Type.Launcher);
+        DesSim.initModel(DesSim.Type.Launcher, 0);
         DesSim.inject(0, 50);
         DesSim.resume(10);
 

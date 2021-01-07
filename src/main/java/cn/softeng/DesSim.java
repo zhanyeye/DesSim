@@ -42,14 +42,31 @@ public class DesSim {
      * 初始化模型，确认DES类型
      * @param type DES类型: (包括：水平，垂直，单机)
      */
+    public static void initModel(Type type, double initTime) {
+        desType = type;
+        // 清空时间管理的状态
+        eventManager.clear();
+        // 向事件队列中添加初始化模型的事件
+
+        long waitLength = eventManager.secondsToNearestTick(initTime);
+
+        eventManager.scheduleProcessExternal(waitLength, 0, false, new InitModelTarget(), null);
+        // 执行initTime时刻的初始化操作
+        resume(initTime);
+    }
+
+    /**
+     * 初始化模型，确认DES类型
+     * @param type DES类型: (包括：水平，垂直，单机)
+     */
     public static void initModel(Type type) {
         desType = type;
         // 清空时间管理的状态
         eventManager.clear();
         // 向事件队列中添加初始化模型的事件
         eventManager.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
-        // 执行0时刻的初始化操作
         resume(0);
+        eventManager.clearStatitics();
     }
 
     /**

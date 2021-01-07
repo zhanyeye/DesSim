@@ -34,8 +34,8 @@ public class DesSimTest {
 
         generator.setNextComponent(queue1);
         generator.setEntitiesPerArrival(1);
-        generator.setFirstArrivalTime(0);
-        generator.setInterArrivalTime(5);
+        generator.setFirstArrivalTime(7);
+        generator.setInterArrivalTime(7);
         generator.setPrototypeEntity(simEntity);
 
         server1.setWaitQueue(queue1);
@@ -51,9 +51,13 @@ public class DesSimTest {
         // ********************************
 
         // 初始化模型
-        DesSim.initModel(DesSim.Type.Generator);
-        // 仿真时钟推进到 0时刻
-        DesSim.resume(0);
+        DesSim.initModel(DesSim.Type.Generator, 0);
+
+        // 事件队列中是否有事件
+        log.debug("hasEvent:{}", DesSim.hasEvent());
+        // 事件队列中最近事件的时间
+        log.debug("minEventTime:{}", DesSim.nextEventTime());
+
         // 仿真时钟推进到 50时刻
         DesSim.resume(50);
 
@@ -112,7 +116,7 @@ public class DesSimTest {
         // 下一个事件的发生时间
         log.debug("nextEventTime:{}", DesSim.nextEventTime());
 
-        DesSim.inject(1, 1);
+        DesSim.inject(0, 1);
 
         // 事件队列中是否有事件
         log.debug("hasEvent:{}", DesSim.hasEvent());
