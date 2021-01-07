@@ -105,8 +105,12 @@ public class DesSim {
      * 获取模型的时钟序列
      * @return
      */
-    public static List<Double> getTimePointList() {
-        return new Vector<>(eventManager.getTimePointSet());
+    public static List<Float> getTimePointList() {
+        Vector<Float> ret = new Vector<>();
+        for (Double e : eventManager.getTimePointSet()) {
+            ret.add(e.floatValue());
+        }
+        return ret;
     }
 
     /**
@@ -132,16 +136,16 @@ public class DesSim {
      * 事件队列中即将执行的事件的时间
      * @return
      */
-    public static double minEventTime() {
-        return eventManager.getNextEventTime();
+    public static float minEventTime() {
+        return (float) eventManager.getNextEventTime();
     }
 
     /**
      * DES系统当前仿真时间
      * @return
      */
-    public static double currentSimTime() {
-        return eventManager.getCurrentTime();
+    public static float currentSimTime() {
+        return (float) eventManager.getCurrentTime();
     }
 
     /**
