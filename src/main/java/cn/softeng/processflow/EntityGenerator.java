@@ -118,9 +118,9 @@ public class EntityGenerator extends LinkedService {
     @Override
     public void updateStatistics() {
         log.debug("Generator: {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getNumberAdded(), this.getNumberProcessed(), this.getNumberInProgress());
-        numAddMap.put(getSimTicks(), getNumberAdded());
-        numInProgressMap.put(getSimTicks(), getNumberInProgress());
-        numProcessedMap.put(getSimTicks(), getNumberProcessed());
+        numAddMap.put(getSimTime(), getNumberAdded());
+        numInProgressMap.put(getSimTime(), getNumberInProgress());
+        numProcessedMap.put(getSimTime(), getNumberProcessed());
     }
 
 }

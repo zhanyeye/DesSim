@@ -245,7 +245,7 @@ public class Queue extends LinkedComponent {
             entryNum *= -1;
         }
         int pri = (int) priority;
-        QueueEntry entry = new QueueEntry(entity, entryNum, pri, getSimTicks());
+        QueueEntry entry = new QueueEntry(entity, entryNum, pri, getSimTime());
 
         // 将实体添加到集合中
         boolean bool = itemSet.add(entry);
@@ -374,7 +374,7 @@ public class Queue extends LinkedComponent {
      * @return
      */
     public double getQueueTime() {
-        return this.getSimTicks() - itemSet.first().timeAdded;
+        return this.getSimTime() - itemSet.first().timeAdded;
     }
 
     /**
@@ -396,9 +396,9 @@ public class Queue extends LinkedComponent {
     @Override
     public void updateStatistics() {
         log.debug("Queue : {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getNumberAdded(), this.getNumberProcessed(), this.getNumberInProgress());
-        numAddMap.put(getSimTicks(), getNumberAdded());
-        numInProgressMap.put(getSimTicks(), getNumberInProgress());
-        numProcessedMap.put(getSimTicks(), getNumberProcessed());
+        numAddMap.put(getSimTime(), getNumberAdded());
+        numInProgressMap.put(getSimTime(), getNumberInProgress());
+        numProcessedMap.put(getSimTime(), getNumberProcessed());
     }
 
 }
