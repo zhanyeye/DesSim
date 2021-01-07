@@ -106,7 +106,7 @@ public class DesSim {
      * @return
      */
     public static List<Double> getTimePointList() {
-        return new ArrayList<>(eventManager.getTimePointSet());
+        return new Vector<>(eventManager.getTimePointSet());
     }
 
     /**
@@ -132,7 +132,7 @@ public class DesSim {
      * 事件队列中即将执行的事件的时间
      * @return
      */
-    public static double nextEventTime() {
+    public static double minEventTime() {
         return eventManager.getNextEventTime();
     }
 
@@ -196,28 +196,6 @@ public class DesSim {
             return linkedComponent.getNumProcessedList();
         }
         throw new InvalidParameterException("attr 不存在");
-    }
-
-    /**
-     * 选定指定组件，指定属性到目前为止的所有数据
-     * @param identifier
-     * @param attr
-     * @return
-     */
-    public static Vector<Long> getDataList(int identifier, String attr) {
-        LinkedComponent linkedComponent =  getEntity(identifier);
-        if (attr.equals(NumberAdded)) {
-            return linkedComponent.getNumAddList();
-        } else if (attr.equals(NumberInProgress)) {
-            return linkedComponent.getNumInProgressList();
-        } else if (attr.equals(NumberProcessed)) {
-            return linkedComponent.getNumProcessedList();
-        }
-        throw new InvalidParameterException("attr 不存在");
-    }
-
-    public static void main(String[] args) {
-        System.out.println("Hello ! this is DesSim");
     }
 
     public enum Type {
