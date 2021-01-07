@@ -58,7 +58,7 @@ public class DesSim {
      * @param scheduleTime
      * @param num
      */
-    public static void inject(int scheduleTime, int num) {
+    public static void inject(double scheduleTime, int num) {
         if (desType == Type.Generator) {
             throw new RuntimeException("自动生成实体模式下，不支持 inject !!!");
         }
@@ -70,7 +70,7 @@ public class DesSim {
      * @param scheduleTime 时间调度时间
      * @param num 注入个数
      */
-    public static void parallelScheduling(int scheduleTime, int num) {
+    public static void parallelScheduling(double scheduleTime, int num) {
         for (Entity entity : Entity.getAll()) {
             if (entity.getClass() == EntityLauncher.class) {
                 EntityLauncher launcher = (EntityLauncher) entity;
