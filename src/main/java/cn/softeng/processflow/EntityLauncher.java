@@ -21,16 +21,16 @@ public class EntityLauncher extends LinkedService{
     private double entitiesPerArrival;
 
     /**
-     * 生成的实体原型
-     */
-    @Setter
-    private Entity prototypeEntity;
-
-    /**
      * EntityLauncher触发时间
      */
     @Setter
     private double scheduleTime;
+
+    /**
+     * 生成的实体原型
+     */
+    @Setter
+    private Entity prototypeEntity;
 
     public EntityLauncher() {}
 
@@ -52,7 +52,7 @@ public class EntityLauncher extends LinkedService{
     private final EventHandle doActionHandle = new EventHandle();
 
     {
-        scheduleTime = Long.MAX_VALUE;
+        scheduleTime = Double.MAX_VALUE;
         entitiesPerArrival = 1;
         prototypeEntity = new SimEntity("prototypeEntity");
     }
@@ -69,28 +69,13 @@ public class EntityLauncher extends LinkedService{
     }
 
     /**
-     * 调度生成实体（只调度一次）
-     * @param eventManager
-     * @param scheduleTime
-     * @param entitiesPerArrival
-     */
-    @Deprecated
-    public void scheduleOneAction(EventManager eventManager, double scheduleTime, int entitiesPerArrival) {
-        this.scheduleTime = scheduleTime;
-        this.entitiesPerArrival = entitiesPerArrival;
-        // 优先级须大于5，当0时刻调度该事件时，initModelTarget.process()中的初始化操作优先级是5
-        // 必须先初始化再调度该事件，所以优先级需要大于5
-        eventManager.scheduleProcessExternal(scheduleTime, 6, false, doActionTarget, doActionHandle);
-    }
-
-    /**
      * 调度生成实体，加入事件队列后，立马暂停调度器，用于DES被并行调度
      * @param eventManager
      * @param scheduleTime
      * @param entitiesPerArrival
      */
-    public void scheduleAction(EventManager eventManager, long scheduleTime, int entitiesPerArrival) {
-        long simTime = eventManager.getTicks();
+    public void scheduleAction(EventManager eventManager, double scheduleTime, int entitiesPerArrival) {
+        double simTime = eventManager.getCurrentTime();
         if (scheduleTime < simTime) {
             error("schedule time is less than current time ????, no! no! no!");
             return;
@@ -99,9 +84,10 @@ public class EntityLauncher extends LinkedService{
         this.scheduleTime = scheduleTime;
         this.entitiesPerArrival = entitiesPerArrival;
 
-        long waitlength = scheduleTime - simTime;
+        double dur = scheduleTime - simTime;
+
         // 将该事件优先级设置为最低
-        eventManager.scheduleProcessExternalAndPause(waitlength, 6, false, doActionTarget, null);
+        eventManager.scheduleProcessExternalAndPause(dur, 6, false, doActionTarget, null);
         // 更新 EventManager 的 nextTick
         eventManager.updateNextTick();
     }
@@ -110,7 +96,7 @@ public class EntityLauncher extends LinkedService{
      * 生成实体的操作
      */
     public void doAction() {
-        int num = entitiesPerArrival;
+        int num = (int) entitiesPerArrival;
         for (int i = 0; i < num; i++) {
             numberGenerated++;
             Entity proto = prototypeEntity;

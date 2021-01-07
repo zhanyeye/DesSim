@@ -967,8 +967,9 @@ public final class EventManager {
      * @param t
      * @param handle
      */
-    public void scheduleProcessExternalAndPause(long waitLength, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
+    public void scheduleProcessExternalAndPause(double duration, int eventPriority, boolean fifo, ProcessTarget t, EventHandle handle) {
         synchronized (lockObject) {
+            long waitLength = secondsToNearestTick(duration);
             long schedTick = calculateEventTime(waitLength);
             EventNode node = getEventNode(schedTick, eventPriority);
             Event evt = getEvent(node, t, handle);
@@ -1244,7 +1245,19 @@ public final class EventManager {
         timePointSet.add(ticksToSeconds(currentTick.get()));
     }
 
+    /**
+     * 获取下一个事件时间对应的秒数
+     * @return
+     */
     public double getNextEventTime() {
         return ticksToSeconds(nextTick);
+    }
+
+    /**
+     * 获取当前仿真时钟对应的秒数
+     * @return
+     */
+    public double getCurrentTime() {
+        return ticksToSeconds(currentTick.get());
     }
 }

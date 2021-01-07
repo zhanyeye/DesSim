@@ -66,28 +66,6 @@ public class DesSim {
     }
 
     /**
-     * DES 被串行调度
-     * @param scheduleTime 注入时间
-     * @param num 注入个数
-     */
-    @Deprecated
-    public static void serialScheduling(int scheduleTime, int num) {
-        // 找到启动器实体，调用其scheduleOneAction方法，添加一个启动事件
-        for (Entity entity : Entity.getAll()) {
-            if (entity.getClass() == EntityLauncher.class) {
-                EntityLauncher launcher = (EntityLauncher) entity;
-                launcher.scheduleOneAction(eventManager, scheduleTime, num);
-                break;
-            }
-        }
-        // 调度器启动
-        eventManager.resume(Long.MAX_VALUE);
-        while (eventManager.isRunning()) {
-            try { Thread.sleep(1); } catch (InterruptedException e) { e.printStackTrace(); }
-        }
-    }
-
-    /**
      * DES被并行的调度，调用时必须确保DES调度正在运行，否则会报错
      * @param scheduleTime 时间调度时间
      * @param num 注入个数
@@ -152,8 +130,8 @@ public class DesSim {
      * DES系统当前仿真时间
      * @return
      */
-    public static long currentSimTime() {
-        return eventManager.getTicks();
+    public static double currentSimTime() {
+        return eventManager.getCurrentTime();
     }
 
     /**
