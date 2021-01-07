@@ -75,7 +75,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
         }
 
         if (!bool) {
-            stopWorkTime = this.getSimTicks();
+            stopWorkTime = this.getSimTime();
         }
         busy = bool;
     }
@@ -150,7 +150,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      */
     protected final void startAction() {
         // 执行LinkedService子类的特别处理操作
-        double simTime = this.getSimTicks();
+        double simTime = this.getSimTime();
         boolean bool = this.startProcessing(simTime);
         if (!bool) {
             this.stopAction();
@@ -174,7 +174,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      */
     final void endAction() {
         // 执行此LinkedService子类所需的任何特殊处理
-        this.endProcessing(this.getSimTicks());
+        this.endProcessing(this.getSimTime());
         // 处理下一个实体
         this.startAction();
     }
@@ -197,12 +197,12 @@ public class LinkedService extends LinkedComponent implements QueueUser {
         if (this.isIdle()) {
             if (processKilled) {
                 processKilled = false;
-                boolean bool = this.updateForStoppage(startTime, stopWorkTime, getSimTicks());
+                boolean bool = this.updateForStoppage(startTime, stopWorkTime, getSimTime());
                 if (bool) {
                     this.setBusy(true);
                     this.setPresentState();
                     duration -= stopWorkTime - startTime;
-                    startTime = this.getSimTicks();
+                    startTime = this.getSimTime();
                     this.scheduleProcess(duration, 5, endActionTarget, endActionHandle);
                     return;
                 }

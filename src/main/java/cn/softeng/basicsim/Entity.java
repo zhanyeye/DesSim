@@ -102,6 +102,10 @@ public class Entity {
         return EventManager.simTicks();
     }
 
+    public final double getSimTime() {
+        return EventManager.simSeconds();
+    }
+
     /**
      * 返回实体名称
      * @return

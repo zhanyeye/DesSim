@@ -1134,7 +1134,6 @@ public final class EventManager {
      * Returns the current simulation time in seconds for the current Process.
      * @throws ProcessError if called outside of a Process context
      */
-    @Deprecated
     public static final double simSeconds() {
         return Process.current().evt().getSeconds();
     }

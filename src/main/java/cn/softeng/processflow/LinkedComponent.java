@@ -97,7 +97,7 @@ public class LinkedComponent extends StateEntity {
      */
     public void sendToNextComponent(Entity entity) {
         numberProcessed++;
-        releaseTime = this.getSimTicks();
+        releaseTime = this.getSimTime();
         if (nextComponent != null) {
             nextComponent.addEntity(entity);
         }
@@ -115,11 +115,11 @@ public class LinkedComponent extends StateEntity {
     // *****************************
 
 
-    protected Map<Long, Long> numAddMap = new LinkedHashMap<>();
+    protected Map<Double, Long> numAddMap = new LinkedHashMap<>();
 
-    protected Map<Long, Long> numProcessedMap = new LinkedHashMap<>();
+    protected Map<Double, Long> numProcessedMap = new LinkedHashMap<>();
 
-    protected Map<Long, Long> numInProgressMap = new LinkedHashMap<>();
+    protected Map<Double, Long> numInProgressMap = new LinkedHashMap<>();
 
     /**
      * 返回numAdd各时钟序列所对应的值
