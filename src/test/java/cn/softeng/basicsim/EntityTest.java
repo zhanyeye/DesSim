@@ -13,7 +13,7 @@ public class EntityTest {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    @Test
+//    @Test
     public void test_fastCopy_noError() throws InstantiationException, IllegalAccessException {
         EntityGenerator origin = new EntityGenerator();
         Entity copy = fastCopy(origin, "testFastCopy");

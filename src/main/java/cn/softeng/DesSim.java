@@ -21,7 +21,7 @@ public class DesSim {
     private static EventManager eventManager = new EventManager("DesSim");
 
     /**
-     * 选择的仿真模式
+     * Des 实体的生成状态
      */
     private static Type desType;
 
@@ -29,10 +29,12 @@ public class DesSim {
      * 添加到组件的实体数量
      */
     public static final String NumberAdded = "NumberAdded";
+
     /**
      * 已经处理完毕的实体数量
      */
     public static final String NumberProcessed = "NumberProcessed";
+
     /**
      * 正在处理中的实体数量
      */
@@ -40,7 +42,7 @@ public class DesSim {
 
     /**
      * 初始化模型，确认DES类型
-     * @param type DES类型: (包括：水平，垂直，单机)
+     *
      */
     public static void initModel(Type type) {
         desType = type;
@@ -89,6 +91,14 @@ public class DesSim {
         while (eventManager.isRunning()) {
             try { Thread.sleep(1); } catch (InterruptedException e) { e.printStackTrace(); }
         }
+    }
+
+    /**
+     * 执行事件直到指定时刻
+     * @param time
+     */
+    public static void doEvent(long time) {
+        resume(time);
     }
 
     /**
@@ -189,8 +199,27 @@ public class DesSim {
     }
 
     /**
-     * DES运行类型枚举类
+     * 选定指定组件，指定属性到目前为止的所有数据
+     * @param identifier
+     * @param attr
+     * @return
      */
+    public static Vector<Long> getDataList(int identifier, String attr) {
+        LinkedComponent linkedComponent =  getEntity(identifier);
+        if (attr.equals(NumberAdded)) {
+            return linkedComponent.getNumAddList();
+        } else if (attr.equals(NumberInProgress)) {
+            return linkedComponent.getNumInProgressList();
+        } else if (attr.equals(NumberProcessed)) {
+            return linkedComponent.getNumProcessedList();
+        }
+        throw new InvalidParameterException("attr 不存在");
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Hello ! this is DesSim");
+    }
+
     public enum Type {
         /**
          * DES 自己定时生成实体

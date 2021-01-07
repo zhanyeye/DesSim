@@ -125,6 +125,7 @@ public class DesSimTest {
         DesSim.resume(7);
 
         log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+        log.debug("{}", DesSim.minEventTime());
 
         DesSim.inject(7,1);
 
@@ -151,4 +152,5 @@ public class DesSimTest {
         log.debug("{}", server1.getNumInProgressList().toString());
 
     }
+
 }
