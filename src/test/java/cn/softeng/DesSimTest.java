@@ -4,9 +4,6 @@ import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
-
-import java.util.Map;
-
 /**
  * Unit test for simple DesSim.
  */
@@ -67,7 +64,7 @@ public class DesSimTest {
         // *******************************
 
         log.debug("{}", DesSim.getEntity("Server1").getClass());
-        log.debug("{}", DesSim.getTimePointList().toString());
+        log.debug("{}", DesSim.getDesClockList().toString());
         log.debug("{}", DesSim.getDataList("Server1", DesSim.NumberAdded).toString());
         log.debug("{}", DesSim.getDataList("Server1", DesSim.NumberProcessed).toString());
         log.debug("{}", DesSim.getDataList("Server1", DesSim.NumberInProgress).toString());
@@ -146,7 +143,7 @@ public class DesSimTest {
 
         // 输出时钟序列
         log.debug("Server:");
-        log.debug("{}", DesSim.getTimePointList().toString());
+        log.debug("{}", DesSim.getDesClockList().toString());
         log.debug("{}",server1.getNumAddList().toString());
         log.debug("{}",server1.getNumProcessedList().toString());
         log.debug("{}", server1.getNumInProgressList().toString());

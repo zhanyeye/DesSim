@@ -97,7 +97,7 @@ public class DesSim {
      * 执行事件直到指定时刻
      * @param time
      */
-    public static void doEvent(long time) {
+    public static void doEvent(double time) {
         resume(time);
     }
 
@@ -105,7 +105,7 @@ public class DesSim {
      * 获取模型的时钟序列
      * @return
      */
-    public static List<Float> getTimePointList() {
+    public static List<Float> getDesClockList() {
         Vector<Float> ret = new Vector<>();
         for (Double e : eventManager.getTimePointSet()) {
             ret.add(e.floatValue());
