@@ -11,7 +11,6 @@ import java.util.*;
 @Slf4j
 public class PlaygroundTest {
 
-
     @Test
     public void testSet() {
         Set<Long> set = new LinkedHashSet<>();
@@ -28,7 +27,7 @@ public class PlaygroundTest {
 
     @Test
     public void testLinkedHashMap() {
-        Map<Long, Long> map =  new LinkedHashMap<>();
+        Map<Long, Long> map = new LinkedHashMap<>();
         map.put(1L, 1L);
         map.put(2L, 2L);
         map.put(3L, 3L);

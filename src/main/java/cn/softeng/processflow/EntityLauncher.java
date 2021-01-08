@@ -69,12 +69,13 @@ public class EntityLauncher extends LinkedService{
     }
 
     /**
-     * 调度生成实体，加入事件队列后，立马暂停调度器，用于DES被并行调度
+     * 调度生成实体，加入事件队列后，立马暂停调度器，用于实体被触发产生
      * @param eventManager
      * @param scheduleTime
      * @param entitiesPerArrival
      */
-    public void scheduleAction(EventManager eventManager, double scheduleTime, int entitiesPerArrival) {
+    public void scheduleAction(EventManager eventManager, double scheduleTime, int entitiesPerArrival, ProcessTarget clearTarget) {
+
         double simTime = eventManager.getCurrentTime();
         if (scheduleTime < simTime) {
             error("schedule time is less than current time ????, no! no! no!");
@@ -86,9 +87,15 @@ public class EntityLauncher extends LinkedService{
 
         double dur = scheduleTime - simTime;
 
+        if (clearTarget != null) {
+            // 若clearTarget不为空,则清空组件数据
+            long waitTicks =  eventManager.secondsToNearestTick(dur);
+            eventManager.scheduleProcessExternal(waitTicks, 6, true, clearTarget, null);
+        }
+
         // 将该事件优先级设置为最低
-        eventManager.scheduleProcessExternalAndPause(dur, 6, false, doActionTarget, null);
-        // 更新 EventManager 的 nextTick
+        eventManager.scheduleProcessExternalAndPause(dur, 6, true, doActionTarget, null);
+        // 更新 eventManager 的 nextTick
         eventManager.updateNextTick();
     }
 
@@ -138,10 +145,17 @@ public class EntityLauncher extends LinkedService{
      */
     @Override
     public void updateStatistics() {
-        log.debug("Launcher: {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getNumberAdded(), this.getNumberProcessed(), this.getNumberInProgress());
+//        log.debug("Launcher: {} -> NumAdd: {}, NumberProcessed: {}, NumInProcess: {}", this.getName(), this.getNumberAdded(), this.getNumberProcessed(), this.getNumberInProgress());
         numAddMap.put(getSimTime(), getNumberAdded());
         numInProgressMap.put(getSimTime(), getNumberInProgress());
         numProcessedMap.put(getSimTime(), getNumberProcessed());
+    }
+
+    @Override
+    public void clearStatistics() {
+        numAddMap.clear();
+        numInProgressMap.clear();
+        numProcessedMap.clear();
     }
 
 }

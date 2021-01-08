@@ -98,6 +98,11 @@ public final class EventManager {
     private boolean oneSimTime;
 
     /**
+     * 是否记录统计数据
+     */
+    private boolean recordStatistics;
+
+    /**
      * 每秒中所模拟的离散刻度数
      */
     private double ticksPerSecond;
@@ -172,6 +177,7 @@ public final class EventManager {
         executeRealTime = false;
         realTimeFactor = 1;
         rebaseRealTime = true;
+        recordStatistics = false;
         setTimeListener(null);
     }
 
@@ -208,6 +214,7 @@ public final class EventManager {
             nextTick = 0;
             targetTick = Long.MAX_VALUE;
             rebaseRealTime = true;
+            recordStatistics = false;
 
             eventTree.runOnAllNodes(new KillAllEvents());
             eventTree.reset();
@@ -407,8 +414,12 @@ public final class EventManager {
                     continue;
                 }
 
-                // 时钟推进前，更新统计数据
-                updateStatitics();
+                // 时钟推进前，更新统计数据, 当时跳过推进到初始化时间前的记录
+                if (recordStatistics) {
+                    updateStatitics();
+                } else {
+                    recordStatistics = true;
+                }
 
                 // Advance to the next event time
                 // 实时模式推进时间: 通过wait20ms（推进时间）, 然后continue，再来判断时间，
@@ -433,7 +444,7 @@ public final class EventManager {
                     currentTick.set(nextTick);
                 }
 
-                log.debug("time: {} - [time advance]", ticksToSeconds(currentTick.get()));
+//                log.debug("time: {} - [time advance]", ticksToSeconds(currentTick.get()));
 
                 timelistener.tickUpdate(currentTick.get());
 
@@ -961,7 +972,7 @@ public final class EventManager {
 
     /**
      * 外部命令向时间队列中添加新事件，推进到时间发生时间，然后立马暂停
-     * @param waitLength
+     * @param duration
      * @param eventPriority
      * @param fifo
      * @param t
@@ -1242,6 +1253,16 @@ public final class EventManager {
             entity.updateStatistics();
         }
         timePointSet.add(ticksToSeconds(currentTick.get()));
+    }
+
+    /**
+     * 重置统计数据,初始化完毕后调用
+     */
+    public void clearStatitics() {
+        for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
+            entity.clearStatistics();
+        }
+        timePointSet.clear();
     }
 
     /**
