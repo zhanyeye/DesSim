@@ -111,17 +111,15 @@ public class DesSimTest {
 
         DesSim.initModel(DesSim.Type.Launcher);
 
-        // 事件队列中是否有事件
         log.debug("hasEvent:{}", DesSim.hasEvent());
-        // 下一个事件的发生时间
         log.debug("nextEventTime:{}", DesSim.nextEventTime());
+        log.debug("currentTime:{}", DesSim.currentSimTime());
 
         DesSim.inject(0, 1);
 
-        // 事件队列中是否有事件
         log.debug("hasEvent:{}", DesSim.hasEvent());
-        // 下一个事件的发生时间
         log.debug("nextEventTime:{}", DesSim.nextEventTime());
+        log.debug("currentTime: {}", DesSim.currentSimTime());
 
         // 仿真时钟推进到 5时刻
         DesSim.resume(5);

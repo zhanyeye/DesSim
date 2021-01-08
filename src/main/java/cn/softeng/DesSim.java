@@ -1,8 +1,10 @@
 package cn.softeng;
 
+import cn.softeng.basicsim.ClearStatisticsTarget;
 import cn.softeng.basicsim.Entity;
 import cn.softeng.basicsim.InitModelTarget;
 import cn.softeng.events.EventManager;
+import cn.softeng.events.ProcessTarget;
 import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +28,11 @@ public class DesSim {
     private static Type desType;
 
     /**
+     * 是否是第一次注入 (desType 是 Launcher模式下有效)
+     */
+    private static boolean firstInject;
+
+    /**
      * 添加到组件的实体数量
      */
     public static final String NumberAdded = "NumberAdded";
@@ -38,8 +45,10 @@ public class DesSim {
      */
     public static final String NumberInProgress = "NumberInProgress";
 
+
+
     /**
-     * 初始化模型，确认DES类型
+     * 初始化模型，适用于Generator模式
      * @param type DES类型: (包括：水平，垂直，单机)
      */
     public static void initModel(Type type, double initTime) {
@@ -47,31 +56,28 @@ public class DesSim {
         // 清空时间管理的状态
         eventManager.clear();
         // 向事件队列中添加初始化模型的事件
-
         long waitLength = eventManager.secondsToNearestTick(initTime);
-
         eventManager.scheduleProcessExternal(waitLength, 0, false, new InitModelTarget(), null);
         // 执行initTime时刻的初始化操作
         resume(initTime);
     }
 
     /**
-     * 初始化模型，确认DES类型
+     * 初始化模型，适用于Launcher模式
      * @param type DES类型: (包括：水平，垂直，单机)
      */
     public static void initModel(Type type) {
         desType = type;
+        firstInject = true;
         // 清空时间管理的状态
         eventManager.clear();
         // 向事件队列中添加初始化模型的事件
         eventManager.scheduleProcessExternal(0, 0, false, new InitModelTarget(), null);
         resume(0);
-        eventManager.clearStatitics();
     }
 
     /**
-     * 水平模式下：注入后会立即执行
-     * 垂直模式下：出入后不会立即执行，需要手动触发
+     * Launcher注入实体，调用时必须确保DES调度正在运行，否则会报错
      * @param scheduleTime
      * @param num
      */
@@ -79,19 +85,17 @@ public class DesSim {
         if (desType == Type.Generator) {
             throw new RuntimeException("自动生成实体模式下，不支持 inject !!!");
         }
-        parallelScheduling(scheduleTime, num);
-    }
-
-    /**
-     * DES被并行的调度，调用时必须确保DES调度正在运行，否则会报错
-     * @param scheduleTime 时间调度时间
-     * @param num 注入个数
-     */
-    public static void parallelScheduling(double scheduleTime, int num) {
+        ProcessTarget target = null;
+        if (firstInject && (scheduleTime - 0.0) > 0.000000001) {
+            target = new ClearStatisticsTarget();
+        } else {
+            target = null;
+        }
+        firstInject = false;
         for (Entity entity : Entity.getAll()) {
             if (entity.getClass() == EntityLauncher.class) {
                 EntityLauncher launcher = (EntityLauncher) entity;
-                launcher.scheduleAction(eventManager, scheduleTime, num);
+                launcher.scheduleAction(eventManager, scheduleTime, num, target);
                 break;
             }
         }
