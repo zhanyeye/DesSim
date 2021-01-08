@@ -53,7 +53,7 @@ public class DesSimTest {
                 // 事件队列中是否有事件
                 log.debug("hasEvent:{}", DesSim.hasEvent());
                 // 事件队列中最近事件的时间
-                log.debug("minEventTime:{}", DesSim.nextEventTime());
+                log.debug("minEventTime:{}", DesSim.minEventTime());
 
                 // 仿真时钟推进到 50时刻
                 DesSim.resume(50);

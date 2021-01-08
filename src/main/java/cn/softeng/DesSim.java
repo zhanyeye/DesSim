@@ -239,6 +239,29 @@ public class DesSim {
         throw new InvalidParameterException("attr 不存在");
     }
 
+    /**
+     * 更新服务组件的服务时间
+     * @param identifier
+     * @param serverTime
+     */
+    public static void updateServerTime(int identifier, double serverTime) {
+        updateServerTime(String.valueOf(identifier), serverTime);
+    }
+
+    /**
+     * 更新服务组件的服务时间
+     * @param identifier
+     * @param serverTime
+     */
+    public static void updateServerTime(String identifier, double serverTime) {
+        LinkedComponent component = getEntity(identifier);
+        if (component.getClass() == Server.class) {
+            ((Server) component).setServiceTime(serverTime);
+        } else {
+            throw new RuntimeException("该标识符对应的不是 Server组件，请检查您的输入");
+        }
+    }
+
     public enum Type {
         /**
          * DES 自己定时生成实体
