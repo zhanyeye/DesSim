@@ -23,9 +23,9 @@
 ##### Generator模式示例
 
 ```java
-// *************************************************
+// ************************************************
 // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-// *************************************************
+// ************************************************
 
 EntityGenerator generator = new EntityGenerator("EntityGenerator");
 SimEntity simEntity = new SimEntity("DefaultEntity");
@@ -41,8 +41,8 @@ EntitySink sink = new EntitySink("EntitySink");
 
 generator.setNextComponent(queue1);
 generator.setEntitiesPerArrival(1);
-generator.setFirstArrivalTime(0);
-generator.setInterArrivalTime(5);
+generator.setFirstArrivalTime(7);
+generator.setInterArrivalTime(7);
 generator.setPrototypeEntity(simEntity);
 
 server1.setWaitQueue(queue1);
@@ -57,16 +57,16 @@ server2.setNextComponent(sink);
 // 运行模型
 // ********************************
 
-// 初始化模型
-DesSim.initModel(DesSim.Type.Generator);
-// 仿真时钟推进到 0时刻
-DesSim.resume(0);
+// 初始化模型（模型类别和初始化时间）
+DesSim.initModel(DesSim.Type.Generator, 0);
+
+log.debug("hasEvent:{}", DesSim.hasEvent());
+log.debug("minEventTime:{}", DesSim.nextEventTime());
+
 // 仿真时钟推进到 50时刻
 DesSim.resume(50);
 
-// 事件队列中是否有事件
 log.debug("hasEvent:{}", DesSim.hasEvent());
-// 事件队列中最近事件的时间
 log.debug("minEventTime:{}", DesSim.nextEventTime());
 
 // *******************************
@@ -85,9 +85,9 @@ log.debug("{}", DesSim.getDataList("Server1", DesSim.NumberInProgress).toString(
 ##### Launcher模式示例
 
 ```java
-// ***********************************************
+// *************************************************
 // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-// ***********************************************
+// *************************************************
 
 EntityLauncher launcher = new EntityLauncher("launcher");
 Queue queue1 = new Queue("queue1");
@@ -115,34 +115,29 @@ server2.setNextComponent(sink);
 
 DesSim.initModel(DesSim.Type.Launcher);
 
-// 事件队列中是否有事件
 log.debug("hasEvent:{}", DesSim.hasEvent());
-// 下一个事件的发生时间
 log.debug("nextEventTime:{}", DesSim.nextEventTime());
+log.debug("currentTime:{}", DesSim.currentSimTime());
 
-DesSim.inject(1, 1);
+DesSim.inject(0, 1);
 
-// 事件队列中是否有事件
 log.debug("hasEvent:{}", DesSim.hasEvent());
-// 下一个事件的发生时间
 log.debug("nextEventTime:{}", DesSim.nextEventTime());
+log.debug("currentTime: {}", DesSim.currentSimTime());
 
-// 仿真时钟推进到 5时刻
-DesSim.resume(5);
 // 仿真时钟推进到 7时刻
 DesSim.resume(7);
 
-log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
-
+// 7时刻注入一个实体
 DesSim.inject(7,1);
 
-// 仿真时钟推进到 10时刻
-DesSim.resume(10);
 // 仿真时钟推进到 15时刻
 DesSim.resume(15);
 
+// 15时刻注入一个实体
 DesSim.inject(15, 1);
-// 仿真时钟推进到 50时刻
+
+// 仿真时钟推进到30时刻
 DesSim.resume(30);
 
 log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
