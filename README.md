@@ -1,7 +1,7 @@
 # DesSim 操作手册
 
 #### 项目介绍：
-一个🎈离🎐散🎉事🎨件🥼仿🎃真💎工🎓具，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
+一个🎈离🎐散🎉事🎨件🥼仿🎃真💎工🎓具💊，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
 支持两种原型实体生成方式
 1. `Generator`模式: 原型实体根据配置自动生成
