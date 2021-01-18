@@ -56,7 +56,7 @@ public class DesSimTest {
                 log.debug("minEventTime:{}", DesSim.minEventTime());
 
                 // 仿真时钟推进到 50时刻
-                DesSim.resume(50);
+                DesSim.resume(16.4588);
 
                 // 事件队列中是否有事件
                 log.debug("hasEvent:{}", DesSim.hasEvent());
@@ -134,9 +134,10 @@ public class DesSimTest {
 
                 DesSim.inject(15, 1);
                 // 仿真时钟推进到 50时刻
-                DesSim.resume(30);
+                DesSim.resume(16.4588);
 
                 log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
+                log.debug("{}", DesSim.minEventTime());
 
                 // *******************************
                 // 获取统计数据

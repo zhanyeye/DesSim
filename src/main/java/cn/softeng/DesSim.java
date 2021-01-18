@@ -134,11 +134,8 @@ public class DesSim {
      * 
      * @return
      */
-    public static List<Float> getDesClockList() {
-        Vector<Float> ret = new Vector<>();
-        for (Double e : eventManager.getTimePointSet()) {
-            ret.add(e.floatValue());
-        }
+    public static List<Double> getDesClockList() {
+        Vector<Double> ret = new Vector<>(eventManager.getTimePointSet());
         return ret;
     }
 
@@ -168,8 +165,8 @@ public class DesSim {
      * 
      * @return
      */
-    public static float minEventTime() {
-        return (float) eventManager.getNextEventTime();
+    public static double minEventTime() {
+        return eventManager.getNextEventTime();
     }
 
     /**
@@ -177,8 +174,8 @@ public class DesSim {
      * 
      * @return
      */
-    public static float currentSimTime() {
-        return (float) eventManager.getCurrentTime();
+    public static double currentSimTime() {
+        return eventManager.getCurrentTime();
     }
 
     /**
