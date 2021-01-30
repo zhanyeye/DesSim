@@ -9,9 +9,15 @@ public class ClonesOfIterable<T extends Entity> extends EntityIterator<T> {
         super(tClass);
     }
 
+    /**
+     * 用于迭代器指针向后遍历时，匹配到需要的实体
+     * 只有当entityClass与参数中的类型相同或为其父类，才匹配成功
+     * @param tClass 当前遍历的实体类型
+     * @return 若匹配条件为真，返回true
+     */
     @Override
     boolean matches(Class<?> tClass) {
         // 若参数中的类型能够被赋值到指定类型entityClass则符合要求
-        return entityClass.isAssignableFrom(tClass);
+        return this.entityClass.isAssignableFrom(tClass);
     }
 }
