@@ -204,10 +204,18 @@ public class Queue extends LinkedComponent {
 
     /**
      * 队列变化通知Target, 用于通知Queue的使用者,Queue发生了改变
+     * 命令模式中具体命令的实现
      */
     private static class DoQueueChanged extends ProcessTarget {
+        /**
+         * 持有相应的接收者对象: 被通知的Queue实例
+         */
         private final Queue queue;
 
+        /**
+         * 构造方法，传入相应的接收者对象
+         * @param q 被通知的Queue实例
+         */
         public DoQueueChanged(Queue q) {
             queue = q;
         }
@@ -318,7 +326,7 @@ public class Queue extends LinkedComponent {
     }
 
     /**
-     * 当队列中有实体等待超时后，对实体进行的相关操作的 target
+     * 命令模式中的 ConcreteCommand,执行 Queue 的 renegeAction操作
      */
     private static class RenegeActionTarget extends EntityTarget<Queue> {
         private final Entity queuedEntity;

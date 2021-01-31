@@ -5,13 +5,11 @@ import cn.softeng.events.ProcessTarget;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 初始化target,在模型运行前,初始化模型中各个组件
+ * 初始化模型的target,在模型运行前,初始化模型中各个组件（命令模式中的 ConcreteCommand）
  * @date: 12/23/2020 12:18 PM
  */
 @Slf4j
 public class InitModelTarget extends ProcessTarget {
-
-    public static boolean vertical;
 
     @Override
     public void process() {

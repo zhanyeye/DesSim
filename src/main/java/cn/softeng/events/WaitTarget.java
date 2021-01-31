@@ -17,8 +17,8 @@
 package cn.softeng.events;
 
 /**
- * 用于将一个线程封装到执行目标，包装进事件中，延迟执行
- * 一般创建一个组合waitTarget的事件后，会捕获(wait)被封装的线程
+ * 用于将一个线程封装到target(命令对象中)，包装进Event中，延迟执行
+ * 一般创建一个组合waitTarget的Event后，会捕获(wait)被封装的线程
  */
 class WaitTarget extends ProcessTarget {
 	private Process proc;

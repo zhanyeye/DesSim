@@ -217,6 +217,9 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     }
 
 
+    /**
+     * 命令模式中的 ConcreteCommand, 用于执行 LinkedService 的 endAction()
+     */
     private static class EndActionTarget extends EntityTarget<LinkedService> {
         EndActionTarget(LinkedService ent) {
             super(ent, "endAction");

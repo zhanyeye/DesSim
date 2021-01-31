@@ -117,7 +117,7 @@ public class EntityLauncher extends LinkedService{
     }
 
     /**
-     * 调度EntityLauncher去产生实体的代码
+     * 命令模式中的 ConcreteCommand，执行 EntityLauncher 的 doAction() 操作
      */
     private static class DoActionTarget extends EntityTarget<EntityLauncher> {
 
