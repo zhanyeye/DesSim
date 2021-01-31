@@ -29,6 +29,10 @@ public abstract class ProcessTarget {
      */
     public abstract String getDescription();
 
+    /**
+     * 重写toString方法，方便debug时识别target
+     * @return
+     */
     @Override
     public String toString() {
         return getDescription();
