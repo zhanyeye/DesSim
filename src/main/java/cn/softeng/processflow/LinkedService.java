@@ -110,7 +110,8 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     }
 
     /**
-     * 当该组件用到的队列改变时，触发
+     * 当该组件用到的队列改变时触发
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     @Override
     public void queueChanged() {
@@ -171,6 +172,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
 
     /**
      * 完成一个实体的处理
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     final void endAction() {
         // 执行此LinkedService子类所需的任何特殊处理

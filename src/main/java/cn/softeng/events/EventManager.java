@@ -1257,8 +1257,9 @@ public final class EventManager {
 
     /**
      * 重置统计数据,初始化完毕后调用
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
-    public void clearStatitics() {
+    public void clearStatiticsAction() {
         for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
             entity.clearStatistics();
         }

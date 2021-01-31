@@ -67,6 +67,7 @@ public class Entity {
     /**
      * 模型运行前初始化实体
      * 该方法中操作只能依赖于自身，这样才可以在任何序列中初始化每个实体
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     public void earlyInit() {
         // 将实体的属性重置为初始值
@@ -75,6 +76,7 @@ public class Entity {
 
     /**
      * 初始化实体
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     public void lateInit() {
 
@@ -82,6 +84,7 @@ public class Entity {
 
     /**
      * 启动该实体的模型运行
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     public void startUp() {
 

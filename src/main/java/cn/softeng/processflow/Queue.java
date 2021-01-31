@@ -295,6 +295,7 @@ public class Queue extends LinkedComponent {
 
     /**
      * 当队列中有实体等待超时，需要进行的操作
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      * @param entity 等待超时的实体
      */
     public void renegeAction(Entity entity) {

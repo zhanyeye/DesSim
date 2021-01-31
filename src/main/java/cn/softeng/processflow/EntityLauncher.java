@@ -101,6 +101,7 @@ public class EntityLauncher extends LinkedService{
 
     /**
      * 生成实体的操作
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     public void doAction() {
         int num = (int) entitiesPerArrival;
