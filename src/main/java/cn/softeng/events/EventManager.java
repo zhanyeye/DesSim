@@ -250,7 +250,7 @@ public final class EventManager {
     }
 
     /**
-     * 指定线程去执行
+     * 相当于命令对象中的调用者，调用命令(target)对象的执行方法
      * the return from execute target informs whether or not this thread should grab an new Event, or return to the pool
      * cur执行完毕后，若没有等待cur的nextProcess，则返回true,cur继续获取ProcessTarget执行；若有等待cur执行完毕的nextProcess,唤醒
      * nextProcess,并放回false,将cur返回线程池。
