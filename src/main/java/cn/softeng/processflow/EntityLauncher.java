@@ -47,6 +47,9 @@ public class EntityLauncher extends LinkedService{
      */
     private long numberGenerated = 0;
 
+    /**
+     * 相当于命令模式中的客户端，创建命令对象(doActionTarget)并设定它的接收者(this)
+     */
     private final ProcessTarget doActionTarget = new DoActionTarget(this);
 
     private final EventHandle doActionHandle = new EventHandle();

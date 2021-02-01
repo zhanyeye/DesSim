@@ -71,6 +71,9 @@ public class Queue extends LinkedComponent {
     protected double elementSeconds;               // 所有实体在队列中花费的总时间
     protected long numberReneged;                  // 等待超时的实体数目
 
+    /**
+     * 相当于命令模式中的客户端，创建命令对象(userUpdate)并设定它的接收者(this)
+     */
     private final DoQueueChanged userUpdate = new DoQueueChanged(this);
     private final EventHandle userUpdateHandle = new EventHandle();
 
@@ -272,6 +275,7 @@ public class Queue extends LinkedComponent {
             double dur =  renegeTime;
             // 以FIFO的顺序调度违约测试，所以若有多个实体被同时添加到队列中
             // 则队列中越靠近前目的实体会先被测试
+            // new RenegeActionTarget() 操作相当于命令模式中的客户端，创建命令对象，并设定它的接收者(this)
             EventManager.scheduleSeconds(dur, 5, true, new RenegeActionTarget(this, entity), null);
         }
     }

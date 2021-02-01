@@ -28,6 +28,9 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     private boolean processKilled;
     private double stopWorkTime;
 
+    /**
+     * 相当于命令模式中的客户端，创建命令对象(endActionTarget)并设定它的接收者(this)
+     */
     private final ProcessTarget endActionTarget = new EndActionTarget(this);
     /**
      * 用于持有endActions事件的引用
