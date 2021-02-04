@@ -16,6 +16,9 @@
 - **Server** : 服务，延时组件，模拟处理实体所消耗的时间
 - **EntitySink** : 实体回收器，回收处理完毕的实体
 
+#### 基本原理
+🎈离🎐散🎉事🎨件🥼仿🎃真💎原理的简单介绍，（实际代码实现比这个复杂多了）
+<a href="https://sm.ms/image/ogdtEiLKunvq5mp" target="_blank"><img src="https://i.loli.net/2021/02/04/ogdtEiLKunvq5mp.png" ></a>
 
 #### 使用指南
 使用的前将DesSim打包成jar包，并在你的项目中引用。[[参考]](https://www.jianshu.com/p/257dcca702f7)
