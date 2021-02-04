@@ -2,6 +2,7 @@
 
 #### 项目介绍：
 一个🎈离🎐散🎉事🎨件🥼仿🎃真💎工🎓具💊，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
+> 由于该工具正在为一篇毕设中的某个功能做支持，，目前不希望被检索到，后面都会使用符号表情来混淆
 
 支持两种原型实体生成方式
 1. `Generator`模式: 原型实体根据配置自动生成
@@ -17,7 +18,8 @@
 - **EntitySink** : 实体回收器，回收处理完毕的实体
 
 #### 基本原理
-🎈离🎐散🎉事🎨件🥼仿🎃真💎原理的简单介绍，（实际代码实现比这个复杂多了）
+🎈🎐🎉🎨🥼🎃原理的简单介绍，（实际代码实现比这个复杂多了）  
+
 <a href="https://sm.ms/image/ogdtEiLKunvq5mp" target="_blank"><img src="https://i.loli.net/2021/02/04/ogdtEiLKunvq5mp.png" ></a>
 
 #### 使用指南
