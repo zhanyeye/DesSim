@@ -18,7 +18,7 @@
 - **EntitySink** : 实体回收器，回收处理完毕的实体
 
 #### 基本原理
-🎈🎐🎉🎨🥼🎃原理的简单介绍，（实际代码实现比这个复杂多了）  
+事件调度的基本原理介绍
 
 ![](https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210205144224.png)
 
