@@ -5,7 +5,7 @@
 **由于该工具正在为某位学姐的篇毕设中的某个功能模块做支持，目前不希望被检索到，后面都会使用符号表情来混淆**
 
 
-一个🎈 (li) 🎐 (san) 🎉 (shi) 🎨 (jian) 🥼 (fan) 🎃 (zhen) 💎工🎓具💊，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
+一个🎈 (li) 🎐 (san) 🎉 (shi) 🎨 (jian) 🥼 (fan) 🎃 (zhen) 💎工具，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
 支持两种原型实体生成方式
 1. `Generator`模式: 原型实体根据配置自动生成
