@@ -20,7 +20,7 @@
 #### 基本原理
 🎈🎐🎉🎨🥼🎃原理的简单介绍，（实际代码实现比这个复杂多了）  
 
-![](zhanyeye-img.oss-accelerate.aliyuncs.com/20210205144224.png)
+![](https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210205144224.png)
 
 #### 使用指南
 使用的前将DesSim打包成jar包，并在你的项目中引用。[[参考]](https://www.jianshu.com/p/257dcca702f7)
