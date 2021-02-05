@@ -20,7 +20,7 @@
 #### 基本原理
 🎈🎐🎉🎨🥼🎃原理的简单介绍，（实际代码实现比这个复杂多了）  
 
-<a href="https://sm.ms/image/ogdtEiLKunvq5mp" target="_blank"><img src="https://i.loli.net/2021/02/04/ogdtEiLKunvq5mp.png" ></a>
+![](https://zhanyeye-img.oss-cn-shanghai.aliyuncs.com/20210205140426.png)
 
 #### 使用指南
 使用的前将DesSim打包成jar包，并在你的项目中引用。[[参考]](https://www.jianshu.com/p/257dcca702f7)
