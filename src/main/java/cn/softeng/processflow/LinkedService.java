@@ -118,6 +118,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
      */
     @Override
     public void queueChanged() {
+        // 该组件再次处理到达事件
         this.restartAction();
     }
 

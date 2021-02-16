@@ -35,6 +35,11 @@ public class Server extends LinkedService {
         servedEntity = null;
     }
 
+    /**
+     * 当实体被处理时，调用的钩子函数，server组件会从队列中取出一个临时实体来加工
+     * @param simTime 当前的仿真时间
+     * @return
+     */
     @Override
     protected boolean startProcessing(double simTime) {
         if (waitQueue.isEmpty()) {
@@ -45,6 +50,10 @@ public class Server extends LinkedService {
         return true;
     }
 
+    /**
+     * 当时实体处理结束时，会调用的钩子函数，server会将实体传递给下一个组件
+     * @param simTime 当前的仿真时间
+     */
     @Override
     protected void endProcessing(double simTime) {
         // 将实体发送到链中的下一个组件
@@ -52,6 +61,11 @@ public class Server extends LinkedService {
         servedEntity = null;
     }
 
+    /**
+     * 获取实体加工的时间
+     * @param simTime 当前的仿真时间
+     * @return
+     */
     @Override
     protected double getProcessingTime(double simTime) {
         return serviceTime;
