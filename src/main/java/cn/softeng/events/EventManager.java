@@ -360,7 +360,7 @@ public final class EventManager {
                 }
 
                 // If the next event is at the current tick, execute it
-                // 如果下一个事件发生刻度等于系统当前刻度，则执行它
+                // 如果该事件的调度时间等于当前仿真时钟，则执行它
                 if (nextNode.schedTick == currentTick.get()) {
                     // Remove the event from the future events
                     Event nextEvent = nextNode.head;
