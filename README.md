@@ -27,7 +27,7 @@
 
 模型组件的实现原理介绍  
 
- <img width="850px" src="https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210218123803.png">
+ <img width="800px" src="https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210218123803.png">
 
 
 #### 使用指南
