@@ -14,9 +14,11 @@ import java.util.*;
 @Slf4j
 public class Assign extends LinkedComponent {
 
-
     private Map<String, Integer> assignments;
-    Random random = new Random();
+
+    private Random random = new Random();
+
+    private List<Object> shuffledList = new LinkedList<>();
 
     public Assign() {
 
@@ -26,12 +28,9 @@ public class Assign extends LinkedComponent {
         setName(name);
     }
 
-
     public void addAssignment(Map<String, Integer> assign) {
         assignments = assign;
     }
-
-
 
     {
         assignments = new HashMap<>();
@@ -54,7 +53,11 @@ public class Assign extends LinkedComponent {
         this.sendToNextComponent(entity);
     }
 
-
+    /**
+     * 按照权重来分配属性，使用随机函数
+     * @param choice
+     * @return
+     */
     public String randomAssign(Map<String, Integer> choice) {
         List<Integer> weights = new ArrayList<>(choice.values());
         List<Integer> weightTmp = new ArrayList<>(weights.size() + 1);
@@ -85,6 +88,23 @@ public class Assign extends LinkedComponent {
         return res;
     }
 
+    /**
+     * 按照权重来分配属性，使用洗牌策略
+     * @param choice
+     * @return
+     */
+    public String shuffleAssign(Map<String, Integer> choice) {
+        if (shuffledList.size() == 0) {
+            for (Map.Entry<String, Integer> entry : choice.entrySet()) {
+                for (int i = 0; i < entry.getValue(); i++) {
+                    shuffledList.add(entry.getKey());
+                }
+            }
+        }
+        Collections.shuffle(shuffledList);
+        return (String) shuffledList.remove(0);
+    }
+
     @Override
     public void updateStatistics() {
         numAddMap.put(getSimTime(), getNumberAdded());
@@ -98,5 +118,25 @@ public class Assign extends LinkedComponent {
         numInProgressMap.clear();
         numProcessedMap.clear();
     }
+
+//    public static void main(String[] args) {
+//        Map<String, Integer> map = new HashMap<>();
+//        map.put("red", 3);
+//        map.put("black", 7);
+//        Assign assign = new Assign();
+//        Map<String, Integer> res = new HashMap<>();
+//
+//        for (int i = 0; i < 18; i++) {
+//            String color = assign.shuffleAssign(map);
+////            String color = assign.randomAssign(map);
+//            System.out.println(color);
+//            if (res.containsKey(color)) {
+//                res.put(color, res.get(color) + 1);
+//            } else {
+//                res.put(color, 1);
+//            }
+//        }
+//        System.out.println(res.toString());
+//    }
 
 }
