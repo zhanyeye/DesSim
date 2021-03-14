@@ -4,6 +4,9 @@ import cn.softeng.processflow.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Unit test for simple DesSim.
  */
@@ -19,6 +22,7 @@ public class DesSimTest {
 
                 EntityGenerator generator = new EntityGenerator("EntityGenerator");
                 SimEntity simEntity = new SimEntity("DefaultEntity");
+                Assign assign = new Assign("assign");
                 Queue queue1 = new Queue("Queue1");
                 Queue queue2 = new Queue("Queue2");
                 Server server1 = new Server("Server1");
@@ -29,12 +33,23 @@ public class DesSimTest {
                 // 为模型属性赋值
                 // ******************************
 
-                generator.setNextComponent(queue1);
+                generator.setNextComponent(assign);
                 generator.setEntitiesPerArrival(1);
                 generator.setFirstArrivalTime(7);
                 generator.setInterArrivalTime(7);
                 generator.setPrototypeEntity(simEntity);
 
+                Map<String, Integer> map = new HashMap<>();
+                map.put("red", 3);
+                map.put("black", 7);
+
+                assign.addAssignment(map);
+                assign.setNextComponent(queue1);
+
+                Map<String, Double> map1 = new HashMap<>();
+                map1.put("red", 10.0);
+                map1.put("black", 15.0);
+                server1.setServerTimeChoice(map1);
                 server1.setWaitQueue(queue1);
                 server1.setServiceTime(5);
                 server1.setNextComponent(queue2);
@@ -50,10 +65,12 @@ public class DesSimTest {
                 // 初始化模型
                 DesSim.initModel(DesSim.Type.Generator, 0);
 
-                // 事件队列中是否有事件
-                log.debug("hasEvent:{}", DesSim.hasEvent());
-                // 事件队列中最近事件的时间
-                log.debug("minEventTime:{}", DesSim.minEventTime());
+                server2.setWaitQueue(queue2);
+                server2.setServiceTime(5);
+                server2.setNextComponent(sink);
+
+                // 仿真时钟推进到 50时刻
+                DesSim.resume(6000);
 
                 // 仿真时钟推进到 50时刻
                 DesSim.resume(16.4588);
@@ -78,9 +95,13 @@ public class DesSimTest {
         @Test
         public void testLauncherScheduling() {
 
-                // ***********************************************
-                // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-                // ***********************************************
+                EntityLauncher launcher = new EntityLauncher("launcher");
+
+                Queue queue1 = new Queue("queue1");
+                Queue queue2 = new Queue("queue2");
+                Server server1 = new Server("server1");
+                Server server2 = new Server("server2");
+                EntitySink sink = new EntitySink("sink");
 
                 EntityLauncher launcher = new EntityLauncher("launcher");
                 Queue queue1 = new Queue("queue1");

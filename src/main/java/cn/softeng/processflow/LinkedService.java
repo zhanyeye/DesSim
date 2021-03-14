@@ -28,6 +28,9 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     private boolean processKilled;
     private double stopWorkTime;
 
+    /**
+     * 相当于命令模式中的客户端，创建命令对象(endActionTarget)并设定它的接收者(this)
+     */
     private final ProcessTarget endActionTarget = new EndActionTarget(this);
     /**
      * 用于持有endActions事件的引用
@@ -110,10 +113,12 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     }
 
     /**
-     * 当该组件用到的队列改变时，触发
+     * 当该组件用到的队列改变时触发
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     @Override
     public void queueChanged() {
+        // 该组件再次处理到达事件
         this.restartAction();
     }
 
@@ -171,6 +176,7 @@ public class LinkedService extends LinkedComponent implements QueueUser {
 
     /**
      * 完成一个实体的处理
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     final void endAction() {
         // 执行此LinkedService子类所需的任何特殊处理
@@ -217,6 +223,9 @@ public class LinkedService extends LinkedComponent implements QueueUser {
     }
 
 
+    /**
+     * 命令模式中的 ConcreteCommand, 用于执行 LinkedService 的 endAction()
+     */
     private static class EndActionTarget extends EntityTarget<LinkedService> {
         EndActionTarget(LinkedService ent) {
             super(ent, "endAction");

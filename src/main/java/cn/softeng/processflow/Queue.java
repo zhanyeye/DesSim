@@ -71,6 +71,9 @@ public class Queue extends LinkedComponent {
     protected double elementSeconds;               // 所有实体在队列中花费的总时间
     protected long numberReneged;                  // 等待超时的实体数目
 
+    /**
+     * 相当于命令模式中的客户端，创建命令对象(userUpdate)并设定它的接收者(this)
+     */
     private final DoQueueChanged userUpdate = new DoQueueChanged(this);
     private final EventHandle userUpdateHandle = new EventHandle();
 
@@ -204,10 +207,18 @@ public class Queue extends LinkedComponent {
 
     /**
      * 队列变化通知Target, 用于通知Queue的使用者,Queue发生了改变
+     * 命令模式中具体命令的实现
      */
     private static class DoQueueChanged extends ProcessTarget {
+        /**
+         * 持有相应的接收者对象: 被通知的Queue实例
+         */
         private final Queue queue;
 
+        /**
+         * 构造方法，传入相应的接收者对象
+         * @param q 被通知的Queue实例
+         */
         public DoQueueChanged(Queue q) {
             queue = q;
         }
@@ -264,6 +275,7 @@ public class Queue extends LinkedComponent {
             double dur =  renegeTime;
             // 以FIFO的顺序调度违约测试，所以若有多个实体被同时添加到队列中
             // 则队列中越靠近前目的实体会先被测试
+            // new RenegeActionTarget() 操作相当于命令模式中的客户端，创建命令对象，并设定它的接收者(this)
             EventManager.scheduleSeconds(dur, 5, true, new RenegeActionTarget(this, entity), null);
         }
     }
@@ -287,6 +299,7 @@ public class Queue extends LinkedComponent {
 
     /**
      * 当队列中有实体等待超时，需要进行的操作
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      * @param entity 等待超时的实体
      */
     public void renegeAction(Entity entity) {
@@ -318,7 +331,7 @@ public class Queue extends LinkedComponent {
     }
 
     /**
-     * 当队列中有实体等待超时后，对实体进行的相关操作的 target
+     * 命令模式中的 ConcreteCommand,执行 Queue 的 renegeAction操作
      */
     private static class RenegeActionTarget extends EntityTarget<Queue> {
         private final Entity queuedEntity;

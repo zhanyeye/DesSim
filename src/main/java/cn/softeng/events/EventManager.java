@@ -250,7 +250,7 @@ public final class EventManager {
     }
 
     /**
-     * 指定线程去执行
+     * 相当于命令对象中的调用者，调用命令(target)对象的执行方法
      * the return from execute target informs whether or not this thread should grab an new Event, or return to the pool
      * cur执行完毕后，若没有等待cur的nextProcess，则返回true,cur继续获取ProcessTarget执行；若有等待cur执行完毕的nextProcess,唤醒
      * nextProcess,并放回false,将cur返回线程池。
@@ -360,7 +360,7 @@ public final class EventManager {
                 }
 
                 // If the next event is at the current tick, execute it
-                // 如果下一个事件发生刻度等于系统当前刻度，则执行它
+                // 如果该事件的调度时间等于当前仿真时钟，则执行它
                 if (nextNode.schedTick == currentTick.get()) {
                     // Remove the event from the future events
                     Event nextEvent = nextNode.head;
@@ -1257,8 +1257,9 @@ public final class EventManager {
 
     /**
      * 重置统计数据,初始化完毕后调用
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
-    public void clearStatitics() {
+    public void clearStatiticsAction() {
         for (Entity entity : Entity.getClonesOfIterator(Entity.class)) {
             entity.clearStatistics();
         }

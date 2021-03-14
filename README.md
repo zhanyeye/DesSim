@@ -1,7 +1,11 @@
 # DesSim 操作手册
 
 #### 项目介绍：
-一个离散事件仿真工具，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
+
+**由于该工具正在为学姐毕设中的某个功能模块做支持，目前不希望被检索到，后面都会使用符号表情来混淆**
+
+
+一个🎈 (li) 🎐 (san) 🎉 (shi) 🎨 (jian) 🥼 (fang) 🎃 (zhen) 💎工具，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
 支持两种原型实体生成方式
 1. `Generator`模式: 原型实体根据配置自动生成
@@ -10,15 +14,20 @@
 
 支持的模型组件有：
 
-**EntityGenerator** : 实体生成器，根据指定时间间隔生成实体 
+- **EntityGenerator** : 实体生成器，根据指定时间间隔生成实体 
+- **EntityLauncher** : 实体启动器，被用户触发后生成实体 
+- **Queue** : 队列，用于存放等待中的实体
+- **Server** : 服务，延时组件，模拟处理实体所消耗的时间
+- **EntitySink** : 实体回收器，回收处理完毕的实体
 
-**EntityLauncher** : 实体启动器，被用户触发后生成实体 
+#### 基本原理
+事件调度的基本原理介绍
 
-**Queue** : 队列，用于存放等待中的实体
+![](https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210205144224.png)
 
-**Server** : 服务，延时组件，模拟处理实体所消耗的时间
+模型组件的实现原理介绍  
 
-**EntitySink** : 实体回收器，回收处理完毕的实体
+ <img width="800px" src="https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210218123803.png">
 
 
 #### 使用指南
@@ -27,9 +36,9 @@
 ##### Generator模式示例
 
 ```java
-// *************************************************
+// ************************************************
 // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-// *************************************************
+// ************************************************
 
 EntityGenerator generator = new EntityGenerator("EntityGenerator");
 SimEntity simEntity = new SimEntity("DefaultEntity");
@@ -45,8 +54,8 @@ EntitySink sink = new EntitySink("EntitySink");
 
 generator.setNextComponent(queue1);
 generator.setEntitiesPerArrival(1);
-generator.setFirstArrivalTime(0);
-generator.setInterArrivalTime(5);
+generator.setFirstArrivalTime(7);
+generator.setInterArrivalTime(7);
 generator.setPrototypeEntity(simEntity);
 
 server1.setWaitQueue(queue1);
@@ -61,16 +70,16 @@ server2.setNextComponent(sink);
 // 运行模型
 // ********************************
 
-// 初始化模型
-DesSim.initModel(DesSim.Type.Generator);
-// 仿真时钟推进到 0时刻
-DesSim.resume(0);
+// 初始化模型（模型类别和初始化时间）
+DesSim.initModel(DesSim.Type.Generator, 0);
+
+log.debug("hasEvent:{}", DesSim.hasEvent());
+log.debug("minEventTime:{}", DesSim.nextEventTime());
+
 // 仿真时钟推进到 50时刻
 DesSim.resume(50);
 
-// 事件队列中是否有事件
 log.debug("hasEvent:{}", DesSim.hasEvent());
-// 事件队列中最近事件的时间
 log.debug("minEventTime:{}", DesSim.nextEventTime());
 
 // *******************************
@@ -89,9 +98,9 @@ log.debug("{}", DesSim.getDataList("Server1", DesSim.NumberInProgress).toString(
 ##### Launcher模式示例
 
 ```java
-// ***********************************************
+// *************************************************
 // 定义模型, 同时设置标识符，(先定义出所有组件，在给组件赋值)
-// ***********************************************
+// *************************************************
 
 EntityLauncher launcher = new EntityLauncher("launcher");
 Queue queue1 = new Queue("queue1");
@@ -119,34 +128,29 @@ server2.setNextComponent(sink);
 
 DesSim.initModel(DesSim.Type.Launcher);
 
-// 事件队列中是否有事件
 log.debug("hasEvent:{}", DesSim.hasEvent());
-// 下一个事件的发生时间
 log.debug("nextEventTime:{}", DesSim.nextEventTime());
+log.debug("currentTime:{}", DesSim.currentSimTime());
 
-DesSim.inject(1, 1);
+DesSim.inject(0, 1);
 
-// 事件队列中是否有事件
 log.debug("hasEvent:{}", DesSim.hasEvent());
-// 下一个事件的发生时间
 log.debug("nextEventTime:{}", DesSim.nextEventTime());
+log.debug("currentTime: {}", DesSim.currentSimTime());
 
-// 仿真时钟推进到 5时刻
-DesSim.resume(5);
 // 仿真时钟推进到 7时刻
 DesSim.resume(7);
 
-log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");
-
+// 7时刻注入一个实体
 DesSim.inject(7,1);
 
-// 仿真时钟推进到 10时刻
-DesSim.resume(10);
 // 仿真时钟推进到 15时刻
 DesSim.resume(15);
 
+// 15时刻注入一个实体
 DesSim.inject(15, 1);
-// 仿真时钟推进到 50时刻
+
+// 仿真时钟推进到30时刻
 DesSim.resume(30);
 
 log.debug("{}", DesSim.hasEvent() ? "has Event" : "no Event");

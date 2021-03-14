@@ -47,6 +47,9 @@ public class EntityLauncher extends LinkedService{
      */
     private long numberGenerated = 0;
 
+    /**
+     * 相当于命令模式中的客户端，创建命令对象(doActionTarget)并设定它的接收者(this)
+     */
     private final ProcessTarget doActionTarget = new DoActionTarget(this);
 
     private final EventHandle doActionHandle = new EventHandle();
@@ -101,6 +104,7 @@ public class EntityLauncher extends LinkedService{
 
     /**
      * 生成实体的操作
+     * (相当于命令模式中的接收者，是真正执行命令操作的功能代码)
      */
     public void doAction() {
         int num = (int) entitiesPerArrival;
@@ -117,7 +121,7 @@ public class EntityLauncher extends LinkedService{
     }
 
     /**
-     * 调度EntityLauncher去产生实体的代码
+     * 命令模式中的 ConcreteCommand，执行 EntityLauncher 的 doAction() 操作
      */
     private static class DoActionTarget extends EntityTarget<EntityLauncher> {
 
