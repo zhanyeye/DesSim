@@ -85,4 +85,18 @@ public class Assign extends LinkedComponent {
         return res;
     }
 
+    @Override
+    public void updateStatistics() {
+        numAddMap.put(getSimTime(), getNumberAdded());
+        numInProgressMap.put(getSimTime(), getNumberInProgress());
+        numProcessedMap.put(getSimTime(), getNumberProcessed());
+    }
+
+    @Override
+    public void clearStatistics() {
+        numAddMap.clear();
+        numInProgressMap.clear();
+        numProcessedMap.clear();
+    }
+
 }
