@@ -26,10 +26,10 @@ public class EntitySink extends LinkedComponent {
     public void addEntity(Entity entity) {
         super.addEntity(entity);
         SimEntity simEntity = (SimEntity) entity;
-//        Map<String, Object> map = simEntity.getAttribute();
-//        for (Map.Entry entry : map.entrySet()) {
-//            log.debug(entry.getKey() + ": " + entry.getValue());
-//        }
+        Map<String, Object> map = simEntity.getAttribute();
+        for (Map.Entry entry : map.entrySet()) {
+            log.debug(entry.getKey() + ": " + entry.getValue());
+        }
         // 当 nextComponent为空的情况下，只累加 numberProcessed
         this.sendToNextComponent(entity);
         // 终止加入到该组件的实体
