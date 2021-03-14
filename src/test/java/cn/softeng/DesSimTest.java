@@ -49,7 +49,7 @@ public class DesSimTest {
 
         Map<String, Double> map1 = new HashMap<>();
         map1.put("red", 10.0);
-        map1.put("black", 15.0);
+        map1.put("black", 2.0);
         server1.setServerTimeChoice(map1);
 
         server1.setWaitQueue(queue1);
@@ -159,10 +159,10 @@ public class DesSimTest {
 
         // 输出时钟序列
         log.debug("Server:");
-        log.debug("{}", DesSim.getDesClockList().toString());
-        log.debug("{}", server1.getNumAddList().toString());
-        log.debug("{}", server1.getNumProcessedList().toString());
-        log.debug("{}", server1.getNumInProgressList().toString());
+        log.debug("getDesClockList(): {}", DesSim.getDesClockList().toString());
+        log.debug("getNumAddList(): {}", server1.getNumAddList().toString());
+        log.debug("getNumProcessedList(): {}", server1.getNumProcessedList().toString());
+        log.debug("getNumInProgressList(): {}", server1.getNumInProgressList().toString());
 
     }
 
