@@ -76,8 +76,9 @@ public class Server extends LinkedService {
     protected double getProcessingTime(double simTime) {
         if (!serverTimeChoice.isEmpty()) {
             SimEntity simEntity = (SimEntity) this.servedEntity;
-            if (serverTimeChoice.containsKey("color")) {
-                return serverTimeChoice.get("color");
+            String color = (String) simEntity.getAttribute().get("color");
+            if (color != null) {
+                return serverTimeChoice.get(color);
             }
         }
         return serviceTime;
