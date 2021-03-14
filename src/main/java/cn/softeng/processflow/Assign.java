@@ -15,20 +15,23 @@ import java.util.*;
 public class Assign extends LinkedComponent {
 
 
-    /**
-     * 为临时实体设置属性的键值对
-     * key对应着属性名，Value对应着该属性可以有的选项的Map（Map 又是一个 Key-Value键值对）
-     */
-    private Map<String, Map> assignments;
+    private Map<String, Integer> assignments;
+    Random random = new Random();
 
-    /**
-     * 添加一个设置项目
-     * @param name 设置属性的名称
-     * @param assignment 属性可能的选项
-     */
-    public void addAssignment(String name, Map assignment) {
-        assignment.put(name, assignment);
+    public Assign() {
+
     }
+
+    public Assign(String name) {
+        setName(name);
+    }
+
+
+    public void addAssignment(Map<String, Integer> assign) {
+        assignments = assign;
+    }
+
+
 
     {
         assignments = new HashMap<>();
@@ -43,12 +46,9 @@ public class Assign extends LinkedComponent {
         // 调用父类 LinkedComponent的addEntity()方法
         super.addEntity(entity);
 
-        // 遍历所有要分配的属性
-        for (Map.Entry<String, Map> entry : assignments.entrySet()) {
-            String assign = randomAssign(entry.getValue());
-            SimEntity simEntity = (SimEntity) entity;
-            simEntity.getAttribute().put(entry.getKey(), assign);
-        }
+        String assign = randomAssign(assignments);
+        SimEntity simEntity = (SimEntity) entity;
+        simEntity.getAttribute().put("color", assign);
 
         // 将临时实体传递给下一个组件
         this.sendToNextComponent(entity);
@@ -64,7 +64,7 @@ public class Assign extends LinkedComponent {
             sum += w;
             weightTmp.add(sum);
         }
-        Random random = new Random();
+
         int rand = random.nextInt(sum);
 
         int index = 0;
@@ -85,31 +85,4 @@ public class Assign extends LinkedComponent {
         return res;
     }
 
-
-    /**
-     * 随机函数按照指定权重进行分配
-     * @param weights 权重集合
-     * @return
-     */
-    public static int random(List<Integer> weights) {
-        List<Integer> weightTmp = new ArrayList<>(weights.size() + 1);
-        weightTmp.add(0);
-        Integer sum = 0;
-        for (Integer w : weights) {
-            sum += w;
-            weightTmp.add(sum);
-        }
-        Random random = new Random();
-        int rand = random.nextInt(sum);
-
-        int index = 0;
-
-        for (int i = weightTmp.size() - 1; i > 0; i--) {
-            if (rand >= weightTmp.get(i)) {
-                index = i;
-                break;
-            }
-        }
-        return weights.get(index);
-    }
 }
