@@ -5,7 +5,7 @@
 **由于该工具正在为学姐毕设中的某个功能模块做支持，目前不希望被检索到，后面都会使用符号表情来混淆**
 
 
-一个🎈 (li) 🎐 (san) 🎉 (shi) 🎨 (jian) 🥼 (fang) 🎃 (zhen) 💎工具，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
+一个🎈 (li) 🎐 (san) 🎉 (shi) 🎨 (jian) 🥼 (fang) 🎃 (zhen) 💎程序，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
 支持两种原型实体生成方式
 1. `Generator`模式: 原型实体根据配置自动生成
@@ -19,6 +19,7 @@
 - **Queue** : 队列，用于存放等待中的实体
 - **Server** : 服务，延时组件，模拟处理实体所消耗的时间
 - **EntitySink** : 实体回收器，回收处理完毕的实体
+- **Assign** : 为经过的临时实体设置不同的属性，按照用户设置的权重进行分配
 
 #### 基本原理
 事件调度的基本原理介绍
