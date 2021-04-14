@@ -8,10 +8,6 @@
 
 一个🎈 (li) 🎐 (san) 🎉 (shi) 🎨 (jian) 🥼 (fang) 🎃 (zhen) 💎程序，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
-支持两种原型实体生成方式
-1. `Generator`模式: 原型实体根据配置自动生成
-
-2. `Launcher`模式:  原型实体由用户触发生成
 
 
 #### 基本原理
