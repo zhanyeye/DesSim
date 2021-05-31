@@ -2,7 +2,7 @@
 
 #### 项目介绍：
 
-一个离散事件仿真程序，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
+一个简单的离散事件仿真程序，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
 
 支持的模型组件有：
