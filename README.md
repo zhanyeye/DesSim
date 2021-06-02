@@ -1,6 +1,8 @@
 <p align="center">
-   <img width="320" src="https://raw.githubusercontent.com/zhanyeye/Figure-bed/win-pic/img/20210602140857.png">
+    <img width="400" src="https://raw.githubusercontent.com/zhanyeye/Figure-bed/win-pic/img/20210602141834.png">
 </p>
+<h1 align="center">DesSim</h1>
+
 
 #### 项目介绍：
 
