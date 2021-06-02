@@ -1,12 +1,12 @@
-# DesSim 操作手册
+<p align="center">
+   <img width="320" src="https://raw.githubusercontent.com/zhanyeye/Figure-bed/win-pic/img/20210602140857.png">
+</p>
 
 #### 项目介绍：
 
 一个简单的离散事件仿真程序，能够动态的构建模型，基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发
 
-
 支持的模型组件有：
-
 - **EntityGenerator** : 实体生成器，根据指定时间间隔生成实体 
 - **EntityLauncher** : 实体启动器，被用户触发后生成实体 
 - **Queue** : 队列，用于存放等待中的实体
