@@ -1,5 +1,5 @@
 <p align="center">
-    <img width="280" src="https://raw.githubusercontent.com/zhanyeye/Figure-bed/win-pic/img/20210602141834.png">
+    <img width="300" src="https://raw.githubusercontent.com/zhanyeye/Figure-bed/win-pic/img/20210602141834.png">
 </p>
 <h1 align="center">DesSim</h1>
 
