@@ -99,7 +99,7 @@ DESSIM 主要采用的模拟策略是 事件调度法，它从事件的视角去
 **SimEntity**  
 临时实体，继承自Enity，该实体模拟的是在流程模型中被传递的对象，可以由 `EntityGenerator` ， `EntityLauncher`  等的对象生成，他们会在流程模型对象之间传递，最后离开系统。而且它们每次到达模型中的一个对象，就可能会触发一些对应的事件。
 
-**LinkedComponent **  
+**LinkedComponent**    
 链式组件，继承自Entity, 是一个中间层，它为模型组件赋予设置前驱和后继组件的能力，模型中所有具体组件都继承自该类，来获得构建链式的流程模型的能力，同时它可以接收传递穿过模型的零时实体。
 
 - 该类包含一个指向后继组件的nextComponent字段。这样它的子类，也就是每个具体的组件，可以通过设置后继组件来完成模型的构建。
@@ -167,7 +167,7 @@ public class EntitySink extends LinkedComponent {
 - 该组件中有一个实体有序集合 `itemSet` ，用于暂时存放等待服务的实体。
 - 该类重写了 `addEntity()`  每当有实体加入后，会将实体加入到一个有序集合中，并向队列的用户发送通知
 
-**LinkedService ** 
+**LinkedService**  
 继承自 LinkedComponent, 该类是一个中间层，该层主要作用是封装组件的实体离开事件，并将其插入事件表，等待调度。由这些未来事件来驱动临时实体在各个组件之间传递。同时也提供了钩子函数，让子类来实现具体的处理操作。
 
 ```java
@@ -295,10 +295,10 @@ public class EntityGenerator extends LinkedService {
 }
 ```
 
-**EntityLauncher ** 
+**EntityLauncher**   
 该类继承自 `LinkedServer` ，用于在用户触发时生成指定数量的临时实体传递给下游组件。产生实体的细节与EntityGenerator相似，只是在被调用是才会被执行，且执行一次。
 
-**Server ** 
+**Server**   
 该类继承自 `LinkedServer` ，它用于模拟临时实体在组件中加工一段时间再释放的过程，它实现了LinkedServer 类的钩子函数，来实现加工指定时间后，再将实体传递个下游组件。
 
 ```java
