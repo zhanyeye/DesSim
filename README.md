@@ -152,7 +152,7 @@ public class LinkedComponent extends StateEntity {
 - 该组件重写了addEntity()方法, 传递给该组件的临时实体都会被销毁。
 ```java
 public class EntitySink extends LinkedComponent {
-	// 其他字段 ...
+    // 其他字段 ...
     @Override
     public void addEntity(Entity entity) {
         super.addEntity(entity);
