@@ -621,7 +621,7 @@ public class EntityGenerator extends LinkedService {
 //事件调度原理介绍伪代码
 while (true) {
 
-	从时间表中获取队首事件；
+    从时间表中获取队首事件；
     
     if (队首事件为空 || 仿真时钟已经到达目标时间) {
     	停止执行；
