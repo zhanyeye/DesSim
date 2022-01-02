@@ -1,7 +1,7 @@
 <p align="center">
-    <img width="280" src="https://raw.githubusercontent.com/zhanyeye/Figure-bed/win-pic/img/20210602141834.png">
+    <img width="180" src="https://raw.githubusercontent.com/zhanyeye/Figure-bed/win-pic/img/20210602141834.png">
+    <h2 align="center">DesSim</h2>
 </p>
-<h1 align="center">DesSim</h1>
 
 #### 项目介绍：
 
