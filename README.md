@@ -1,7 +1,16 @@
 <p align="center">
     <img width="180" src="https://raw.githubusercontent.com/zhanyeye/Figure-bed/win-pic/img/20210602141834.png">
     <h2 align="center">DesSim</h2>
+    <p align="center">
+        <a href="https://github.com/jaamsim/jaamsim">
+          <img src="https://img.shields.io/static/v1?label=Citing&message=JaamSim&color=brightgreen">
+        </a>
+        <a href="http://dx.doi.org/10.5281/zenodo.57118">
+          <img src="https://zenodo.org/badge/doi/10.5281/zenodo.57118.svg">
+        </a>
+    </p>
 </p>
+
 
 #### 项目介绍：
 
