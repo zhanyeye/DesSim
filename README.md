@@ -14,7 +14,8 @@
 
 #### 项目介绍：
 
-一个简单的离散事件仿真程序，能够动态的构建模型，**基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发**
+一个简单的离散事件仿真程序，能够动态的构建模型，**基于 [JaamSim](https://github.com/jaamsim/jaamsim) 开发**。
+> A simple discrete event simulation program that supports dynamic construction of models, developed based on [JaamSim](https://github.com/jaamsim/jaamsim).
 <details close>
  <summary>👉 离散事件仿真介绍 👈（点击查看详情~） </summary>
  <br/>
@@ -47,12 +48,12 @@
 
 
 支持的模型组件有：
-- **EntityGenerator** : 实体生成器，根据指定时间间隔生成实体 
-- **EntityLauncher** : 实体启动器，被用户触发后生成实体 
-- **Queue** : 队列，用于存放等待中的实体
-- **Server** : 服务，延时组件，模拟处理实体所消耗的时间
-- **EntitySink** : 实体回收器，回收处理完毕的实体
-- **Assign** : 为经过的临时实体设置不同的属性，按照用户设置的权重进行分配
+- **EntityGenerator** : 实体生成器，根据指定时间间隔生成实体。 
+- **EntityLauncher** : 实体启动器，被用户触发后生成实体。 
+- **Queue** : 队列，用于存放等待中的实体。
+- **Server** : 服务，延时组件，模拟处理实体所消耗的时间。
+- **EntitySink** : 实体回收器，回收处理完毕的实体。
+- **Assign** : 为经过的临时实体设置不同的属性，按照用户设置的权重进行分配。
 
 
 
@@ -60,7 +61,7 @@
 
 ##### 1.事件调度的策略
 
-DESSIM 主要采用的模拟策略是 事件调度法，它从事件的视角去抽象真实的系统，事件发生可能会导致系统状态变化，也可能会触发新的未来事件。每一个事件都会有对应的时间点，事件调度器会按照时间顺序调度事件，并推进仿真时钟。整个调度流程就如下图所示
+DESSIM 主要采用的模拟策略是 事件调度法，它从事件的视角去抽象真实的系统，事件发生可能会导致系统状态变化，也可能会触发新的未来事件。每一个事件都会有对应的时间点，事件调度器会按照时间顺序调度事件，并推进仿真时钟。整个调度流程就如下图所示：
 
 <p align="center">
     <img src="https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210205144224.png">
@@ -108,7 +109,7 @@ DESSIM 主要采用的模拟策略是 事件调度法，它从事件的视角去
 - `startUp()` 该方法是在完成初始化后调用，用于启动组件开始运行，生成临时实体的组件实现该方法。
 - `getSimTicks()` 用于从当前正运行线程所持有的事件管理器获取仿真时钟。
 - `kill()` 用于销毁该实体，当临时实体被收集后会调用该方法。
-- `updateStatistics()` 定义了更新实体统计数据的接口，模型中各组件会有自己的实现
+- `updateStatistics()` 定义了更新实体统计数据的接口，模型中各组件会有自己的实现。
 - `scheduleProcess(long ticks, int priority, ProcessTarget t)` ，该方法是用于将操作封装成相应的事件，加入事件列表中。
 
 **StateEntity** 
