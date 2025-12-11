@@ -64,7 +64,7 @@
 DESSIM 主要采用的模拟策略是 事件调度法，它从事件的视角去抽象真实的系统，事件发生可能会导致系统状态变化，也可能会触发新的未来事件。每一个事件都会有对应的时间点，事件调度器会按照时间顺序调度事件，并推进仿真时钟。整个调度流程就如下图所示：
 
 <p align="center">
-    <img src="https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210205144224.png">
+    <img src="https://github.com/user-attachments/assets/b2755514-e320-4065-80dd-22b492b5f485">
 </p>
 
 1. 首先初始化子程序将初始化事件加入事件表，事件调度器开始运行。
@@ -99,7 +99,7 @@ DESSIM 主要采用的模拟策略是 事件调度法，它从事件的视角去
 看完使用示例，你会发现这些组件对象组装成了一个链式结构 ，你可能好奇这些组件是如何实现的呢？临时实体又是如何在这些模型组件之间传递的呢？接下来我会通过类图向您介绍模型实体/组件的实现。
 
 <p align="center">
-    <img width="850px" src="https://zhanyeye-img.oss-accelerate.aliyuncs.com/20210218123803.png">
+    <img width="850px" src="https://github.com/user-attachments/assets/99c65adb-6343-4967-8522-e1dfde8ee7c5">
 </p>
 
 **Entity**  
@@ -371,7 +371,7 @@ public class Server extends LinkedService {
 整个 DesSim 都是围绕着这个命令模式来实现的。命令模式的关键之处就是把请求封装成为对象，也就是命令对象，并定义了统一的执行操作的接口，这个命令对象可以被存储、转发、执行 等，整个命令模式都是围绕这个对象在进行，它的类图如下:
 
 <p align="center">
-    <img width="700px" src="https://zhanyeye-img.oss-cn-shanghai.aliyuncs.com/20210207183606.png">
+    <img width="700px" src="https://github.com/user-attachments/assets/2b328f2e-3a24-4c45-a5d1-0d1c7f1ddd6a">
 </p>
 
 在"事件调度策略"中，我们发现"事件"像一个对象一样，可以被传递，可以被保存在集合中并排序，即使这个事件被创建很久了，它仍然能够被调度执行。可是"事件"本应该是一些列操作，它是如何做到被存储，排序和执行调度的呢？
